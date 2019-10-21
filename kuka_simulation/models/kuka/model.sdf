@@ -1,0 +1,653 @@
+<sdf version='1.6'>
+  <model name='kuka'>
+    <link name="base_footprint"/>
+    <link name='base_link'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <mass>364</mass>
+        <inertia>
+          <ixx>25.86</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>47.42</iyy>
+          <iyz>0</iyz>
+          <izz>49.2</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose frame=''>0 0 0.1025 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>1.08 0.63 0.675</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose frame=''>0 0 0.1025 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>1.08 0.63 0.675</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>1 0 0 1</ambient>
+          <diffuse>1 0 0 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <emissive>0 0 0 0</emissive>
+        </material>
+      </visual>
+    </link>
+    <joint name="fixed" type="fixed">
+      <child>base_link</child>
+      <parent>base_footprint</parent>
+    </joint>
+    <link name='back_left_wheel_link'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <mass>6.5</mass>
+        <inertia>
+          <ixx>0.04197</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0508</iyy>
+          <iyz>0</iyz>
+          <izz>0.04197</izz>
+        </inertia>
+      </inertial>
+      <collision name='back_left_wheel_collision'>
+        <pose frame=''>-0.28 0.1825 -0.135 1.57 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.175</length>
+            <radius>0.125</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='back_left_wheel_visual'>
+        <pose frame=''>-0.28 0.1825 -0.135 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/omni_wheel_1.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='back_left_wheel_joint' type='revolute'>
+      <child>back_left_wheel_link</child>
+      <parent>base_link</parent>
+      <pose>-0.28 0.1825 -0.135 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <link name='back_right_wheel_link'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <mass>6.5</mass>
+        <inertia>
+          <ixx>0.04197</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0508</iyy>
+          <iyz>0</iyz>
+          <izz>0.04197</izz>
+        </inertia>
+      </inertial>
+      <collision name='back_right_wheel_collision'>
+        <pose frame=''>-0.28 -0.1825 -0.135 1.57 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.175</length>
+            <radius>0.125</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='back_right_wheel_visual'>
+        <pose frame=''>-0.28 -0.1825 -0.135 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/omni_wheel_1.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='back_right_wheel_joint' type='revolute'>
+      <child>back_right_wheel_link</child>
+      <parent>base_link</parent>
+      <pose>-0.28 -0.1825 -0.135 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <link name='front_left_wheel_link'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <mass>6.5</mass>
+        <inertia>
+          <ixx>0.04197</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0508</iyy>
+          <iyz>0</iyz>
+          <izz>0.04197</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_left_wheel_collision'>
+        <pose frame=''>0.28 0.1825 -0.135 1.57 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.175</length>
+            <radius>0.125</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='front_left_wheel_visual'>
+        <pose frame=''>0.28 0.1825 -0.135 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/omni_wheel_1.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_left_wheel_joint' type='revolute'>
+      <child>front_left_wheel_link</child>
+      <parent>base_link</parent>
+      <pose>0.28 0.1825 -0.135 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <link name='front_right_wheel_link'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <mass>6.5</mass>
+        <inertia>
+          <ixx>0.04197</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0508</iyy>
+          <iyz>0</iyz>
+          <izz>0.04197</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_right_wheel_collision'>
+        <pose frame=''>0.28 -0.1825 -0.135 1.57 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.175</length>
+            <radius>0.125</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='front_right_wheel_visual'>
+        <pose frame=''>0.28 -0.1825 -0.135 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/omni_wheel_1.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='front_right_wheel_joint' type='revolute'>
+      <child>front_right_wheel_link</child>
+      <parent>base_link</parent>
+      <pose>0.28 -0.1825 -0.135 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <joint name='base_link-to-iiwa' type='fixed'>
+      <pose frame=''>-0.363 0.184 0.44 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>base_iiwa</child>
+    </joint>
+
+    <link name='base_iiwa'>
+      <visual name='base_iiwa_visual'>
+        <pose frame=''>-0.363 0.184 0.44 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/base_link.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name='base_iiwa_collision'>
+        <pose frame=''>-0.363 0.184 0.44 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/base_link.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name='link_1'>
+      <visual name='link_1_visual'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_1.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name='link_1_collision'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_1.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name='link_2'>
+      <visual name='link_2_visual'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_2.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name='link_2_collision'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_2.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name='link_3'>
+      <visual name='link_3_visual'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_3.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name='link_3_collision'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_3.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name='link_4'>
+      <visual name='link_4_visual'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_4.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name='link_4_collision'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_4.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name='link_5'>
+      <visual name='link_5_visual'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_5.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name='link_5_collision'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_5.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name='link_6'>
+      <visual name='link_6_visual'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_6.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name='link_6_collision'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_6.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name='link_7'>
+      <visual name='link_7_visual'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_7.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name='link_7_collision'>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_7.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name='tool0'/>
+
+    <joint name='joint_a1' type='fixed'>
+      <pose frame="base_iiwa">0.0 0.0 0.0 0 -0 0</pose>
+      <parent>base_iiwa</parent>
+      <child>link_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-2.9668</lower>
+          <upper>2.9668</upper>
+          <effort>0</effort>
+          <velocity>1.4834</velocity>
+        </limit>
+      </axis>
+    </joint>
+    <joint name='joint_a2' type='fixed'>
+      <pose frame="link_1">-0.00043624 0 0.36 0 -0 0</pose>
+      <parent>link_1</parent>
+      <child>link_2</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-2.0942</lower>
+          <upper>2.0942</upper>
+          <effort>0</effort>
+          <velocity>1.4834</velocity>
+        </limit>
+      </axis>
+    </joint>
+    <joint name='joint_a3' type="fixed">
+      <pose frame="link_2">0.0 0.0 0.0 0 -0 0</pose>
+      <parent>link_2</parent>
+      <child>link_3</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-2.9668</lower>
+          <upper>2.9668</upper>
+          <effort>0</effort>
+          <velocity>1.7452</velocity>
+        </limit>
+      </axis>
+    </joint>
+    <joint name='joint_a4' type="fixed">
+      <pose frame="link_3">0.00043624 0 0.42 0 -0 0</pose>
+      <parent>link_3</parent>
+      <child>link_4</child>
+      <axis>
+        <xyz>0 -1 0</xyz>
+        <limit>
+          <lower>-2.0942</lower>
+          <upper>2.0942</upper>
+          <effort>0</effort>
+          <velocity>1.3089</velocity>
+        </limit>
+      </axis>
+    </joint>
+    <joint name='joint_a5' type="fixed">
+      <pose frame="link_4">0.0 0.0 0.0 0 -0 0</pose>
+      <parent>link_4</parent>
+      <child>link_5</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-2.9668</lower>
+          <upper>2.9668</upper>
+          <effort>0</effort>
+          <velocity>2.2688</velocity>
+        </limit>
+      </axis>
+    </joint>
+    <joint name='joint_a6' type='fixed'>
+      <pose frame="link_5">0.0 0.0 0.4 0 -0 0</pose>
+      <parent>link_5</parent>
+      <child>link_6</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-2.0942</lower>
+          <upper>2.0942</upper>
+          <effort>0</effort>
+          <velocity>2.356</velocity>
+        </limit>
+      </axis>
+    </joint>
+    <joint name='joint_a7' type="fixed">
+      <pose frame="link_6">0.0 0.0 0.0 0 -0 0</pose>
+      <parent>link_6</parent>
+      <child>link_7</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-3.0541</lower>
+          <upper>3.0541</upper>
+          <effort>0</effort>
+          <velocity>2.356</velocity>
+        </limit>
+      </axis>
+    </joint>
+    <joint name='joint_a7-tool0' type="fixed">
+      <pose frame="link_7">0.0 0.0 0.126 0 -0 0</pose>
+      <parent>link_7</parent>
+      <child>tool0</child>
+      <axis>
+        <xyz>0 0 0</xyz>
+      </axis>
+    </joint>
+
+    <joint name="lidar_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>base_scan</child>
+      <pose>-0 0 0.47 0 0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+    <link name="imu_link">
+      <sensor name="tb3_imu" type="imu">
+        <always_on>true</always_on>
+        <update_rate>200</update_rate>
+        <imu>
+          <angular_velocity>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>2e-4</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>2e-4</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>2e-4</stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7e-2</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7e-2</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>1.7e-2</stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+        <plugin name="turtlebot3_imu" filename="libgazebo_ros_imu_sensor.so">
+          <ros>
+            <!-- <namespace>/tb3</namespace> -->
+            <argument>~/out:=imu</argument>
+          </ros>
+        </plugin>
+      </sensor>
+    </link>
+
+    <link name="base_scan">
+      <inertial>
+        <pose>-0 0 0.47 0 0 0</pose>
+        <inertia>
+          <ixx>0.001</ixx>
+          <ixy>0.000</ixy>
+          <ixz>0.000</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0.000</iyz>
+          <izz>0.001</izz>
+        </inertia>
+        <mass>0.125</mass>
+      </inertial>
+
+      <collision name="lidar_sensor_collision">
+        <pose>-0 0 0.47 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.0508</radius>
+            <length>0.055</length>
+          </cylinder>
+        </geometry>
+      </collision>
+
+      <visual name="lidar_sensor_visual">
+        <pose>-0 0 0.47 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://kuka/meshes/lds.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </visual>
+
+      <sensor name="hls_lfcd_lds" type="ray">
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <pose>0 0 0.47 0 0 0</pose>
+        <update_rate>5</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>360</samples>
+              <resolution>1.000000</resolution>
+              <min_angle>0.000000</min_angle>
+              <max_angle>6.280000</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.120000</min>
+            <max>3.5</max>
+            <resolution>0.015000</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="turtlebot3_laserscan" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <!-- <namespace>/tb3</namespace> -->
+            <argument>~/out:=scan</argument>
+          </ros>
+          <output_type>sensor_msgs/LaserScan</output_type>
+          <frame_name>base_scan</frame_name>
+        </plugin>
+      </sensor>
+    </link>
+    <plugin name='planar_move' filename='libgazebo_ros_planar_move.so'>
+            <ros>
+              <argument>cmd_vel:=cmd_vel</argument>
+              <argument>odom:=odom</argument>
+            </ros>
+
+            <update_rate>100</update_rate>
+            <publish_rate>10</publish_rate>
+
+            <!-- output -->
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+
+            <odometry_frame>odom</odometry_frame>
+            <robot_base_frame>base_footprint</robot_base_frame>
+
+            <covariance_x>0.0001</covariance_x>
+            <covariance_y>0.0001</covariance_y>
+            <covariance_yaw>0.01</covariance_yaw>
+    </plugin>
+
+    <plugin name="gazebo_ros_joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+      <ros>
+        <!-- <namespace>/tb3</namespace> -->
+        <argument>~/out:=joint_states</argument>
+      </ros>
+      <update_rate>30</update_rate>
+      <joint_name>back_right_wheel_joint</joint_name>
+      <joint_name>back_left_wheel_joint</joint_name>
+      <joint_name>front_left_wheel_joint</joint_name>
+      <joint_name>front_right_wheel_joint</joint_name>
+    </plugin>
+  </model>
+</sdf>
