@@ -49,25 +49,13 @@ if(BUILD_TESTING)
 endif()
 
 
-#install(TARGETS
-#  dummy_joint_states
-#  DESTINATION lib/${PROJECT_NAME}
-#)
-
 # Install python scripts
 install(
   PROGRAMS
     scripts/server.py
-    DESTINATION lib/${PROJECT_NAME}
-)
-install(
-  PROGRAMS
-    scripts/client_lib.py
-    DESTINATION lib/${PROJECT_NAME}
-)
-
-install(
-  PROGRAMS
+    scripts/client_lib_lbr.py
+    scripts/client_lib_kmp.py
+    scripts/server_kmp.py
     scripts/TCPconnector_withListener.py
     DESTINATION lib/${PROJECT_NAME}
 )
