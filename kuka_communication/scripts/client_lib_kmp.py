@@ -47,7 +47,7 @@ class kuka_iiwa_ros_client:
         command = String()
         command.data  = command_str
         self.pub_kuka_command.publish(command)
-        time.sleep(0.001)  # 1000 hz, should maybe be 100 hz?
+        self.rate.sleep()  # 1000 hz, should maybe be 100 hz?
         # CAN NOT BE CALLED WITHOUT THIS DELAY (Tested for smaller timeouts)
 
     #   M: callbacks ===========================
