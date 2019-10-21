@@ -32,4 +32,14 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+
+################################################################################
+# Install
+################################################################################
+install(
+  DIRECTORY map launch param
+  DESTINATION share/${PROJECT_NAME}
+)
+################################################################################
+
 ament_package()
