@@ -69,6 +69,8 @@ class kuka_iiwa_ros_client:
         #    Make a listener for all kuka_iiwa data
         rclpy.init(args=None)
         self.kuka_client = rclpy.create_node("kuka_iiwa_client")
+        self.rate = self.kuka_client.create_rate(100) #100 hz
+
         self.kuka_client.create_subscription(String, "JointPosition", self.JointPosition_callback, 10)
         self.kuka_client.create_subscription(String, "ToolPosition", self.ToolPosition_callback, 10)
         self.kuka_client.create_subscription(String, "ToolForce", self.ToolForce_callback, 10)
@@ -84,12 +86,8 @@ class kuka_iiwa_ros_client:
         #   Make Publishers for kuka_iiwa commands
         self.pub_kuka_command = self.kuka_client.create_publisher(String, "kuka_command",10)
 
-        ## PRØVER MEG PÅ THREAD :D
+        ## Denne fungerte. Vet ikke om det er nødvendig nå som rate er på banen.
         thread.start_new_thread(self.executor,())
-
-        #Hardkodet denne:
-        #self.isready = True
-
         #la på spin. Da begynte det å kjøre
 
 
