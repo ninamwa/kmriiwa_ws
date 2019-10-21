@@ -69,7 +69,7 @@
         <pose frame=''>-0.28 0.1825 -0.135 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://kuka/meshes/omni_wheel_1.dae</uri>
+            <uri>model://kuka/meshes/wheels/omni_wheel_1.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -118,7 +118,7 @@
         <pose frame=''>-0.28 -0.1825 -0.135 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://kuka/meshes/omni_wheel_1.dae</uri>
+            <uri>model://kuka/meshes/wheels/omni_wheel_1.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -168,7 +168,7 @@
         <pose frame=''>0.28 0.1825 -0.135 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://kuka/meshes/omni_wheel_1.dae</uri>
+            <uri>model://kuka/meshes/wheels/omni_wheel_1.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -217,7 +217,7 @@
         <pose frame=''>0.28 -0.1825 -0.135 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://kuka/meshes/omni_wheel_1.dae</uri>
+            <uri>model://kuka/meshes/wheels/omni_wheel_1.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -576,7 +576,7 @@
         <pose>-0 0 0.47 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://kuka/meshes/lds.dae</uri>
+            <uri>model://kuka/meshes/sensors/lds.dae</uri>
             <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>

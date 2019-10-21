@@ -3,7 +3,7 @@
 <package format="3">
   <name>kuka_simulation</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Gazebo simulation package for the KUKA omniMove robot</description>
   <maintainer email="ninamwa@stud.ntnu.no">nina</maintainer>
   <license>TODO: License declaration</license>
 
@@ -11,6 +11,9 @@
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+
+  <depend>rclcpp</depend>
+  <depend>gazebo_ros_pkgs</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

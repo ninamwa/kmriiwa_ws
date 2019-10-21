@@ -17,9 +17,9 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(gazebo_ros_pkgs REQUIRED)
+find_package(gazebo_msgs REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -36,9 +36,10 @@ endif()
 # Install
 ################################################################################
 install(
-  DIRECTORY models
+  DIRECTORY models worlds launch
   DESTINATION share/${PROJECT_NAME}
 )
 ################################################################################
-
+ament_export_dependencies(rclcpp)
+ament_export_dependencies(gazebo_ros_pkgs)
 ament_package()
