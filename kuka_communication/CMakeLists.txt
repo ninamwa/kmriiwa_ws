@@ -17,9 +17,25 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
+find_package(std_msgs REQUIRED)
+
+
+# Install the python module for this package
+ament_python_install_package(scripts/)
+
+
+#add_executable(dummy_joint_states dummy_joint_states.cpp)
+#ament_target_dependencies(dummy_joint_states "rclcpp" "sensor_msgs")
+
+
+# Install C++ headers
+#install(
+#  DIRECTORY include/${PROJECT_NAME}/
+#  DESTINATION include/${PROJECT_NAME}
+#  FILES_MATCHING PATTERN "*.hpp"
+#)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -31,5 +47,29 @@ if(BUILD_TESTING)
   #set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+
+#install(TARGETS
+#  dummy_joint_states
+#  DESTINATION lib/${PROJECT_NAME}
+#)
+
+# Install python scripts
+install(
+  PROGRAMS
+    scripts/server.py
+    DESTINATION lib/${PROJECT_NAME}
+)
+install(
+  PROGRAMS
+    scripts/client_lib.py
+    DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  PROGRAMS
+    scripts/TCPconnector_withListener.py
+    DESTINATION lib/${PROJECT_NAME}
+)
 
 ament_package()
