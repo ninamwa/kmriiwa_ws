@@ -86,7 +86,7 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
     float []params = new float[10];
 
     public long LastReceivedTime = System.currentTimeMillis();
-    private IMotionContainer _currentMotion;
+    private ICommandContainer _currentMotion;
 
 
 	public void initialize() {
@@ -191,7 +191,7 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
 			double override = 100;
 
 			MobilePlatformVelocityMotion vel = new MobilePlatformVelocityMotion(vx,vy,vTheta,override);
-			kmp.move(vel);
+			_currentMotion = kmp.move(vel);
 		}else{
 			getLogger().info("Unacceptable Velocity command!");
 		}
@@ -257,7 +257,7 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
 
 			if( (lineSplt[0]).equals("setVelocity"))
 				setMobilePlatformVelocity(CommandStr);
-
+			
 			if( socket.isInputShutdown() || !socket.isConnected() || socket.isOutputShutdown() || socket.isClosed())
 			{
 				try {
