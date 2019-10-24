@@ -17,15 +17,13 @@ from std_msgs.msg import String
 class kuka_iiwa_ros_client:
 
     def __init__(self): # Makes kuka_iiwa ROS node
-        self.JointPosition = ([None,None,None,None,None,None,None],None)
+        self.TwistPosition = [None,None,None,None,None,None]
 
         #    Make a listener for all kuka_iiwa data
         rclpy.init(args=None)
         self.kuka_client = rclpy.create_node("kuka_iiwa_client")
         self.kuka_client.create_subscription(String, "JointPosition", self.JointPosition_callback, 10)
 
-        #   Make Publishers for kuka_iiwa commands
-        self.pub_kuka_command = self.kuka_client.create_publisher(String, "kuka_command",10)
 
         ## PRØVER MEG PÅ THREAD :D
         thread.start_new_thread(self.executor,())
@@ -54,7 +52,7 @@ class kuka_iiwa_ros_client:
         # e.g. [0.0, 0.17, 0.0, 1.92, 0.0, 0.35, 0.0] 1459253274.1
         self.JointPosition = ([float(x) for x in data.data.split(']')[0][1:].split(', ')], float(data.data.split(']')[1]))
 
-    
+
 
 #   ~Class: Kuka iiwa ROS client    #####################
 ######################################################################################################################

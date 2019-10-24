@@ -19,9 +19,12 @@ import sys
 import termios
 import tty
 import rclpy
+import socket
 # import rospy
+import tf
 from std_msgs.msg import String
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
+from nav_msgs.msg import Odometry
 
 from time import sleep
 
@@ -53,6 +56,10 @@ class iiwa_socket:
         self.isFinished = (False, None)
         self.hasError = (False, None)
         self.isready = False
+        self.odometry = ([None,None,None,None,None,None])
+        self.laserScan = (None,None)
+
+        #TODO: Do something with isready, which is relevant for us.
 
 
         try:
@@ -61,18 +68,10 @@ class iiwa_socket:
         except:
             print(cl_pink("Error: ") + "Unable to start connection thread")
 
-    #   ~M: __init__ ==========================
-
-    #   M: Stop connection ====================
     def close(self):
         self.isconnected = False
 
-    #   ~M: Stop connection ===================
-
-    #   M: Connection socket ==================
     def socket(self, ip, port):
-        import socket
-
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Bind the socket to the port
         server_address = (ip, port)
@@ -120,11 +119,7 @@ class iiwa_socket:
                 for pack in data.split(">"):  # parsing data pack
                     cmd_splt = pack.split()
 
-                    if len(pack) and cmd_splt[0] == 'Joint_Pos':  # If it's JointPosition
-                        tmp = [float(''.join([c for c in s if c in '0123456789.eE-'])) for s in cmd_splt[1:]]
-                        if len(tmp) == 7: self.JointPosition = (tmp, last_read_time)
-
-
+                    ##REMOVE last_read_time from messages, not used for anything!
                     if len(pack) and cmd_splt[0] == 'isFinished':  # If isFinished
                         if cmd_splt[1] == "false":
                             self.isFinished = (False, last_read_time)
@@ -135,6 +130,14 @@ class iiwa_socket:
                             self.hasError = (False, last_read_time)
                         elif cmd_splt[1] == "true":
                             self.hasError = (True, last_read_time)
+                    if len(pack) and cmd_splt[0] == 'odometry':
+                            tmp = [float(''.join([c for c in s if c in '0123456789.eE-'])) for s in cmd_splt[1:]]
+                            if len(tmp) == 6:
+                                self.odometry = (tmp, last_read_time)
+                    if len(pack) and cmd_splt[0] == 'laserScan':
+                            tmp = [float(''.join([c for c in s if c in '0123456789.eE-'])) for s in cmd_splt[1:]]
+                            if len(tmp) == 6:
+                                self.odometry = (tmp, last_read_time)
 
             except:
                 elapsed_time = time.time() - last_read_time
@@ -150,12 +153,9 @@ class iiwa_socket:
         sock.close()
         self.isconnected = False
         print(cl_lightred('Connection is closed!'))
-        # NOE JEG SLANG PÅ SELV :)
+        # NOE JEG SLANG Paa SELV :)
         rclpy.shutdown()
 
-    #   ~M: Connection socket ===================
-
-    #   M: Command send thread ==================
     # Each send command runs as a thread. May need to control the maximum running time (valid time to send a command).
     def send(self, cmd):
         thread.start_new_thread(self.__send, (cmd,))
@@ -179,67 +179,90 @@ class kuka_iiwa_ros2_node:
     #   M: __init__ ===========================
     def __init__(self, ip, port):  # Makes kuka_iiwa ROS2 node
         self.iiwa_soc = iiwa_socket(ip, port)
-
-        #   Wait until iiwa is connected zzz!
         while (not self.iiwa_soc.isready):
             pass
         print("Ready to go!")
-        #    Make a listener for kuka_iiwa commands
+        #    Make a listener for relevant topics
         rclpy.init(args=None)
         self.kuka_node = rclpy.create_node("kuka_iiwa")
-        kuka_subscriber = self.kuka_node.create_subscription(String, 'kuka_command', self.callback, 10)
-        kuka_teleop_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.teleop_callback, 10)
-
+        kuka_twist_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.twist_callback, 10)
 
         #   Make Publishers for all kuka_iiwa data
         pub_isFinished = self.kuka_node.create_publisher(String, 'isFinished', 10)
         pub_hasError = self.kuka_node.create_publisher(String, 'hasError', 10)
+        pub_odometry = self.kuka_node.create_publisher(Odometry, 'odom',10)
+        pub_laserscan = self.kuka_node.create_publisher(LaserScan, 'scan', 10)
         thread.start_new_thread(self.executor, ())
-
-        # rate = rospy.Rate(100) #    100hz update rate.
-        #sleep(0.01)
 
         # while not rospy.is_shutdown() and self.iiwa_soc.isconnected:
         while rclpy.ok() and self.iiwa_soc.isconnected:
-            # data_str = self.iiwa_soc.data + " %s" % rospy.get_time()
-            #   Update all the kuka_iiwa data
-            for [pub, values] in [[pub_JointPosition, self.iiwa_soc.JointPosition],
-                                [pub_isFinished, self.iiwa_soc.isFinished],
-                                [pub_hasError, self.iiwa_soc.hasError]]:
-                msg = String()
-                msg.data= str(values[0]) + " %s" % time.time()
-
-                #msg.data = str(values[0]) + " %s" % kuka_node.get_clock()
-                #Vet ikke om time.time blir riktig timestamp.. skulle vært: t= kuka_node.get_clock()
-                # msg.data = str(values[0]) + " %s" % kuka_node.get_clock()
-                #For å poste til terminal
-                # kuka_node.get_logger().info('Publishing: "%s"' % msg.data)
-
-                pub.publish(msg)
-                #HOW OFTEN SHOULD THEY BE PUBLISHED?
+            string_callback(pub_isFinished, self.iiwa_soc.isFinished)
+            string_callback(pub_hasError,self.iiwa_soc.hasError)
+            odom_callback(pub_odometry, self.iiwa_soc.odometry)
+            scan_callback(pub_laserscan, self.iiwa_soc.laserScan)
 
             time.sleep(0.01) #100 hz rate.sleep()
 
-    #   ~M: __init__ ==========================
+    def string_callback(self,publisher,values):
+        msg = String()
+        msg.data= str(values[0]) + " %s" % time.time())
+        pub.publish(msg)
+
+    def odom_callback(self, publisher, values):
+        x = values[0]
+        y = values[1]
+        th = values[2]
+        vx = values[3]
+        vy = values[4]
+        vth = values[5]
+
+        odom = Odometry()
+        odom.header.stamp = self.kuka_node.get_clock().now()
+        odom.header.frame_id = "odom"
+        odom_quat = tf.transformations.quaternion_from_euler(0, 0, th)
+        odom.pose.pose = Pose(Point(x, y, 0), Quaternion(odom_quat))
+
+        # set the velocity
+        odom.child_frame_id = "base_link"
+        odom.twist.twist = Twist(Vector3(vx, vy, 0), Vector3(0, 0, vth))
+
+        publisher.publish(odom)
+
+    def scan_callback(self, publisher, values):
+        scan = LaserScan()
+        scan.header.stamp = self.kuka_node.get_clock().now()
+        scan.angle_increment = (2.0*M_PI/360.0)
+        scan.angle_min = 0.0
+        scan.angle_max = 2.0*M_PI-scan
+        scan.range_min = 0.12
+        scan.range_max = 3.5
+        #scan.ranges.resize(360)
+        #scan.intensities.resize(360)
+        scan.ranges = values
+        publisher.publish(scan)
+
+
 
     #   M: callback ===========================
     #   Receiving command string and sending it to KUKA iiwa
     def callback(self, data):
         ###########rospy.loginfo(rospy.get_caller_id() + "Received command " + str(data.data) )
         self.iiwa_soc.send(data.data)  # e.g 'setPosition 45 60 0 -25 0 95 0' for going to start position
-    #   ~M: callback ===========================
 
-    def teleop_callback(self, data):
-        ###########rospy.loginfo(rospy.get_caller_id() + "Received command " + str(data.data) )
+
+    def twist_callback(self, data):
         msg = 'setTwist ' + listToString(data.linear) + " " + listToString(data.angular)
-        self.iiwa_soc.send(msg)  # e.g 'setPosition 45 60 0 -25 0 95 0' for going to start position
+        self.iiwa_soc.send(msg)
 
-    #   ~M: callback ===========================
+
     def executor(self):
         while rclpy.ok():
             rclpy.spin_once(self.kuka_node)
         self.kuka_node.destroy_node()
         rclpy.shutdown()
+
+
+
 
 #   ~Class: Kuka iiwa ROS2 node    #####################
 ######################################################################################################################
