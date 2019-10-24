@@ -1,14 +1,15 @@
+#!/usr/bin/env python3
 # load additional Python modules
 import socket
 import time
 import _thread as thread
 
 
-class TCPconnector:
+class UDPconnector:
     def __init__(self):
 
         # create TCP/IP socket
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         # Set buffer size
         self.BUFFER_SIZE = 1024
@@ -23,8 +24,15 @@ class TCPconnector:
         ip_address = socket.gethostbyname(local_hostname)
 
         # bind the socket to the port 23456, and connect
-        server_address = (ip_address, 23456)
-        self.sock.connect(server_address)
+        self.server_address = (ip_address, 5252)
+
+        bytesToSend = "HALLA".encode()
+        self.sock.sendto(bytesToSend,self.server_address)
+        msgFromServer = self.sock.recvfrom(self.BUFFER_SIZE)
+        msg = "Message from Server {}".format(msgFromServer[0])
+        time.sleep(100)
+        self.sock.bind(self.server_address)
+
         print("connecting to %s (%s) with %s" % (local_hostname, local_fqdn, ip_address))
         self.isconnected = True
 
@@ -56,9 +64,9 @@ class TCPconnector:
                 # SEND DATA OVER TCP:
                 # new_data = entry.encode("utf-8")
                 new_data = entry.encode()
-                self.sock.send(new_data)
-                # sock.sendall(new_data)
-                # wait for two seconds
+                #self.sock.send(new_data)
+                self.sock.sendto(new_data,self.server_address)
+                # wait for 1 millisecond
                 time.sleep(0.1)
             i = i + 1
             time.sleep(1)
@@ -69,7 +77,7 @@ class TCPconnector:
 
     def listener(self):
         while self.isconnected:
-            data = self.sock.recv(self.BUFFER_SIZE)
+            data,addr = self.sock.recvfrom(self.BUFFER_SIZE)
             data = data.decode()
             print(data)
 
@@ -77,7 +85,7 @@ class TCPconnector:
 
 
 def main(args=None):
-    con = TCPconnector()
+    con = UDPconnector()
 
 if __name__ == '__main__':
     main()

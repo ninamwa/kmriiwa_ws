@@ -56,7 +56,7 @@ install(
     scripts/client_lib_lbr.py
     scripts/client_lib_kmp.py
     scripts/server_kmp.py
-    scripts/TCPconnector_withListener.py
+    scripts/UDPconnector_withListener.py
     DESTINATION lib/${PROJECT_NAME}
 )
 

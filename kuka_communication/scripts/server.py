@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # KUKA API for ROS
 version = '26092019'
@@ -89,22 +89,17 @@ class iiwa_socket:
     #   M: Connection socket ==================
     def socket(self, ip, port):
         import socket
-
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # Bind the socket to the port
         server_address = (ip, port)
 
         #TEST:
+        port = 5252
         local_hostname = socket.gethostname()
-        ip_address = socket.gethostbyname(local_hostname)
-        server_address = (ip_address, 23456)
+        ip = socket.gethostbyname(local_hostname)
+        server_address = (ip, port)
 
         os.system('clear')
-        print(cl_pink('\n=========================================='))
-        print(cl_pink('<   <  < << SHEFFIELD ROBOTICS >> >  >   >'))
-        print(cl_pink('=========================================='))
-        print(cl_pink(' KUKA API for ROS'))
-        print(cl_pink(' Server Version: ') + version)
         print(cl_pink('==========================================\n'))
 
         print(cl_cyan('Starting up on:'), 'IP:', ip, 'Port:', port)
@@ -115,19 +110,17 @@ class iiwa_socket:
             print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address:", ip, port)
             os._exit(-1)
 
-        # Listen for incoming connections
-        sock.listen(1)
-
         # Wait for a connection
         print(cl_cyan('Waiting for a connection...'))
-        self.connection, client_address = sock.accept()
-        self.connection.settimeout(0.01)
-        print(cl_cyan('Connection from'), client_address)
+
+        data, self.client_address = sock.recvfrom(port)
+        print(cl_cyan('Connection from'), self.client_address)
         self.isconnected = True
         last_read_time = time.time()
         while self.isconnected:
             try:
-                data = self.connection.recv(self.BUFFER_SIZE)
+                data = self.sock.recvfrom(self.BUFFER_SIZE)
+                print(data)
                 ######  TEST DECODE #######
                 #data.decode("utf-8")
                 data = data.decode()
@@ -229,7 +222,7 @@ class iiwa_socket:
         sock.close()
         self.isconnected = False
         print(cl_lightred('Connection is closed!'))
-        # NOE JEG SLANG PÅ SELV :)
+        # NOE JEG SLANG P SELV :`)
         rclpy.shutdown()
 
     #   ~M: Connection socket ===================
@@ -245,7 +238,8 @@ class iiwa_socket:
         ## Encode to bytes
         encoded_cmd = cmd.encode()
         ## Send commands
-        self.connection.sendall(encoded_cmd)
+        self.socket.sendall(encoded_cmd,self.client_address)
+        #self.connection.sendall(encoded_cmd)
     #   ~M: Command send thread ==================
 
 
@@ -309,9 +303,9 @@ class kuka_iiwa_ros2_node:
                                 [pub_hasError, self.iiwa_soc.hasError]]:
                 msg = String()
                 msg.data= str(values[0]) + " %s" % time.time()
-                #Vet ikke om time.time blir riktig timestamp.. skulle vært: t= kuka_node.get_clock()
+                #Vet ikke om time.time blir riktig timestamp.. skulle vaert: t= kuka_node.get_clock()
 
-                #For å poste til terminal
+                #For og poste til terminal
                 # kuka_node.get_logger().info('Publishing: "%s"' % msg.data)
 
                 pub.publish(msg)
@@ -354,10 +348,10 @@ def read_conf():
                 IP = l_splt[1]
                 Port = int(l_splt[3])
         if len(IP.split('.')) != 4 or Port <= 0:
-            print(cl_red('Error:'), "conf.txt doesn't include correct IP/Port! e.g. server 172.31.1.50 port 1234")
+            print(cl_red('Error:'), "config.txt doesn't include correct IP/Port! e.g. server 172.31.1.50 port 1234")
             exit()
     else:
-        print(cl_red('Error:'), "conf.txt doesn't exist!")
+        print(cl_red('Error:'), "config.txt doesn't exist!")
         #exit()
     return [IP, Port]
 
@@ -367,7 +361,6 @@ def listToString(list):
 #   ~M:  Reading config file for Server IP and Port ================
 
 def main(args=None):
-    #rclpy.init(args=args)
     [IP, Port] = read_conf()
     try:
         node = kuka_iiwa_ros2_node(IP, Port)  # Make a Kuka_iiwa ROS node

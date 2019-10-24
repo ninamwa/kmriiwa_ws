@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # KUKA API for ROS2
 version = 'V012019'
 
