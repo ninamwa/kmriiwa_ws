@@ -13,6 +13,8 @@ import os
 import rclpy
 import time
 from std_msgs.msg import String
+import _thread as thread
+
 
 class kuka_iiwa_ros_client:
 
@@ -22,10 +24,12 @@ class kuka_iiwa_ros_client:
         #    Make a listener for all kuka_iiwa data
         rclpy.init(args=None)
         self.kuka_client = rclpy.create_node("kuka_iiwa_client")
+        self.rate = self.kuka_client.create_rate(100) #100 hz
+
         self.kuka_client.create_subscription(String, "JointPosition", self.JointPosition_callback, 10)
 
 
-        ## PRØVER MEG PÅ THREAD :D
+        ## Denne fungerte. Vet ikke om det er nødvendig nå som rate er på banen.
         thread.start_new_thread(self.executor,())
 
     #   ~M: __init__ ==========================
@@ -41,7 +45,7 @@ class kuka_iiwa_ros_client:
         command = String()
         command.data  = command_str
         self.pub_kuka_command.publish(command)
-        time.sleep(0.001)  # 1000 hz, should maybe be 100 hz?
+        self.rate.sleep()  # 1000 hz, should maybe be 100 hz?
         # CAN NOT BE CALLED WITHOUT THIS DELAY (Tested for smaller timeouts)
 
     #   M: callbacks ===========================

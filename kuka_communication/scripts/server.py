@@ -269,6 +269,7 @@ class kuka_iiwa_ros2_node:
         kuka_subscriber = self.kuka_node.create_subscription(String, 'kuka_command', self.callback, 10)
         kuka_teleop_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.teleop_callback, 10)
 
+        self.rate = self.kuka_node.create_rate(100) # 100 hz
 
         #   Make Publishers for all kuka_iiwa data
         pub_JointPosition = self.kuka_node.create_publisher(String, 'JointPosition', 10)
@@ -287,8 +288,6 @@ class kuka_iiwa_ros2_node:
         pub_hasError = self.kuka_node.create_publisher(String, 'hasError', 10)
         thread.start_new_thread(self.executor, ())
 
-        # rate = rospy.Rate(100) #    100hz update rate.
-        #sleep(0.01)
 
         # while not rospy.is_shutdown() and self.iiwa_soc.isconnected:
         while rclpy.ok() and self.iiwa_soc.isconnected:
@@ -310,17 +309,14 @@ class kuka_iiwa_ros2_node:
                                 [pub_hasError, self.iiwa_soc.hasError]]:
                 msg = String()
                 msg.data= str(values[0]) + " %s" % time.time()
-
-                #msg.data = str(values[0]) + " %s" % kuka_node.get_clock()
                 #Vet ikke om time.time blir riktig timestamp.. skulle vært: t= kuka_node.get_clock()
-                # msg.data = str(values[0]) + " %s" % kuka_node.get_clock()
+
                 #For å poste til terminal
                 # kuka_node.get_logger().info('Publishing: "%s"' % msg.data)
 
                 pub.publish(msg)
-                #HOW OFTEN SHOULD THEY BE PUBLISHED?
 
-            time.sleep(0.01) #100 hz rate.sleep()
+            self.rate.sleep() #100 hz rate.sleep()
 
     #   ~M: __init__ ==========================
 

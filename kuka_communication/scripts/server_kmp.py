@@ -186,6 +186,10 @@ class kuka_iiwa_ros2_node:
         rclpy.init(args=None)
         self.kuka_node = rclpy.create_node("kuka_iiwa")
         kuka_twist_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.twist_callback, 10)
+        self.rate = self.kuka_node.create_rate(100) # 100 hz
+        kuka_subscriber = self.kuka_node.create_subscription(String, 'kuka_command', self.callback, 10)
+        kuka_teleop_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.teleop_callback, 10)
+
 
         #   Make Publishers for all kuka_iiwa data
         pub_isFinished = self.kuka_node.create_publisher(String, 'isFinished', 10)
@@ -201,7 +205,23 @@ class kuka_iiwa_ros2_node:
             odom_callback(pub_odometry, self.iiwa_soc.odometry)
             scan_callback(pub_laserscan, self.iiwa_soc.laserScan)
 
-            time.sleep(0.01) #100 hz rate.sleep()
+        # while not rospy.is_shutdown() and self.iiwa_soc.isconnected:
+        while rclpy.ok() and self.iiwa_soc.isconnected:
+            # data_str = self.iiwa_soc.data + " %s" % rospy.get_time()
+            #   Update all the kuka_iiwa data
+            for [pub, values] in [[pub_isFinished, self.iiwa_soc.isFinished],
+                                [pub_hasError, self.iiwa_soc.hasError]]:
+                msg = String()
+                msg.data= str(values[0]) + " %s" % time.time()
+                # Denne tiden maa dobbeltsjekkes at blir riktig!
+                # I ros 1 er det  data_str = str(data[0]) +' '+ str(rospy.get_time())
+
+                #For å poste til terminal
+                # kuka_node.get_logger().info('Publishing: "%s"' % msg.data)
+
+                pub.publish(msg)
+
+            self.rate.sleep() #100 hz rate.sleep()
 
     def string_callback(self,publisher,values):
         msg = String()
