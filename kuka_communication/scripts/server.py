@@ -22,7 +22,7 @@ import rclpy
 # import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
-
+import socket
 from time import sleep
 
 
@@ -48,7 +48,7 @@ def cl_lightcyan(msge): return '\033[96m' + msge + '\033[0m'
 class iiwa_socket:
     #   M: __init__ ===========================
     def __init__(self, ip, port):
-        self.BUFFER_SIZE = 1024
+        self.BUFFER_SIZE = 2048
         self.isconnected = False
         self.JointPosition = ([None, None, None, None, None, None, None], None)
         self.ToolPosition = ([None, None, None, None, None, None], None)
@@ -66,6 +66,7 @@ class iiwa_socket:
         self.isFinished = (False, None)
         self.hasError = (False, None)
         self.isready = False
+        self.UDPsocket = None
 
         #self.JointAcceleration = (0, 0)
         #self.JointVelocity = (0, 0)
@@ -88,24 +89,23 @@ class iiwa_socket:
 
     #   M: Connection socket ==================
     def socket(self, ip, port):
-        import socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.UDPsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # Bind the socket to the port
         server_address = (ip, port)
 
         #TEST:
-        port = 5252
+        local_port = 20001
         local_hostname = socket.gethostname()
-        ip = socket.gethostbyname(local_hostname)
-        server_address = (ip, port)
+        local_ip = socket.gethostbyname(local_hostname)
+        server_address = (local_ip, local_port)
 
         os.system('clear')
         print(cl_pink('==========================================\n'))
 
-        print(cl_cyan('Starting up on:'), 'IP:', ip, 'Port:', port)
+        print(cl_cyan('Starting up on:'), 'IP:', local_ip, 'Port:', local_port)
         try:
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sock.bind(server_address)
+            self.UDPsocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.UDPsocket.bind(server_address)
         except:
             print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address:", ip, port)
             os._exit(-1)
@@ -113,14 +113,19 @@ class iiwa_socket:
         # Wait for a connection
         print(cl_cyan('Waiting for a connection...'))
 
-        data, self.client_address = sock.recvfrom(port)
-        print(cl_cyan('Connection from'), self.client_address)
+        data, self.client_address = self.UDPsocket.recvfrom(self.BUFFER_SIZE)
+        print(cl_cyan('Connection from: '), self.client_address)
+        print(cl_cyan('Message: '), data)
+
+
+        self.UDPsocket.sendto("HALLA".encode(), self.client_address)
+        print("Responded KUKA")
+
         self.isconnected = True
         last_read_time = time.time()
         while self.isconnected:
             try:
-                data = self.sock.recvfrom(self.BUFFER_SIZE)
-                print(data)
+                data,addr = self.UDPsocket.recvfrom(self.BUFFER_SIZE)
                 ######  TEST DECODE #######
                 #data.decode("utf-8")
                 data = data.decode()
@@ -129,7 +134,6 @@ class iiwa_socket:
                 # Process the received data package
                 for pack in data.split(">"):  # parsing data pack
                     cmd_splt = pack.split()
-
                     if len(pack) and cmd_splt[0] == 'Joint_Pos':  # If it's JointPosition
                         tmp = [float(''.join([c for c in s if c in '0123456789.eE-'])) for s in cmd_splt[1:]]
                         if len(tmp) == 7: self.JointPosition = (tmp, last_read_time)
@@ -217,9 +221,9 @@ class iiwa_socket:
                     print(cl_lightred('No packet received from iiwa for 5s!'))
 
         print("SHUTTING DOWN")
-        self.connection.shutdown(socket.SHUT_RDWR)
-        self.connection.close()
-        sock.close()
+        #self.connection.shutdown(socket.SHUT_RDWR)
+        #self.connection.close()
+        self.UDPsocket.close()
         self.isconnected = False
         print(cl_lightred('Connection is closed!'))
         # NOE JEG SLANG P SELV :`)
@@ -227,20 +231,22 @@ class iiwa_socket:
 
     #   ~M: Connection socket ===================
 
-    #   M: Command send thread ==================
+
+
+
+    #   Command send thread ==================
     # Each send command runs as a thread. May need to control the maximum running time (valid time to send a command).
     def send(self, cmd):
         thread.start_new_thread(self.__send, (cmd,))
 
     def __send(self, cmd):
         ## Add lines between commands
-        cmd = cmd + '\r\n'
+        #cmd = cmd + '\r\n'
         ## Encode to bytes
         encoded_cmd = cmd.encode()
+
         ## Send commands
-        self.socket.sendall(encoded_cmd,self.client_address)
-        #self.connection.sendall(encoded_cmd)
-    #   ~M: Command send thread ==================
+        self.UDPsocket.sendto(encoded_cmd, self.client_address)
 
 
 #   ~Class: Kuka iiwa TCP communication    #####################
@@ -257,13 +263,18 @@ class kuka_iiwa_ros2_node:
         while (not self.iiwa_soc.isready):
             pass
         print("Ready to go!")
-        #    Make a listener for kuka_iiwa commands
+        #  Initialize rclpy
         rclpy.init(args=None)
+
+        # Create node
         self.kuka_node = rclpy.create_node("kuka_iiwa")
+
+        # Initialize subscribers
         kuka_subscriber = self.kuka_node.create_subscription(String, 'kuka_command', self.callback, 10)
         kuka_teleop_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.teleop_callback, 10)
 
-        self.rate = self.kuka_node.create_rate(100) # 100 hz
+        ## Define rate - Not yet available for ROS2 Dashing
+        #self.rate = self.kuka_node.create_rate(100)# 100 hz
 
         #   Make Publishers for all kuka_iiwa data
         pub_JointPosition = self.kuka_node.create_publisher(String, 'JointPosition', 10)
@@ -281,7 +292,6 @@ class kuka_iiwa_ros2_node:
         pub_isFinished = self.kuka_node.create_publisher(String, 'isFinished', 10)
         pub_hasError = self.kuka_node.create_publisher(String, 'hasError', 10)
         thread.start_new_thread(self.executor, ())
-
 
         # while not rospy.is_shutdown() and self.iiwa_soc.isconnected:
         while rclpy.ok() and self.iiwa_soc.isconnected:
@@ -307,10 +317,9 @@ class kuka_iiwa_ros2_node:
 
                 #For og poste til terminal
                 # kuka_node.get_logger().info('Publishing: "%s"' % msg.data)
-
                 pub.publish(msg)
 
-            self.rate.sleep() #100 hz rate.sleep()
+            #self.rate.sleep() #100 hz rate.sleep()
 
     #   ~M: __init__ ==========================
 
@@ -366,8 +375,8 @@ def main(args=None):
         node = kuka_iiwa_ros2_node(IP, Port)  # Make a Kuka_iiwa ROS node
     except Exception:
         print("An error occured, the system has crashed!")
-        # rclpy.ROSInterruptException:
-        pass
+        rclpy.ROSInterruptException
+        #pass
 
     ## MAIN ##
     ######################################################################################################################
