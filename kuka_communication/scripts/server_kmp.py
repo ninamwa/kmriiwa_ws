@@ -20,11 +20,11 @@ import termios
 import tty
 import rclpy
 import socket
-# import rospy
 import tf
 from std_msgs.msg import String
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
 from nav_msgs.msg import Odometry
+from sensor_msgs.msg import LaserScan
 
 from time import sleep
 
@@ -58,9 +58,10 @@ class iiwa_socket:
         self.isready = False
         self.odometry = ([None,None,None,None,None,None])
         self.laserScan = (None,None)
+        self.UDPsocket = None
+
 
         #TODO: Do something with isready, which is relevant for us.
-
 
         try:
             # Starting connection thread
@@ -72,46 +73,49 @@ class iiwa_socket:
         self.isconnected = False
 
     def socket(self, ip, port):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.UDPsocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # Bind the socket to the port
         server_address = (ip, port)
 
-        #TEST:
+        # TODO: REPLACE THIS WHEN CONFIG.TXT IS FIXED
         local_hostname = socket.gethostname()
-        ip_address = socket.gethostbyname(local_hostname)
-        server_address = (ip_address, 23456)
+        local_ip= socket.gethostbyname(local_hostname)
+        local_port = 23456
+        server_address = (local_ip, local_port)
 
         os.system('clear')
         print(cl_pink('\n=========================================='))
-        print(cl_pink('<   <  < << SHEFFIELD ROBOTICS >> >  >   >'))
+        print(cl_pink('<   <  < << INITIALIZE UDPconnection>> >  >   >'))
         print(cl_pink('=========================================='))
-        print(cl_pink(' KUKA API for ROS'))
-        print(cl_pink(' Server Version: ') + version)
+        print(cl_pink(' KUKA API for ROS2'))
         print(cl_pink('==========================================\n'))
 
         print(cl_cyan('Starting up on:'), 'IP:', ip, 'Port:', port)
         try:
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sock.bind(server_address)
+            self.UDPsocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.UDPsocket.bind(server_address)
         except:
             print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address:", ip, port)
             os._exit(-1)
 
-        # Listen for incoming connections
-        sock.listen(1)
+            # Wait for a connection
+            print(cl_cyan('Waiting for a connection...'))
 
-        # Wait for a connection
-        print(cl_cyan('Waiting for a connection...'))
-        self.connection, client_address = sock.accept()
-        self.connection.settimeout(0.01)
-        print(cl_cyan('Connection from'), client_address)
+        data, self.client_address = self.UDPsocket.recvfrom(self.BUFFER_SIZE)
+        print(cl_cyan('Connection from: '), self.client_address)
+        print(cl_cyan('Message: '), data)
+
+        self.UDPsocket.sendto("hello KUKA".encode(), self.client_address)
+        print("Responded KUKA")
+
         self.isconnected = True
+
         last_read_time = time.time()
         while self.isconnected:
             try:
-                data = self.connection.recv(self.BUFFER_SIZE)
+                data, addr = self.UDPsocket.recvfrom(self.BUFFER_SIZE)
                 ######  TEST DECODE #######
-                #data.decode("utf-8")
+                # data.decode("utf-8")
                 data = data.decode()
                 ##########################
                 last_read_time = time.time()  # Keep received time
@@ -148,9 +152,9 @@ class iiwa_socket:
                     print(cl_lightred('No packet received from iiwa for 5s!'))
 
         print("SHUTTING DOWN")
-        self.connection.shutdown(socket.SHUT_RDWR)
+        self.connection.shutdown(self.socket.SHUT_RDWR)
         self.connection.close()
-        sock.close()
+        self.UDPsocket.close()
         self.isconnected = False
         print(cl_lightred('Connection is closed!'))
         # NOE JEG SLANG Paa SELV :)
@@ -162,12 +166,12 @@ class iiwa_socket:
 
     def __send(self, cmd):
         ## Add lines between commands
-        cmd = cmd + '\r\n'
+        # cmd = cmd + '\r\n'
         ## Encode to bytes
         encoded_cmd = cmd.encode()
+
         ## Send commands
-        self.connection.sendall(encoded_cmd)
-    #   ~M: Command send thread ==================
+        self.UDPsocket.sendto(encoded_cmd, self.client_address)
 
 
 #   ~Class: Kuka iiwa TCP communication    #####################
@@ -200,10 +204,13 @@ class kuka_iiwa_ros2_node:
 
         # while not rospy.is_shutdown() and self.iiwa_soc.isconnected:
         while rclpy.ok() and self.iiwa_soc.isconnected:
-            string_callback(pub_isFinished, self.iiwa_soc.isFinished)
-            string_callback(pub_hasError,self.iiwa_soc.hasError)
-            odom_callback(pub_odometry, self.iiwa_soc.odometry)
-            scan_callback(pub_laserscan, self.iiwa_soc.laserScan)
+            print()
+            #string_callback(pub_isFinished, self.iiwa_soc.isFinished)
+            #string_callback(pub_hasError,self.iiwa_soc.hasError)
+            #odom_callback(pub_odometry, self.iiwa_soc.odometry)
+            #scan_callback(pub_laserscan, self.iiwa_soc.laserScan)
+            self.rate.sleep() #100 hz rate.sleep()
+
 
         # while not rospy.is_shutdown() and self.iiwa_soc.isconnected:
         while rclpy.ok() and self.iiwa_soc.isconnected:
@@ -225,8 +232,8 @@ class kuka_iiwa_ros2_node:
 
     def string_callback(self,publisher,values):
         msg = String()
-        msg.data= str(values[0]) + " %s" % time.time())
-        pub.publish(msg)
+        msg.data= str(values[0]) + " %s" % time.time()
+        publisher.publish(msg)
 
     def odom_callback(self, publisher, values):
         x = values[0]
@@ -249,6 +256,8 @@ class kuka_iiwa_ros2_node:
         publisher.publish(odom)
 
     def scan_callback(self, publisher, values):
+        # TODO: M_PI må settes :) "how to make a laserscan message"
+        M_PI = 0
         scan = LaserScan()
         scan.header.stamp = self.kuka_node.get_clock().now()
         scan.angle_increment = (2.0*M_PI/360.0)
