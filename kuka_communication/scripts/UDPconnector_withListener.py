@@ -10,7 +10,6 @@ class UDPconnector:
 
         # create TCP/IP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
         # Set buffer size
         self.BUFFER_SIZE = 1024
 
@@ -22,19 +21,23 @@ class UDPconnector:
 
         # get the according IP address
         ip_address = socket.gethostbyname(local_hostname)
+        port = 47954;
 
-        # bind the socket to the port 23456, and connect
-        self.server_address = (ip_address, 5252)
+        client_adress = (ip_address,port)
+        # bind the socket to the port 2001, and connect
+        self.sock.bind(client_adress)
 
-        bytesToSend = "HALLA".encode()
-        self.sock.sendto(bytesToSend,self.server_address)
+
+        self.server_address = (ip_address , 20001)
+
+        bytesToSend = "Hello ROS Server!".encode()
+        self.sock.sendto(bytesToSend, self.server_address)
+
         msgFromServer = self.sock.recvfrom(self.BUFFER_SIZE)
-        msg = "Message from Server {}".format(msgFromServer[0])
-        time.sleep(100)
-        self.sock.bind(self.server_address)
 
-        print("connecting to %s (%s) with %s" % (local_hostname, local_fqdn, ip_address))
-        self.isconnected = True
+        if msgFromServer[0].decode() == "Hello KUKA!":
+            print("connected to %s (%s) with %s" % (local_hostname, local_fqdn, ip_address))
+            self.isconnected = True
 
         ## Make listener thread
         thread.start_new_thread(self.listener, ())
@@ -65,7 +68,7 @@ class UDPconnector:
                 # new_data = entry.encode("utf-8")
                 new_data = entry.encode()
                 #self.sock.send(new_data)
-                self.sock.sendto(new_data,self.server_address)
+                self.sock.sendto(new_data, self.server_address)
                 # wait for 1 millisecond
                 time.sleep(0.1)
             i = i + 1
@@ -77,7 +80,7 @@ class UDPconnector:
 
     def listener(self):
         while self.isconnected:
-            data,addr = self.sock.recvfrom(self.BUFFER_SIZE)
+            data, addr = self.sock.recvfrom(self.BUFFER_SIZE)
             data = data.decode()
             print(data)
 
