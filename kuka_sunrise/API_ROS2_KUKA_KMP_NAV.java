@@ -90,6 +90,8 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 
 
 	public void initialize() {
+		logger.info("Robot is being initialized!");
+
 		getController("KUKA_Sunrise_Cabinet_1");
 
 		kmp = getContext().getDeviceFromType(KmpOmniMove.class);
@@ -163,7 +165,7 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 	{
 		String line;
 		try{
-			//HELP! was: while(!inputStream.ready()){}
+			//was: while(!inputStream.ready()){}
 			while(!RUN) {}
 			socket.receive(input_packet);;
 			line = decode(input_packet);
