@@ -1,27 +1,24 @@
 package com.kuka.roboticsAPI;
 
 //JAVA
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Inject;
-
-import java.io.BufferedReader;
+import javax.inject.Named;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+
+//UDP
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.nio.charset.Charset;
 
 //COMMON
 import com.kuka.common.ThreadUtil;
 import com.kuka.roboticsAPI.applicationModel.RoboticsAPIApplication;
 import com.kuka.roboticsAPI.executionModel.ICommandContainer;
+import com.kuka.task.ITaskLogger;
+
 
 //DEVICE MODEL
 import com.kuka.roboticsAPI.deviceModel.Device;
@@ -39,36 +36,32 @@ import com.kuka.roboticsAPI.motionModel.IMotionContainer;
 import com.kuka.roboticsAPI.motionModel.IErrorHandler;
 import com.kuka.roboticsAPI.motionModel.MotionBatch;
 import com.kuka.roboticsAPI.motionModel.kmp.*;
-
 //SENSOR
 import com.kuka.roboticsAPI.controllerModel.sunrise.state.kmp.io.ScannerIOGroup;
 import com.kuka.roboticsAPI.controllerModel.sunrise.mapping.CommandMapper;
 import com.kuka.roboticsAPI.ioModel.AbstractIO;
 import com.kuka.roboticsAPI.ioModel.AbstractIOGroup;
 import com.kuka.roboticsAPI.ioModel.Output;
-import com.kuka.nav.core.swb.laserView.controller.LaserDataController;
-import com.kuka.nav.fdi.FDIConnection;
+import com.kuka.roboticsAPI.controllerModel.sunrise.state.kmp.IMobilePlatformSafetyState;
+import com.kuka.roboticsAPI.controllerModel.sunrise.state.kmp.IMobilePlatformSafetyState.SafetyState;
 
 //FOR TESTING:
 import com.kuka.roboticsAPI.controllerModel.sunrise.predefinedCompounds.kmp.*;
-import com.kuka.roboticsAPI.controllerModel.sunrise.api.ObserverModule;
-import com.kuka.roboticsAPI.controllerModel.sunrise.api.DeviceObserverModule;
 import com.kuka.roboticsAPI.controllerModel.sunrise.api.OutPort;
-import com.kuka.roboticsAPI.controllerModel.sunrise.api.Port;
 import com.kuka.roboticsAPI.controllerModel.sunrise.api.SPR;
-import com.kuka.roboticsAPI.capabilities.interfaces.*;
 import com.kuka.roboticsAPI.requestModel.IRequestHandler;
 import com.kuka.roboticsAPI.requestModel.ReadIORequest;
-import com.kuka.roboticsAPI.controllerModel.sunrise.api.SSRFactory;
-import com.kuka.roboticsAPI.controllerModel.sunrise.state.kmp.provider.MobilePlatformStateProvider;
 import com.kuka.nav.geometry.DetectionModel;
 import com.kuka.nav.robot.MobileRobotManager;
 
 
-public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
+public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
 	
 	@Inject
-	@Named("[Name in StationSetup]")
+	private ITaskLogger logger;
+	
+	@Inject
+	@Named("[KMPOmniMove200]")
 	public KmpOmniMove kmp;
 
 	public ScannerIOGroup scanner;
@@ -79,28 +72,23 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
 	public double[] current_vel;
 
 	public long LastReceivedTime = System.currentTimeMillis();
-	private IMotionContainer _currentMotion;
+	private ICommandContainer _currentMotion;
 	
 	// TEST
 	public OutPort odom_port;
-	public OutPort vel_port;
 	public AbstractIO ab_io;
 	public ReadIORequest read_io_req;
 	public IRequestHandler req_handler;
 	public DetectionModel detection_mod;
-	public LaserDataController laser_data_controller;
-	public MobilePlatformStateProvider state_provider;
 	public MobileRobotManager mr_manager;
 	public MobilePlatformVelocity mp_vel;
 	public MobilePlatformPosition mp_pose;
-	public FDIConnection fdi;
-	private List<String> sensors;
 
 	public String CommandStr; // Command String
 	String []strParams = new String[20];
 	float []params = new float[10];
 	
-	public OmniMoveObserver observer;
+	public OutPort odomPort;
 
 	// FOR SOCKET CONNECTION:
 	public DatagramPacket output_packet;
@@ -115,21 +103,22 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
 
 
 	public void initialize() {
+		logger.info("Robot is being initialized!");
 		getController("KUKA_Sunrise_Cabinet_1");
-
+			
 		kmp = getContext().getDeviceFromType(KmpOmniMove.class);
-		kmp.setName("kmp1");
+		kmp.setName("KMPOmniMove200");
 		
 		controller = kmp.getController();
 		socket = this.socketConnection();
 		
-		//state_provider = new MobilePlatformStateProvider(controller); //
-		//state_provider.getMobilePlatformSafetyState(); // SKAL PRINTE ANTALL SENSORER i logger
-		//observer = new OmniMoveObserver("ObsGroup",new SPR(null,"kmp1"));
-		//odom_port = observer.getOdoMsr();
-		//vel_port = observer.getOdoSpeedMsr();
-		//sensors = Arrays.asList("foo", "bar");
-		//scanner = new ScannerIOGroup(kmp.getController(), sensors);
+		// Init ports to read odometry  - usikker på init av denne.
+		OmniMoveObserver observer = new OmniMoveObserver("ObsGroup",new SPR(null,kmp.getName()));
+		odom_port = observer.getOdoMsr();
+		
+		// Init scannergroup to read lasers
+		List<String> sensors = Arrays.asList("FrontLaser", "RearLaser");
+		scanner = new ScannerIOGroup(controller, sensors);
 
 		//mp_pose = new MobilePlatformPosition();
 		//mp_vel = new MobilePlatformVelocity();
@@ -142,7 +131,7 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
 		socket = new DatagramSocket(); 
 		ros_inetaddress = InetAddress.getByName("charlotte-MacBookAir"); 
         // default for controller 172.31.1.10 defaultport: 8090
-		ros_IPport = 20001;
+		ros_IPport = 20001; // 30,000 to 30,010
 		int buffer_size = 1024;
         byte init_msg[] = "Hello".getBytes();
         byte buf[] = new byte[buffer_size]; 
@@ -171,6 +160,7 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
 			}
 		}
 		RUN = true;
+		return socket;
 	}
 	
     static String decode(DatagramPacket pack) {
@@ -214,7 +204,7 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
 		send_package(output_packet, ">"+"OperationMode " + opMode);
 	}
 
-	private void getOdometry() {
+	private void getOdometry(DatagramPacket output_packet) {
 		String odom_string = odom_port.getValue().toString(); // get Odometry from port as string
 		//String vel_string = vel_port.getValue().toString();
 
@@ -225,25 +215,44 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
 	}
 
 	private void getLaserScan(DatagramPacket output_packet) {
-		String scan_string = odom_port.getValue().toString(); // get Odometry from port as string
-		send_package(output_packet, ">"+"laserScan " + scan_string);
+		String scan_str= scanner.getOutputs().toString();		send_package(output_packet, ">"+"laserScan " + scan_str);
+		send_package(output_packet, ">"+"laserScan " + scan_str);
+		// ScannerIOGroup:
+		//getMobilePlatformIOValue
+		
 	}
 
 	public void setMobilePlatformVelocity(String data) {
-		String []lineSplt = CommandStr.split(" ");
-		if (strParams.length==4){
+		String []lineSplt = data.split(" ");
+		if (lineSplt.length==4){
 			double vx = Double.parseDouble(lineSplt[1]);
 			double vy = Double.parseDouble(lineSplt[2]);
 			double vTheta = Double.parseDouble(lineSplt[3]);
-			double override = 100;
+			double override = 1; //
 
-			MobilePlatformVelocityMotion vel = new MobilePlatformVelocityMotion(vx,vy,vTheta,override);
-			kmp.move(vel);
+			MobilePlatformVelocityMotion MP_vel_motion = new MobilePlatformVelocityMotion(vx,vy,vTheta,override);
+			// 16.6.1 Synchronous and asynchronous motion execution in sunrise workbench 1.16
+			// HOW IS THIS SET??
+			if(kmp.isReadyToMove()) {
+				this._currentMotion =  kmp.moveAsync(MP_vel_motion);
+			}
+			else {
+				logger.warn("Kmp is not ready to move!");
+			}
 		}else{
-			getLogger().info("Unacceptable Velocity command!");
+			getLogger().info("Unacceptable Mobile Platform Velocity command!");
 		}
 	}
 
+	public void setForcedStop() {
+		try {
+			if(!(this._currentMotion.isFinished() || this._currentMotion.hasError()))
+				this._currentMotion.cancel();
+		}catch(Exception e){
+			logger.info("Could not force stop");
+		}
+	}
+	
 	public void getIsFinished(DatagramPacket output_packet)
 	{
 		LastReceivedTime = System.currentTimeMillis();
@@ -257,6 +266,7 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
      	send_package(output_packet, ">"+"isFinished " + "true");
 		};
 	}
+	
 	public void getHasError(DatagramPacket output_packet)
 	{
 		LastReceivedTime = System.currentTimeMillis();
@@ -274,7 +284,9 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
 	    public void run(){
 	    	while (RUN)
 	    	{
-	    		getOperationMode(output_packet);
+	    		//getOperationMode(output_packet);
+	    		getLaserScan(output_packet);
+	    		getOdometry(output_packet);
 
 	    		ThreadUtil.milliSleep(100);
 	    	}
@@ -282,12 +294,16 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
 	};
 
 	public Thread MonitorWorkspace = new Thread(){
-
+		SafetyState state;
 	    public void run(){
 	    	while (RUN)
 	    	{
-
+	    		state = kmp.getMobilePlatformSafetyState().getSafetyState();
+	    		// DO SOMETHING
 	    		ThreadUtil.milliSleep(10);
+	    		//if(kriterie) { setForcedStop();}
+	    		//else if(kriterie){sett ned fart;}
+	    		
 	    	}
 	    }
 	};
@@ -302,14 +318,14 @@ public class API_ROS2_KUKA_KMP extends RoboticsAPIApplication{
 	    	CommandStr = getLine(input_packet);
 	    	String []lineSplt = CommandStr.split(" ");
 
-			if( (lineSplt[0]).equals("setVelocity"))
+			if( (lineSplt[0]).equals("setTwist"))
 				setMobilePlatformVelocity(CommandStr);
 
 			if(  !socket.isConnected() || socket.isClosed()) //|| socket.isOutputShutdown() ||   socket.isInputShutdown())
 			{
 				try {
 					socket.close();
-				} catch (IOException e) {
+				} catch (Exception e) {
 					System.out.println("ERROR closing the port!");
 				}
 				RUN = false;
