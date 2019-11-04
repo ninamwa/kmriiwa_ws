@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.log4j.BasicConfigurator;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -85,20 +87,22 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 	private byte[] buf;
 	private InetAddress ros_inetaddress;
 	private int ros_IPport;
-    private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
+
+	private ICommandContainer _currentMotion;
+    	private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
 
 
 	public void initialize() {
-		logger.info("Robot is being initialized!");
-
+		BasicConfigurator.configure();
 		getController("KUKA_Sunrise_Cabinet_1");
-
+		getLogger().info("Initializing robot");
 		kmp = getContext().getDeviceFromType(KmpOmniMove.class);
 		kmp.setName("KMPOmniMove200");
 
 		controller = kmp.getController();
 		socket = this.socketConnection();
+		System.out.println("Connected!");
 
 	}
 
@@ -109,9 +113,9 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 		socket = new DatagramSocket();
 		ros_inetaddress = InetAddress.getByName("charlotte-MacBookAir");
         // default for controller 172.31.1.10 defaultport: 8090
-		ros_IPport = 20001;
+		ros_IPport = 20001;  // 30,000 to 30,010
 		int buffer_size = 1024;
-        byte init_msg[] = "Hello".getBytes();
+        byte init_msg[] = "Hello from KUKA".getBytes();
         byte buf[] = new byte[buffer_size];
 
         // connect() method - connect to ROS
@@ -120,7 +124,7 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 	    System.out.println("KMR iiwa is connected to the server.");
 
 
-        output_packet = new DatagramPacket(init_msg, buffer_size, ros_inetaddress, ros_IPport);
+        output_packet = new DatagramPacket(init_msg, init_msg.length, ros_inetaddress, ros_IPport); 
         input_packet = new DatagramPacket(buf, buffer_size);
 
         // send() method
@@ -153,6 +157,7 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 	public void send_package(DatagramPacket output_packet, String msg)
 	{
      output_packet.setData(msg.getBytes());
+     output_packet.setLength(msg.length());
 
      try {
 			socket.send(output_packet);
@@ -192,15 +197,20 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 	}
 
 	public void setMobilePlatformVelocity(String data) {
-		String []lineSplt = CommandStr.split(" ");
+		String []lineSplt = data.split(" ");
 		if (strParams.length==4){
 			double vx = Double.parseDouble(lineSplt[1]);
 			double vy = Double.parseDouble(lineSplt[2]);
 			double vTheta = Double.parseDouble(lineSplt[3]);
-			double override = 100;
+			double override = 1;
 
 			MobilePlatformVelocityMotion vel = new MobilePlatformVelocityMotion(vx,vy,vTheta,override);
-			kmp.move(vel);
+		if(kmp.isReadyToMove()) {
+				this._currentMotion =  kmp.moveAsync(MP_vel_motion);
+			}
+			else {
+				getLogger().warn("Kmp is not ready to move!");
+			}
 		}else{
 			getLogger().info("Unacceptable Velocity command!");
 		}
@@ -255,7 +265,7 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 	};
 
 	public void run() {
-		socketConnection();
+
 		Send_KMP_data.start();
 		MonitorWorkspace.start();
 
@@ -284,7 +294,7 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 
 
 	public static void main(String[] args){
-		API_ROS2_KUKA_KMP_NAV app = new API_ROS2_KUKA_KMP();
+		API_ROS2_KUKA_KMP_NAV app = new API_ROS2_KUKA_KMP_NAV();
 		app.runApplication();
 
 	}
