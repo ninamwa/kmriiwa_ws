@@ -188,11 +188,12 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 	}
 
 	private void getOdometry() {
-
+		String odom_string = "";
 		send_package(output_packet, ">"+"odometry " + odom_string);
 	}
 
 	private void getLaserScan(DatagramPacket output_packet) {
+		String scan_string = "";
 		send_package(output_packet, ">"+"laserScan " + scan_string);
 	}
 
@@ -206,7 +207,7 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 
 			MobilePlatformVelocityMotion vel = new MobilePlatformVelocityMotion(vx,vy,vTheta,override);
 		if(kmp.isReadyToMove()) {
-				this._currentMotion =  kmp.moveAsync(MP_vel_motion);
+				this._currentMotion =  kmp.moveAsync(vel);
 			}
 			else {
 				getLogger().warn("Kmp is not ready to move!");
@@ -264,7 +265,7 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 	    }
 	};
 
-	public void run() {
+	public void run() throws IOException {
 
 		Send_KMP_data.start();
 		MonitorWorkspace.start();
@@ -279,11 +280,7 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 
 			if(  !socket.isConnected() || socket.isClosed()) //|| socket.isOutputShutdown() ||   socket.isInputShutdown())
 			{
-				try {
-					socket.close();
-				} catch (IOException e) {
-					System.out.println("ERROR closing the port!");
-				}
+				socket.close();
 				RUN = false;
 			}
 		}
@@ -300,3 +297,4 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 	}
 
 }
+

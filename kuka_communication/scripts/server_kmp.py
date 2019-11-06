@@ -195,7 +195,7 @@ class kuka_iiwa_ros2_node:
         self.kuka_node = rclpy.create_node("kuka_iiwa")
         kuka_twist_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.twist_callback, 10)
         # TODO: RATE er enda ikke implementert
-        #self.rate = self.kuka_node.create_rate(100) # 100 hz
+        self.rate = self.kuka_node.create_rate(100) # 100 hz
         kuka_subscriber = self.kuka_node.create_subscription(String, 'kuka_command', self.callback, 10)
 
         # TODO: Ta en vurdering på om denne trengs?
@@ -216,7 +216,7 @@ class kuka_iiwa_ros2_node:
             self.odom_callback(pub_odometry, self.iiwa_soc.odometry)
             self.scan_callback(pub_laserscan, self.iiwa_soc.laserScan)
             # TODO: FIKSE RATE
-            #self.rate.sleep() #100 hz rate.sleep()
+            self.rate.sleep() #100 hz rate.sleep()
 
 
         # while not rospy.is_shutdown() and self.iiwa_soc.isconnected:
@@ -235,7 +235,7 @@ class kuka_iiwa_ros2_node:
 
                 pub.publish(msg)
             # TODO: Rate
-            #self.rate.sleep() #100 hz rate.sleep()
+            self.rate.sleep() #100 hz rate.sleep()
 
     def string_callback(self,publisher,values):
         msg = String()
@@ -275,7 +275,6 @@ class kuka_iiwa_ros2_node:
 
         # SET VELOCITY
         odom.child_frame_id = "base_link"
-        #odom.twist.twist = Twist(Vector3(vx, vy, 0), Vector3(0, 0, vth))
 
         linear = Vector3()
         linear.x = vx
@@ -294,7 +293,7 @@ class kuka_iiwa_ros2_node:
 
     def scan_callback(self, publisher, values):
         # TODO: M_PI må settes :) "how to make a laserscan message"
-        M_PI =  3.141592
+        M_PI = 3.141592
         scan = LaserScan()
         scan.header.stamp = self.getTimestamp()
         #scan.header.stamp = self.kuka_node.get_clock().now()
