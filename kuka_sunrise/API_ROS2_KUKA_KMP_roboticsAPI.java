@@ -114,8 +114,8 @@ public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
 		System.out.println("Connected!");
 				
 		// Init ports to read odometry  - usikker på init av denne.
-		//OmniMoveObserver observer = new OmniMoveObserver("ObsGroup",new SPR(null,kmp.getName()));
-		//odom_port = observer.getOdoMsr();
+		OmniMoveObserver observer = new OmniMoveObserver("ObsGroup",new SPR(null,kmp.getName()));
+		odom_port = observer.getOdoMsr();
 	
 		// Init scannergroup to read lasers
 		List<String> sensors = Arrays.asList("FrontLaser", "RearLaser");

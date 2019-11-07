@@ -1,10 +1,6 @@
 package com.kuka.roboticsAPI;
 
 // JAVA
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,7 +14,7 @@ import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
 //COMMON
@@ -27,31 +23,20 @@ import com.kuka.roboticsAPI.applicationModel.RoboticsAPIApplication;
 import com.kuka.roboticsAPI.executionModel.ICommandContainer;
 
 //DEVICE MODEL
-import com.kuka.roboticsAPI.deviceModel.Device;
-import com.kuka.roboticsAPI.deviceModel.JointPosition;
-import com.kuka.roboticsAPI.deviceModel.LBR;
 import com.kuka.roboticsAPI.deviceModel.MobilePlatform;
 import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
 import com.kuka.roboticsAPI.controllerModel.Controller;
 
 
 //MOTION MODEL
-import static com.kuka.roboticsAPI.motionModel.BasicMotions.*;
-import com.kuka.roboticsAPI.motionModel.ErrorHandlingAction;
-import com.kuka.roboticsAPI.motionModel.IMotionContainer;
-import com.kuka.roboticsAPI.motionModel.IErrorHandler;
-import com.kuka.roboticsAPI.motionModel.MotionBatch;
 import com.kuka.roboticsAPI.motionModel.kmp.*;
 
 //SENSOR
 import com.kuka.roboticsAPI.controllerModel.sunrise.state.kmp.io.ScannerIOGroup;
-import com.kuka.roboticsAPI.controllerModel.sunrise.mapping.CommandMapper;
-import com.kuka.roboticsAPI.ioModel.AbstractIO;
-import com.kuka.roboticsAPI.ioModel.AbstractIOGroup;
-import com.kuka.roboticsAPI.ioModel.Output;
+import com.kuka.nav.Pose;
 import com.kuka.nav.fdi.FDIConnection;
-
-//FOR TESTING:
+import com.kuka.nav.fdi.data.Odometry;
+import com.kuka.nav.fdi.internal.protocol.msg.OdometryMsg;
 
 
 
@@ -73,6 +58,7 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 
 	// TEST
 	public FDIConnection fdi;
+	public DataController listener;
 
 	public String CommandStr; // Command String
 	String []strParams = new String[20];
@@ -84,7 +70,6 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 	public DatagramPacket input_packet;
 	private DatagramSocket socket; // UDP socket
 	public boolean RUN = false;  // Is socket Connected and app running?
-	private byte[] buf;
 	private InetAddress ros_inetaddress;
 	private int ros_IPport;
 
@@ -103,7 +88,14 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 		controller = kmp.getController();
 		socket = this.socketConnection();
 		System.out.println("Connected!");
-
+		
+		
+		String serverIP = "127.0.1.1";
+		int port = 34001;
+		InetSocketAddress adr = new InetSocketAddress(serverIP,port);
+		fdi = new FDIConnection(adr);
+		listener = new DataController(getLogger());
+		fdi.addDataListener(listener);		
 	}
 
 	public DatagramSocket socketConnection()  // Connecting to server at 172.31.1.50 Port:1234
@@ -182,19 +174,31 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 		}
 	}
 
-	private void getOperationMode(DatagramPacket output_packet) {
-		String opMode = kmp.getOperationMode().toString();
-		send_package(output_packet, ">"+"OperationMode " + opMode);
-	}
+	private void getOdometry(DatagramPacket output_packet) {
+		Odometry msg = new Odometry();
+		String odom_string1 ="";
+		send_package(output_packet, ">"+"odometry " + odom_string1);
 
-	private void getOdometry() {
-		String odom_string = "";
+		msg = fdi.getLastOdometry();
+		String odom_string = msg.toString();
 		send_package(output_packet, ">"+"odometry " + odom_string);
+
 	}
 
 	private void getLaserScan(DatagramPacket output_packet) {
-		String scan_string = "";
-		send_package(output_packet, ">"+"laserScan " + scan_string);
+		int laserId1 = 1801;
+		int laserId2 = 1802;
+		getLogger().info("Initializing robot");
+		//String scan_string1 = fdi.getNewLaserScan(laserId1).toString();
+		//String scan_string2 = fdi.getNewLaserScan(laserId2).toString();
+		//send_package(output_packet, ">"+"laserScan " + scan_string1);
+		//send_package(output_packet, ">"+"laserScan " + scan_string2);
+		
+		String scan_string3 = fdi.getLastLaserScan(laserId1).toString();
+		String scan_string4 = fdi.getLastLaserScan(laserId2).toString();
+		send_package(output_packet, ">"+"laserScan " + scan_string3);
+		send_package(output_packet, ">"+"laserScan " + scan_string4);
+
 	}
 
 	public void setMobilePlatformVelocity(String data) {
@@ -247,7 +251,8 @@ public class API_ROS2_KUKA_KMP_NAV extends RoboticsAPIApplication{
 	    public void run(){
 	    	while (RUN)
 	    	{
-	    		getOperationMode(output_packet);
+	    		getLaserScan(output_packet);
+	    		getOdometry(output_packet);
 
 	    		ThreadUtil.milliSleep(100);
 	    	}
