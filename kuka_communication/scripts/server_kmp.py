@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # KUKA API for ROS
+
 version = '26092019'
 
 # Marhc 2017 Saeid Mokaram  saeid.mokaram@gmail.com
@@ -190,9 +191,9 @@ class kuka_iiwa_ros2_node:
         rclpy.init(args=None)
         self.kuka_node = rclpy.create_node("kuka_iiwa")
         kuka_twist_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.twist_callback, 10)
+        kuka_pose_subscriber = self.kuka_node.create_subscription(Pose, 'cmd_vel', self.pose_callback, 10)
         self.rate = self.kuka_node.create_rate(100) # 100 hz
         kuka_subscriber = self.kuka_node.create_subscription(String, 'kuka_command', self.callback, 10)
-        kuka_teleop_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.teleop_callback, 10)
 
 
         #   Make Publishers for all kuka_iiwa data
@@ -281,6 +282,10 @@ class kuka_iiwa_ros2_node:
 
     def twist_callback(self, data):
         msg = 'setTwist ' + listToString(data.linear) + " " + listToString(data.angular)
+        self.iiwa_soc.send(msg)
+
+    def pose_callback(self, data):
+        msg = 'setPose ' + listToString(data.position.x) + " " + listToString(data.position.y) + " " + listToString(data.quaternion.z)
         self.iiwa_soc.send(msg)
 
 
