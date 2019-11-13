@@ -15,19 +15,22 @@ version = '26092019'
 import _thread as thread
 import time
 import os
+import math
 import select
 import sys
 import termios
 import tty
+# TODO: Hvorfor virker ikke denne import?
+#import tf2_ros as tf
 import rclpy
 import socket
-import tf
 from std_msgs.msg import String
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
-
+from builtin_interfaces.msg import Time
 from time import sleep
+import numpy as np
 
 
 def cl_black(msge): return '\033[30m' + msge + '\033[0m'
@@ -81,7 +84,7 @@ class iiwa_socket:
         # TODO: REPLACE THIS WHEN CONFIG.TXT IS FIXED
         local_hostname = socket.gethostname()
         local_ip= socket.gethostbyname(local_hostname)
-        local_port = 23456
+        local_port = 20001
         server_address = (local_ip, local_port)
 
         os.system('clear')
@@ -139,6 +142,7 @@ class iiwa_socket:
                             tmp = [float(''.join([c for c in s if c in '0123456789.eE-'])) for s in cmd_splt[1:]]
                             if len(tmp) == 6:
                                 self.odometry = (tmp, last_read_time)
+                                self.isready = True
                     if len(pack) and cmd_splt[0] == 'laserScan':
                             tmp = [float(''.join([c for c in s if c in '0123456789.eE-'])) for s in cmd_splt[1:]]
                             if len(tmp) == 6:
@@ -192,8 +196,12 @@ class kuka_iiwa_ros2_node:
         self.kuka_node = rclpy.create_node("kuka_iiwa")
         kuka_twist_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.twist_callback, 10)
         kuka_pose_subscriber = self.kuka_node.create_subscription(Pose, 'cmd_vel', self.pose_callback, 10)
-        self.rate = self.kuka_node.create_rate(100) # 100 hz
+        # TODO: RATE er enda ikke implementert
+        #self.rate = self.kuka_node.create_rate(100) # 100 hz
         kuka_subscriber = self.kuka_node.create_subscription(String, 'kuka_command', self.callback, 10)
+
+        # TODO: Ta en vurdering på om denne trengs?
+        #kuka_teleop_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.teleop_callback, 10)
 
 
         #   Make Publishers for all kuka_iiwa data
@@ -210,7 +218,7 @@ class kuka_iiwa_ros2_node:
             #string_callback(pub_hasError,self.iiwa_soc.hasError)
             #odom_callback(pub_odometry, self.iiwa_soc.odometry)
             #scan_callback(pub_laserscan, self.iiwa_soc.laserScan)
-            self.rate.sleep() #100 hz rate.sleep()
+            #self.rate.sleep() #100 hz rate.sleep()
 
 
         # while not rospy.is_shutdown() and self.iiwa_soc.isconnected:
@@ -225,11 +233,11 @@ class kuka_iiwa_ros2_node:
                 # I ros 1 er det  data_str = str(data[0]) +' '+ str(rospy.get_time())
 
                 #For å poste til terminal
-                # kuka_node.get_logger().info('Publishing: "%s"' % msg.data)
+                #kuka_node.get_logger().info('Publishing: "%s"' % msg.data)
 
                 pub.publish(msg)
-
-            self.rate.sleep() #100 hz rate.sleep()
+            # TODO: Rate
+            #self.rate.sleep() #100 hz rate.sleep()
 
     def string_callback(self,publisher,values):
         msg = String()
@@ -245,30 +253,62 @@ class kuka_iiwa_ros2_node:
         vth = values[5]
 
         odom = Odometry()
-        odom.header.stamp = self.kuka_node.get_clock().now()
+        #odom.header.stamp = self.getTimestamp()
         odom.header.frame_id = "odom"
-        odom_quat = tf.transformations.quaternion_from_euler(0, 0, th)
-        odom.pose.pose = Pose(Point(x, y, 0), Quaternion(odom_quat))
+        #odom.header.stamp = self.kuka_node.get_clock().now()
 
-        # set the velocity
+        # TODO: FIKSE DENNE! TF ER IKKE KLART FOR RCLPY ENDA
+        odom_quat = Quaternion()
+        quat = self.euler_to_quaternion(0,0,th)
+        #quat = tf.transformations.quaternion_from_euler(0, 0, th)
+        odom_quat.x = quat[0]
+        odom_quat.y = quat[1]
+        odom_quat.z = quat[2]
+        odom_quat.w = quat[3]
+
+        point = Point()
+        point.x = x
+        point.y = y
+        point.z = float(0)
+
+        odom.pose.pose.position = point
+        odom.pose.pose.orientation = odom_quat
+
+        # SET VELOCITY
         odom.child_frame_id = "base_link"
-        odom.twist.twist = Twist(Vector3(vx, vy, 0), Vector3(0, 0, vth))
+
+        linear = Vector3()
+        linear.x = vx
+        linear.y = vy
+        linear.z = float(0)
+
+        angular = Vector3()
+        angular.x = float(0)
+        angular.y = float(0)
+        angular.z = vth
+
+        odom.twist.twist.linear = linear
+        odom.twist.twist.angular = angular
 
         publisher.publish(odom)
 
     def scan_callback(self, publisher, values):
         # TODO: M_PI må settes :) "how to make a laserscan message"
-        M_PI = 0
+        M_PI = 3.141592
         scan = LaserScan()
-        scan.header.stamp = self.kuka_node.get_clock().now()
+        #scan.header.stamp = self.getTimestamp()
+        #scan.header.stamp = self.kuka_node.get_clock().now()
         scan.angle_increment = (2.0*M_PI/360.0)
         scan.angle_min = 0.0
-        scan.angle_max = 2.0*M_PI-scan
+        scan.angle_max = 2.0*M_PI - scan.angle_increment
         scan.range_min = 0.12
         scan.range_max = 3.5
         #scan.ranges.resize(360)
         #scan.intensities.resize(360)
-        scan.ranges = values
+        # TODO: HARDKODET DENNE SIDEN DET FUNKET DÅRLIG NÅR DET IKKE KOM NOEN MELDINGER
+        #scan.ranges = values[0]
+        # TODO: Denne må være sånn! altså alle float, ellers blir det bråk
+        scan.ranges = [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]
         publisher.publish(scan)
 
 
@@ -279,7 +319,7 @@ class kuka_iiwa_ros2_node:
         ###########rospy.loginfo(rospy.get_caller_id() + "Received command " + str(data.data) )
         self.iiwa_soc.send(data.data)  # e.g 'setPosition 45 60 0 -25 0 95 0' for going to start position
 
-
+    # TODO: WHAT IS THIS USED FOR? tror man må ta data[0]
     def twist_callback(self, data):
         msg = 'setTwist ' + listToString(data.linear) + " " + listToString(data.angular)
         self.iiwa_soc.send(msg)
@@ -295,7 +335,20 @@ class kuka_iiwa_ros2_node:
         self.kuka_node.destroy_node()
         rclpy.shutdown()
 
+    def getTimestamp(self):
+        timestamp = Time()
+        timestamp.sec = math.floor((self.kuka_node.get_clock().now().nanoseconds)*(10**(-9)))
+        timestamp.nanosec = int(((self.kuka_node.get_clock().now().nanoseconds)*(10**(-9))-timestamp.sec)*(10**9))
+        return timestamp
 
+    def euler_to_quaternion(self, roll, pitch, yaw):
+
+        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+        return [qx, qy, qz, qw]
 
 
 #   ~Class: Kuka iiwa ROS2 node    #####################
@@ -321,19 +374,19 @@ def read_conf():
     return [IP, Port]
 
 def listToString(list):
-    strl = " "
-    return strl.join([str(elem) for elem in list])
+    listString = str(list.x) + " " + str(list.y) + " " + str(list.z)
+    return listString
 #   ~M:  Reading config file for Server IP and Port ================
 
 def main(args=None):
     #rclpy.init(args=args)
     [IP, Port] = read_conf()
-    try:
-        node = kuka_iiwa_ros2_node(IP, Port)  # Make a Kuka_iiwa ROS node
-    except Exception:
-        print("An error occured, the system has crashed!")
+    #try:
+    node = kuka_iiwa_ros2_node(IP, Port)  # Make a Kuka_iiwa ROS node
+    #except Exception:
+    #    print("An error occured, the system has crashed!")
         # rclpy.ROSInterruptException:
-        pass
+    #    pass
 
 if __name__ == '__main__':
     main()

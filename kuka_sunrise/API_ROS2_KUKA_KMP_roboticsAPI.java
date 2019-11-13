@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.apache.log4j.BasicConfigurator;
+
 import java.io.IOException;
 
 //UDP
@@ -17,7 +20,6 @@ import java.nio.charset.Charset;
 import com.kuka.common.ThreadUtil;
 import com.kuka.roboticsAPI.applicationModel.RoboticsAPIApplication;
 import com.kuka.roboticsAPI.executionModel.ICommandContainer;
-import com.kuka.task.ITaskLogger;
 
 
 //DEVICE MODEL
@@ -56,9 +58,6 @@ import com.kuka.nav.robot.MobileRobotManager;
 
 
 public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
-	
-	@Inject
-	private ITaskLogger logger;
 	
 	@Inject
 	@Named("[KMPOmniMove200]")
@@ -101,21 +100,23 @@ public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
     private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
 
-
 	public void initialize() {
-		logger.info("Robot is being initialized!");
+		BasicConfigurator.configure();
 		getController("KUKA_Sunrise_Cabinet_1");
-			
+		
+		getLogger().info("Initializing robot");
+	
 		kmp = getContext().getDeviceFromType(KmpOmniMove.class);
 		kmp.setName("KMPOmniMove200");
 		
 		controller = kmp.getController();
 		socket = this.socketConnection();
-		
+		System.out.println("Connected!");
+				
 		// Init ports to read odometry  - usikker på init av denne.
 		OmniMoveObserver observer = new OmniMoveObserver("ObsGroup",new SPR(null,kmp.getName()));
 		odom_port = observer.getOdoMsr();
-		
+	
 		// Init scannergroup to read lasers
 		List<String> sensors = Arrays.asList("FrontLaser", "RearLaser");
 		scanner = new ScannerIOGroup(controller, sensors);
@@ -133,7 +134,7 @@ public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
         // default for controller 172.31.1.10 defaultport: 8090
 		ros_IPport = 20001; // 30,000 to 30,010
 		int buffer_size = 1024;
-        byte init_msg[] = "Hello".getBytes();
+        byte init_msg[] = "Hello from KUKA".getBytes();
         byte buf[] = new byte[buffer_size]; 
 
         // connect() method - connect to ROS
@@ -142,7 +143,7 @@ public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
 	    System.out.println("KMR iiwa is connected to the server.");
 
         
-        output_packet = new DatagramPacket(init_msg, buffer_size, ros_inetaddress, ros_IPport); 
+        output_packet = new DatagramPacket(init_msg, init_msg.length, ros_inetaddress, ros_IPport); 
         input_packet = new DatagramPacket(buf, buffer_size); 
         
         // send() method 
@@ -175,6 +176,7 @@ public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
 	public void send_package(DatagramPacket output_packet, String msg)
 	{
      output_packet.setData(msg.getBytes());
+     output_packet.setLength(msg.length());
 
      try {
 			socket.send(output_packet);
@@ -206,11 +208,13 @@ public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
 
 	private void getOdometry(DatagramPacket output_packet) {
 		String odom_string = odom_port.getValue().toString(); // get Odometry from port as string
-		//String vel_string = vel_port.getValue().toString();
 
 		// From MobilePlatformPosition
 		//current_pose = pose.getValues();
 		//current_vel = vel.getValues();
+		
+		// FOR DEBUGGING:
+		//odom_string = "0 0 0 0 0 0";
 		send_package(output_packet, ">"+"odometry " + odom_string);
 	}
 
@@ -237,7 +241,7 @@ public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
 				this._currentMotion =  kmp.moveAsync(MP_vel_motion);
 			}
 			else {
-				logger.warn("Kmp is not ready to move!");
+				getLogger().warn("Kmp is not ready to move!");
 			}
 		}else{
 			getLogger().info("Unacceptable Mobile Platform Velocity command!");
@@ -249,7 +253,7 @@ public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
 			if(!(this._currentMotion.isFinished() || this._currentMotion.hasError()))
 				this._currentMotion.cancel();
 		}catch(Exception e){
-			logger.info("Could not force stop");
+			getLogger().info("Could not force stop");
 		}
 	}
 	
@@ -284,9 +288,9 @@ public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
 	    public void run(){
 	    	while (RUN)
 	    	{
-	    		//getOperationMode(output_packet);
-	    		getLaserScan(output_packet);
+	    		getOperationMode(output_packet);
 	    		getOdometry(output_packet);
+	    		getLaserScan(output_packet);
 
 	    		ThreadUtil.milliSleep(100);
 	    	}
@@ -309,7 +313,6 @@ public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
 	};
 
 	public void run() {
-		socketConnection();
 		Send_KMP_data.start();
 		MonitorWorkspace.start();
 
@@ -338,7 +341,7 @@ public class API_ROS2_KUKA_KMP_roboticsAPI extends RoboticsAPIApplication{
 
 
 	public static void main(String[] args){
-		API_ROS2_KUKA_KMP app = new API_ROS2_KUKA_KMP();
+		API_ROS2_KUKA_KMP_roboticsAPI app = new API_ROS2_KUKA_KMP_roboticsAPI();
 		app.runApplication();
 
 	}
