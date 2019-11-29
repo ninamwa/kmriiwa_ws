@@ -24,7 +24,6 @@ from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
 from builtin_interfaces.msg import Time
-import numpy as np
 
 
 def cl_black(msge): return '\033[30m' + msge + '\033[0m'
@@ -55,7 +54,8 @@ class iiwa_socket:
         self.hasError = (False, None)
         self.isready = False
         self.odometry = []
-        self.laserScan = []
+        self.laserScanB1 = []
+        self.laserScanB4 = []
         self.udp = None
 
         #TODO: Do something with isready, which is relevant for us.
@@ -121,16 +121,22 @@ class iiwa_socket:
                 if len(cmd_splt) and cmd_splt[0] == 'odometry':
                         self.odometry = cmd_splt
                 if len(cmd_splt) and cmd_splt[0] == 'laserScan':
-                        self.laserScan = cmd_splt
+                    if cmd_splt[2] == 1801:
+                        self.laserScanB1 = cmd_splt
+                        print(cmd_splt)
+                    elif cmd_splt[2] == 1802:
+                        self.laserScanB4 = cmd_splt
+                        print(cmd_splt)
+
 
                 el = time.time() - timee
-                if (el > 10.0):
+                #if (el > 20.0):
                     #msg = 'setPose ' + str(100) + " " + str(0) + " " + str(0)
                     #self.send(msg)
-                    msg = 'shutdown'
-                    self.send(msg)
-                    print('Message: ', msg)
-                    self.isconnected = False
+                    #msg = 'shutdown'
+                    #self.send(msg)
+                    #print('Message: ', msg)
+                    #self.isconnected = False
 
             except:
                 elapsed_time = time.time() - last_read_time
@@ -147,7 +153,10 @@ class iiwa_socket:
 
     # Each send command runs as a thread. May need to control the maximum running time (valid time to send a command).
     def send(self, cmd):
-        thread.start_new_thread(self.__send, (cmd,))
+        try:
+            thread.start_new_thread(self.__send, (cmd,))
+        except:
+            print(cl_red('Error: ') + "sending message thread failed")
 
     def __send(self, cmd):
         encoded_cmd = cmd.encode() # Encode to bytes
@@ -164,7 +173,8 @@ class kuka_iiwa_ros2_node:
         rclpy.init(args=None)
         self.kuka_node = rclpy.create_node("kuka_iiwa")
         kuka_twist_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.twist_callback, 10)
-        kuka_pose_subscriber = self.kuka_node.create_subscription(Pose, 'cmd_vel', self.pose_callback, 10)
+        kuka_pose_subscriber = self.kuka_node.create_subscription(Pose, 'pose', self.pose_callback, 10)
+        kuka_shutdown_subscriber = self.kuka_node.create_subscription(String, 'shutdown', self.shutdown_callback, 10)
         kuka_subscriber = self.kuka_node.create_subscription(String, 'kuka_command', self.callback, 10)
         # TODO: RATE er enda ikke implementert
         # self.rate = self.kuka_node.create_rate(100) # 100 hz
@@ -187,7 +197,8 @@ class kuka_iiwa_ros2_node:
             #string_callback(pub_isFinished, self.iiwa_soc.isFinished)
             #string_callback(pub_hasError,self.iiwa_soc.hasError)
             self.odom_callback(pub_odometry,self.iiwa_soc.odometry)
-            #self.scan_callback(pub_laserscan, self.iiwa_soc.laserScan)
+            self.scan_callback(pub_laserscan, self.iiwa_soc.laserScanB1)
+            self.scan_callback(pub_laserscan, self.iiwa_soc.laserScanB4)
             #TODO: Rate igjen? Charlotte?
             #self.rate.sleep() #100 hz rate.sleep()
 
@@ -203,8 +214,8 @@ class kuka_iiwa_ros2_node:
 
     def odom_callback(self, publisher, values):
         if (len(values) == 8 and values[1] != self.last_odom_timestamp):
-            kuka_timestamp = float(values[1])
-            self.last_odom_timestamp = (kuka_timestamp)
+            kuka_timestamp = values[1]
+            self.last_odom_timestamp = kuka_timestamp
 
             x = float(values[2].split(":")[1])
             y = float(values[3].split(":")[1])
@@ -213,11 +224,9 @@ class kuka_iiwa_ros2_node:
             vy = float(values[6].split(":")[1])
             vth = float(values[7].split(":")[1])
 
-            ros_timestamp = Time()
-            ros_timestamp.nanosec=int(kuka_timestamp*10**9)
 
             odom = Odometry()
-            odom.header.stamp = ros_timestamp
+            odom.header.stamp = self.getTimestamp(float(kuka_timestamp))
             odom.header.frame_id = "odom"
 
             point = Point()
@@ -253,34 +262,34 @@ class kuka_iiwa_ros2_node:
             publisher.publish(odom)
 
     def scan_callback(self, publisher, values):
-        if (len(values) == 3 and values[1] != self.last_scan_timestamp):
-            kuka_timestamp = float(values[1])
-            self.last_scan_timestamp = kuka_timestamp
+        if (len(values) == 4 and values[1] != self.last_scan_timestamp):
+            kuka_timestamp = values[1]
+            self.last_scan_timestamp =kuka_timestamp
 
-            ros_timestamp = Time()
-            ros_timestamp.nanosec = int(kuka_timestamp*10**9)
-
-            laserId = values[2]
-
-            # TODO: M_PI må settes :) "how to make a laserscan message"
-            M_PI = 3.141592
             scan = LaserScan()
-            scan.header.stamp = ros_timestamp
-            scan.angle_increment = (2.0*M_PI/360.0)
-            scan.angle_min = 0.0
-            scan.angle_max = 2.0*M_PI - scan.angle_increment
-            scan.range_min = 0.12
-            scan.range_max = 3.5
-            #scan.ranges.resize(360)
-            #scan.intensities.resize(360)
+            scan.header.stamp = self.getTimestamp(float(kuka_timestamp))
+            scan.angle_increment = (0.5*math.pi)/180
+            scan.angle_min = (-135*math.pi)/180
+            scan.angle_max = (135*math.pi)/180
+            scan.range_min = 0.12 #disse må finnes ut av
+            scan.range_max = 3.5 #finn ut
 
             ranges=values[3].split(",")
-            scan.ranges=[float(i) for i in ranges]
+            try:
+                scan.ranges=[float(i) for i in ranges if len(i.strip())]
+            except ValueError as e:
+                print("error", e)
+
             publisher.publish(scan)
 
 
     def callback(self, data):
         self.iiwa_soc.send(data.data)  # e.g 'setPosition 45 60 0 -25 0 95 0' for going to start position
+
+    def shutdown_callback(self, data):
+        msg = 'shutdown'
+        self.iiwa_soc.send(msg)
+        self.iiwa_soc.isconnected = False
 
     # TODO: WHAT IS THIS USED FOR? tror man må ta data[0]
     def twist_callback(self, data):
@@ -288,29 +297,32 @@ class kuka_iiwa_ros2_node:
         self.iiwa_soc.send(msg)
 
     def pose_callback(self, data):
-        msg = 'setPose ' + str(data.position.x) + " " + str(data.position.y) + " " + str(data.quaternion.z)
+        print(data)
+        msg = 'setPose ' + str(data.position.x) + " " + str(data.position.y) + " " + str(data.orientation.z)
         self.iiwa_soc.send(msg)
 
 
     def executor(self):
         while rclpy.ok():
             rclpy.spin_once(self.kuka_node)
-        self.kuka_node.destroy_node()
-        rclpy.shutdown()
+        try:
+            self.kuka_node.destroy_node()
+            rclpy.shutdown()
+        except:
+            print(cl_red('Error: ') + "rclpy shutdown failed")
 
-    #TODO: denne er kun nodvendig om vi lager egendefinerte ROS meldinger?
-    def getTimestamp(self):
+    def getTimestamp(self, kuka_timestamp):
         timestamp = Time()
-        timestamp.sec = math.floor((self.kuka_node.get_clock().now().nanoseconds)*(10**(-9)))
-        timestamp.nanosec = int(((self.kuka_node.get_clock().now().nanoseconds)*(10**(-9))-timestamp.sec)*(10**9))
+        timestamp.sec=math.floor(kuka_timestamp)
+        timestamp.nanosec=int((kuka_timestamp-timestamp.sec)*10**9)
         return timestamp
 
     def euler_to_quaternion(self, roll, pitch, yaw):
 
-        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
-        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
-        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qx = math.sin(roll/2) * math.cos(pitch/2) * math.cos(yaw/2) - math.cos(roll/2) * math.sin(pitch/2) * math.sin(yaw/2)
+        qy = math.cos(roll/2) * math.sin(pitch/2) * math.cos(yaw/2) + math.sin(roll/2) * math.cos(pitch/2) * math.sin(yaw/2)
+        qz = math.cos(roll/2) * math.cos(pitch/2) * math.sin(yaw/2) - math.sin(roll/2) * math.sin(pitch/2) * math.cos(yaw/2)
+        qw = math.cos(roll/2) * math.cos(pitch/2) * math.cos(yaw/2) + math.sin(roll/2) * math.sin(pitch/2) * math.sin(yaw/2)
 
         return [qx, qy, qz, qw]
 
