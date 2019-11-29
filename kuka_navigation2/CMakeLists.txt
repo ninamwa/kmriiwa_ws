@@ -47,8 +47,10 @@ install(
 install(
   PROGRAMS
     scripts/teleop_twist_keyboard.py
+    scripts/pose_keyboard.py
     DESTINATION lib/${PROJECT_NAME}
 )
+
 ################################################################################
 
 ament_package()
