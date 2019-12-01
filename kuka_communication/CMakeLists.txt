@@ -53,6 +53,11 @@ endif()
 
 # Install python scripts
 install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(
   PROGRAMS
     scripts/server.py
     scripts/client_lib_lbr.py

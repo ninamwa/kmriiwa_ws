@@ -45,7 +45,7 @@ def cl_lightcyan(msge): return '\033[96m' + msge + '\033[0m'
 
 #######################################################################################################################
 #   Class: Kuka iiwa TCP communication    #####################
-class iiwa_socket:
+class UDPSocket:
     #   M: __init__ ===========================
     def __init__(self):
         self.BUFFER_SIZE = 1024
@@ -164,41 +164,40 @@ class iiwa_socket:
 
 
 ###   Class: Kuka iiwa ROS node    ###
-class kuka_iiwa_ros2_node:
-    def __init__(self):
+class KukaCommunication:
+    def __init__(self,node,connection):
+        self.kuka_communication_node = node
+        self.udp_soc = connection
+
         self.last_odom_timestamp = 0
         self.last_scan_timestamp = 0
 
         # Make a listener for relevant topics
-        rclpy.init(args=None)
-        self.kuka_node = rclpy.create_node("kuka_iiwa")
-        kuka_twist_subscriber = self.kuka_node.create_subscription(Twist, 'cmd_vel', self.twist_callback, 10)
-        kuka_pose_subscriber = self.kuka_node.create_subscription(Pose, 'pose', self.pose_callback, 10)
-        kuka_shutdown_subscriber = self.kuka_node.create_subscription(String, 'shutdown', self.shutdown_callback, 10)
-        kuka_subscriber = self.kuka_node.create_subscription(String, 'kuka_command', self.callback, 10)
+        sub_twist = self.kuka_communication_node.create_subscription(Twist, 'cmd_vel', self.twist_callback, 10)
+        sub_pose = self.kuka_communication_node.create_subscription(Pose, 'pose', self.pose_callback, 10)
+        sub_shutdown = self.kuka_communication_node.create_subscription(String, 'shutdown', self.shutdown_callback, 10)
+        kuka_subscriber = self.kuka_communication_node.create_subscription(String, 'kuka_command', self.callback, 10)
         # TODO: RATE er enda ikke implementert
         # self.rate = self.kuka_node.create_rate(100) # 100 hz
 
-        #   Make Publishers for all kuka_iiwa data
-        pub_isFinished = self.kuka_node.create_publisher(String, 'isFinished', 10)
-        pub_hasError = self.kuka_node.create_publisher(String, 'hasError', 10)
-        pub_odometry = self.kuka_node.create_publisher(Odometry, 'odom', 10)
-        pub_laserscan = self.kuka_node.create_publisher(LaserScan, 'scan', 10)
+        # Make Publishers for all kuka_iiwa data
+        pub_isFinished = self.kuka_communication_node.create_publisher(String, 'isFinished', 10)
+        pub_hasError = self.kuka_communication_node.create_publisher(String, 'hasError', 10)
+        pub_odometry = self.kuka_communication_node.create_publisher(Odometry, 'odom', 10)
+        pub_laserscan = self.kuka_communication_node.create_publisher(LaserScan, 'scan', 10)
 
-        self.iiwa_soc = iiwa_socket()
-
-        while not self.iiwa_soc.isconnected:
+        while not self.udp_soc.isconnected:
             pass
         print('Ready to start')
 
         thread.start_new_thread(self.executor, ())
 
-        while rclpy.ok() and self.iiwa_soc.isconnected:
-            #string_callback(pub_isFinished, self.iiwa_soc.isFinished)
-            #string_callback(pub_hasError,self.iiwa_soc.hasError)
-            self.odom_callback(pub_odometry,self.iiwa_soc.odometry)
-            self.scan_callback(pub_laserscan, self.iiwa_soc.laserScanB1)
-            self.scan_callback(pub_laserscan, self.iiwa_soc.laserScanB4)
+        while rclpy.ok() and self.udp_soc.isconnected:
+            #string_callback(pub_isFinished, self.udp_soc.isFinished)
+            #string_callback(pub_hasError,self.udp_soc.hasError)
+            self.odom_callback(pub_odometry,self.udp_soc.odometry)
+            self.scan_callback(pub_laserscan, self.udp_soc.laserScanB1)
+            self.scan_callback(pub_laserscan, self.udp_soc.laserScanB4)
             #TODO: Rate igjen? Charlotte?
             #self.rate.sleep() #100 hz rate.sleep()
 
@@ -271,8 +270,8 @@ class kuka_iiwa_ros2_node:
             scan.angle_increment = (0.5*math.pi)/180
             scan.angle_min = (-135*math.pi)/180
             scan.angle_max = (135*math.pi)/180
-            scan.range_min = 0.12 #disse må finnes ut av
-            scan.range_max = 3.5 #finn ut
+            scan.range_min = 0.12 # disse må finnes ut av
+            scan.range_max = 3.5 # finn ut
 
             ranges=values[3].split(",")
             try:
@@ -284,29 +283,29 @@ class kuka_iiwa_ros2_node:
 
 
     def callback(self, data):
-        self.iiwa_soc.send(data.data)  # e.g 'setPosition 45 60 0 -25 0 95 0' for going to start position
+        self.udp_soc.send(data.data)  # e.g 'setPosition 45 60 0 -25 0 95 0' for going to start position
 
     def shutdown_callback(self, data):
         msg = 'shutdown'
-        self.iiwa_soc.send(msg)
-        self.iiwa_soc.isconnected = False
+        self.udp_soc.send(msg)
+        self.udp_soc.isconnected = False
 
-    # TODO: WHAT IS THIS USED FOR? tror man må ta data[0]
+
     def twist_callback(self, data):
-        msg = 'setTwist ' + listToString(data.linear) + " " + listToString(data.angular)
-        self.iiwa_soc.send(msg)
+        msg = 'setTwist ' + self.listToString(data.linear) + " " + self.listToString(data.angular)
+        self.udp_soc.send(msg)
 
     def pose_callback(self, data):
         print(data)
         msg = 'setPose ' + str(data.position.x) + " " + str(data.position.y) + " " + str(data.orientation.z)
-        self.iiwa_soc.send(msg)
+        self.udp_soc.send(msg)
 
 
     def executor(self):
         while rclpy.ok():
-            rclpy.spin_once(self.kuka_node)
+            rclpy.spin_once(self.kuka_communication_node)
         try:
-            self.kuka_node.destroy_node()
+            self.kuka_communication_node.destroy_node()
             rclpy.shutdown()
         except:
             print(cl_red('Error: ') + "rclpy shutdown failed")
@@ -326,8 +325,11 @@ class kuka_iiwa_ros2_node:
 
         return [qx, qy, qz, qw]
 
-######################################################################################################################
+    def listToString(list):
+        listString = str(list.x) + " " + str(list.y) + " " + str(list.z)
+        return listString
 
+##################################################
 #   M:  Reading config file for Server IP and Port
 def read_conf():
     f_conf = os.path.abspath(os.path.dirname(__file__)) + '/config.txt'
@@ -346,13 +348,13 @@ def read_conf():
         print(cl_red('Error:'), "conf.txt doesn't exist!")
     return [IP, Port]
 
-def listToString(list):
-    listString = str(list.x) + " " + str(list.y) + " " + str(list.z)
-    return listString
-
 
 def main(args=None):
-    node = kuka_iiwa_ros2_node()
+    rclpy.init(args=None)
+    kuka_communication_node = rclpy.create_node("kuka_communication_node")
+    udp = UDPSocket()
+    comm = KukaCommunication(kuka_communication_node,udp)
+
 
 if __name__ == '__main__':
     main()
