@@ -37,12 +37,12 @@ int main(int argc, char * argv[])
 
   auto counter = 0.0;
   auto joint_value = 0.0;
-  auto joint_value_2 = 0.0;
+  //auto joint_value_2 = 0.0;
 
   while (rclcpp::ok()) {
     counter += 0.1;
     joint_value = counter;
-    joint_value_2 = std::sin(counter);
+    //joint_value_2 = std::sin(counter);
 
     for (size_t i = 0; i < msg.name.size(); ++i) {
       msg.position[i] = joint_value;
