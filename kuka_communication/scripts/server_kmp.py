@@ -18,12 +18,15 @@ import time
 import os
 import math
 import rclpy
+from rclpy.node import Node
 import socket
 from std_msgs.msg import String
-from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
+from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, TransformStamped
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
 from builtin_interfaces.msg import Time
+from tf2_ros.transform_broadcaster import TransformBroadcaster
+
 
 
 def cl_black(msge): return '\033[30m' + msge + '\033[0m'
@@ -186,6 +189,9 @@ class KukaCommunication:
         pub_odometry = self.kuka_communication_node.create_publisher(Odometry, 'odom', 10)
         pub_laserscan = self.kuka_communication_node.create_publisher(LaserScan, 'scan', 10)
 
+        # Create tf broadcaster
+        self.tf_broadcaster = TransformBroadcaster()
+
         while not self.udp_soc.isconnected:
             pass
         print('Ready to start')
@@ -257,6 +263,9 @@ class KukaCommunication:
 
             odom.twist.twist.linear = linear
             odom.twist.twist.angular = angular
+
+            # Create transform
+            odom_tf= TransformStamped()
 
             publisher.publish(odom)
 
