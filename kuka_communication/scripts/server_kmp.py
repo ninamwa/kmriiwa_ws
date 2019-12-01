@@ -266,8 +266,19 @@ class KukaCommunication:
 
             # Create transform
             odom_tf= TransformStamped()
+            odom_tf.transform.translation.x = odom.pose.pose.position.x
+            odom_tf.transform.translation.y = odom.pose.pose.position.y
+            odom_tf.transform.translation.z = odom.pose.pose.position.z
+            odom_tf.transform.rotation = odom.pose.pose.orientation
+
+            odom_tf.header.frame_id = odom.header.frame_id
+            odom_tf.child_frame_id = odom.child_frame_id
+            odom_tf.header.stamp = odom.header.stamp
+
 
             publisher.publish(odom)
+            self.tf_broadcaster_.sendTransform(odom_tf)
+
 
     def scan_callback(self, publisher, values):
         if (len(values) == 4 and values[1] != self.last_scan_timestamp):
