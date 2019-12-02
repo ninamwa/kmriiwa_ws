@@ -92,6 +92,10 @@ if __name__=="__main__":
             elif key in speedBindings.keys():
                 speed = speed * speedBindings[key][0]
                 turn = turn * speedBindings[key][1]
+                if speed > 1.0:
+                    speed=1.0
+                if turn > 1.0:
+                    turn=1.0
 
                 print(vels(speed,turn))
                 if (status == 14):
