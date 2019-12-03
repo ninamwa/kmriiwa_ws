@@ -2,6 +2,7 @@
 import rclpy
 import sys, select, termios, tty
 from geometry_msgs.msg import Twist
+from std_msgs.msg import String
 
 msg = """
 Reading from the keyboard  and Publishing to Twist!
@@ -54,6 +55,10 @@ speedBindings={
         'c':(1,.9),
     }
 
+stopBindings={
+        's':(0,0,0),
+}
+
 def getKey():
     tty.setraw(sys.stdin.fileno())
     select.select([sys.stdin], [], [], 0)
@@ -70,9 +75,10 @@ if __name__=="__main__":
     rclpy.init()
     node = rclpy.create_node('teleop_keyboard')
     pub = node.create_publisher(Twist, '/cmd_vel', 10)
+    stop_pub = node.create_publisher(String, '/shutdown', 10)
 
     speed = 0.1 #node.get_parameter('speed', 0.5)
-    turn = 0.1#node.get_parameter('turn', 1.0)
+    turn = 0.1 #node.get_parameter('turn', 1.0)
     x = 0
     y = 0
     z = 0
@@ -101,6 +107,13 @@ if __name__=="__main__":
                 if (status == 14):
                     print(msg)
                 status = (status + 1) % 15
+
+            elif key in stopBindings.keys():
+                st = String()
+                st.data="shutdown"
+                print(st)
+                stop_pub.publish(st)
+
             else:
                 x = 0
                 y = 0

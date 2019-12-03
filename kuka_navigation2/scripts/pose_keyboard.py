@@ -51,19 +51,18 @@ if __name__=="__main__":
         while(1):
             key = getKey()
             if key in moveBindings.keys():
-                x = x+moveBindings[key][0]
-                y = y+moveBindings[key][1]
-                th = th+moveBindings[key][2]
+                x = moveBindings[key][0]
+                y = moveBindings[key][1]
+                th = moveBindings[key][2]
             elif key in stopBindings.keys():
                 st = String()
                 st.data="shutdown"
                 print(st)
                 stop_pub.publish(st)
-                break
             else:
-                x = x+0.0
-                y = y+0.0
-                th = th+0.0
+                x = 0.0
+                y = 0.0
+                th = 0.0
                 if (key == '\x03'):
                     break
 
