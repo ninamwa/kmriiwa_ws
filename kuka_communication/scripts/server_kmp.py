@@ -26,6 +26,7 @@ from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
 from builtin_interfaces.msg import Time
 from tf2_ros.transform_broadcaster import TransformBroadcaster
+from tf2_ros import StaticTransformBroadcaster
 
 
 
@@ -108,7 +109,6 @@ class UDPSocket:
                 data, self.client_address = self.udp.recvfrom(self.BUFFER_SIZE)
                 data = data.decode('utf-8')
                 last_read_time = time.time()  # Keep received time
-
                 # Process the received data package
                 cmd_splt=data.split(">")[1].split()
                 if len(cmd_splt) and cmd_splt[0] == 'isFinished':
@@ -124,12 +124,10 @@ class UDPSocket:
                 if len(cmd_splt) and cmd_splt[0] == 'odometry':
                         self.odometry = cmd_splt
                 if len(cmd_splt) and cmd_splt[0] == 'laserScan':
-                    if cmd_splt[2] == 1801:
+                    if cmd_splt[2] == '1801':
                         self.laserScanB1 = cmd_splt
-                        print(cmd_splt)
-                    elif cmd_splt[2] == 1802:
+                    elif cmd_splt[2] == '1802':
                         self.laserScanB4 = cmd_splt
-                        print(cmd_splt)
 
 
                 el = time.time() - timee
@@ -187,10 +185,12 @@ class KukaCommunication:
         pub_isFinished = self.kuka_communication_node.create_publisher(String, 'isFinished', 10)
         pub_hasError = self.kuka_communication_node.create_publisher(String, 'hasError', 10)
         pub_odometry = self.kuka_communication_node.create_publisher(Odometry, 'odom', 10)
-        pub_laserscan = self.kuka_communication_node.create_publisher(LaserScan, 'scan', 10)
+        pub_laserscan1 = self.kuka_communication_node.create_publisher(LaserScan, 'scan_1', 10)
+        pub_laserscan4 = self.kuka_communication_node.create_publisher(LaserScan, 'scan_2', 10)
+        self.send_static_transform()
 
         # Create tf broadcaster
-        self.tf_broadcaster = TransformBroadcaster()
+        self.tf_broadcaster = TransformBroadcaster(node)
 
         while not self.udp_soc.isconnected:
             pass
@@ -202,8 +202,8 @@ class KukaCommunication:
             #string_callback(pub_isFinished, self.udp_soc.isFinished)
             #string_callback(pub_hasError,self.udp_soc.hasError)
             self.odom_callback(pub_odometry,self.udp_soc.odometry)
-            self.scan_callback(pub_laserscan, self.udp_soc.laserScanB1)
-            self.scan_callback(pub_laserscan, self.udp_soc.laserScanB4)
+            self.scan_callback(pub_laserscan1, self.udp_soc.laserScanB1)
+            self.scan_callback(pub_laserscan4, self.udp_soc.laserScanB4)
             #TODO: Rate igjen? Charlotte?
             #self.rate.sleep() #100 hz rate.sleep()
 
@@ -249,7 +249,6 @@ class KukaCommunication:
             odom.pose.pose.position = point
             odom.pose.pose.orientation = odom_quat
 
-            #TODO: Sjekk om denne egentlig skal være base_footprint
             odom.child_frame_id = "base_footprint"
             linear = Vector3()
             linear.x = vx
@@ -277,7 +276,7 @@ class KukaCommunication:
 
 
             publisher.publish(odom)
-            self.tf_broadcaster_.sendTransform(odom_tf)
+            self.tf_broadcaster.sendTransform(odom_tf)
 
 
     def scan_callback(self, publisher, values):
@@ -287,6 +286,10 @@ class KukaCommunication:
 
             scan = LaserScan()
             scan.header.stamp = self.getTimestamp(float(kuka_timestamp))
+            if values[2] == '1801':
+                scan.header.frame_id = "scan_1"
+            elif values[2] == '1802':
+                scan.header.frame_id="scan_2"
             scan.angle_increment = (0.5*math.pi)/180
             scan.angle_min = (-135*math.pi)/180
             scan.angle_max = (135*math.pi)/180
@@ -296,6 +299,7 @@ class KukaCommunication:
             ranges=values[3].split(",")
             try:
                 scan.ranges=[float(i) for i in ranges if len(i.strip())]
+                #scan.intensities=[float(10) for i in ranges]
             except ValueError as e:
                 print("error", e)
 
@@ -308,11 +312,12 @@ class KukaCommunication:
     def shutdown_callback(self, data):
         msg = 'shutdown'
         self.udp_soc.send(msg)
-        self.udp_soc.isconnected = False
+        #self.udp_soc.isconnected = False
 
 
     def twist_callback(self, data):
-        msg = 'setTwist ' + self.listToString(data.linear) + " " + self.listToString(data.angular)
+        print(data)
+        msg = 'setTwist ' + str(data.linear.x) + " " + str(data.linear.y) + " " + str(data.angular.z)
         self.udp_soc.send(msg)
 
     def pose_callback(self, data):
@@ -348,6 +353,25 @@ class KukaCommunication:
     def listToString(list):
         listString = str(list.x) + " " + str(list.y) + " " + str(list.z)
         return listString
+
+    def send_static_transform(self):
+        broadcaster = StaticTransformBroadcaster(self.kuka_communication_node)
+        static_transformStamped = TransformStamped()
+        static_transformStamped.header.frame_id = "laser_B4_link"
+        static_transformStamped.child_frame_id = "scan_2"
+        static_transformStamped.transform.translation.x = 0.0
+        static_transformStamped.transform.translation.y = 0.0
+        static_transformStamped.transform.translation.z = 0.0
+        quat = self.euler_to_quaternion(0, 0, 0)
+        static_transformStamped.transform.rotation.x = quat[0]
+        static_transformStamped.transform.rotation.y = quat[1]
+        static_transformStamped.transform.rotation.z = quat[2]
+        static_transformStamped.transform.rotation.w = quat[3]
+        broadcaster.sendTransform(static_transformStamped)
+        static_transformStamped.header.frame_id = "laser_B1_link"
+        static_transformStamped.child_frame_id = "scan_1"
+        broadcaster.sendTransform(static_transformStamped)
+
 
 ##################################################
 #   M:  Reading config file for Server IP and Port
