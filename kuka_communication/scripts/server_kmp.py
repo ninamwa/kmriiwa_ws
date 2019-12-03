@@ -27,6 +27,8 @@ from sensor_msgs.msg import LaserScan
 from builtin_interfaces.msg import Time
 from tf2_ros.transform_broadcaster import TransformBroadcaster
 from tf2_ros import StaticTransformBroadcaster
+from rclpy.qos import qos_profile_sensor_data
+
 
 
 
@@ -174,19 +176,19 @@ class KukaCommunication:
         self.last_scan_timestamp = 0
 
         # Make a listener for relevant topics
-        sub_twist = self.kuka_communication_node.create_subscription(Twist, 'cmd_vel', self.twist_callback, 10)
-        sub_pose = self.kuka_communication_node.create_subscription(Pose, 'pose', self.pose_callback, 10)
-        sub_shutdown = self.kuka_communication_node.create_subscription(String, 'shutdown', self.shutdown_callback, 10)
-        kuka_subscriber = self.kuka_communication_node.create_subscription(String, 'kuka_command', self.callback, 10)
+        sub_twist = self.kuka_communication_node.create_subscription(Twist, 'cmd_vel', self.twist_callback, qos_profile_sensor_data)
+        sub_pose = self.kuka_communication_node.create_subscription(Pose, 'pose', self.pose_callback, qos_profile_sensor_data)
+        sub_shutdown = self.kuka_communication_node.create_subscription(String, 'shutdown', self.shutdown_callback, qos_profile_sensor_data)
+        kuka_subscriber = self.kuka_communication_node.create_subscription(String, 'kuka_command', self.callback, qos_profile_sensor_data)
         # TODO: RATE er enda ikke implementert
         # self.rate = self.kuka_node.create_rate(100) # 100 hz
 
         # Make Publishers for all kuka_iiwa data
-        pub_isFinished = self.kuka_communication_node.create_publisher(String, 'isFinished', 10)
-        pub_hasError = self.kuka_communication_node.create_publisher(String, 'hasError', 10)
-        pub_odometry = self.kuka_communication_node.create_publisher(Odometry, 'odom', 10)
-        pub_laserscan1 = self.kuka_communication_node.create_publisher(LaserScan, 'scan_1', 10)
-        pub_laserscan4 = self.kuka_communication_node.create_publisher(LaserScan, 'scan_2', 10)
+        pub_isFinished = self.kuka_communication_node.create_publisher(String, 'isFinished', qos_profile_sensor_data)
+        pub_hasError = self.kuka_communication_node.create_publisher(String, 'hasError', qos_profile_sensor_data)
+        pub_odometry = self.kuka_communication_node.create_publisher(Odometry, 'odom', qos_profile_sensor_data)
+        pub_laserscan1 = self.kuka_communication_node.create_publisher(LaserScan, 'scan_1', qos_profile_sensor_data)
+        pub_laserscan4 = self.kuka_communication_node.create_publisher(LaserScan, 'scan_2', qos_profile_sensor_data)
         self.send_static_transform()
 
         # Create tf broadcaster
@@ -355,7 +357,8 @@ class KukaCommunication:
         return listString
 
     def send_static_transform(self):
-        broadcaster = StaticTransformBroadcaster(self.kuka_communication_node)
+        broadcaster1 = StaticTransformBroadcaster(self.kuka_communication_node)
+        broadcaster2 = StaticTransformBroadcaster(self.kuka_communication_node)
         static_transformStamped = TransformStamped()
         static_transformStamped.header.frame_id = "laser_B4_link"
         static_transformStamped.child_frame_id = "scan_2"
@@ -367,10 +370,10 @@ class KukaCommunication:
         static_transformStamped.transform.rotation.y = quat[1]
         static_transformStamped.transform.rotation.z = quat[2]
         static_transformStamped.transform.rotation.w = quat[3]
-        broadcaster.sendTransform(static_transformStamped)
+        broadcaster1.sendTransform(static_transformStamped)
         static_transformStamped.header.frame_id = "laser_B1_link"
         static_transformStamped.child_frame_id = "scan_1"
-        broadcaster.sendTransform(static_transformStamped)
+        broadcaster2.sendTransform(static_transformStamped)
 
 
 ##################################################
