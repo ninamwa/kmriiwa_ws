@@ -12,9 +12,7 @@ import launch_ros.actions
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
 
-
-    #urdf_file_name = 'kukatest.urdf'
-    urdf_file_name = 'kuka2.urdf'
+    urdf_file_name = 'kuka_iiwa.urdf'
     urdf = os.path.join(
         get_package_share_directory('kuka_bringup'),
         'urdf',

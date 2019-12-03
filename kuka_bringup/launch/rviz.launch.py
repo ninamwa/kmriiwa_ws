@@ -15,16 +15,24 @@ def generate_launch_description():
     rviz_config_dir = os.path.join(
             get_package_share_directory('kuka_bringup'),
             'rviz',
-            'model.rviz')
+            'tf2.rviz')
 
-    urdf_file_name = 'kukatest.urdf'
+    urdf_file_name = 'kuka_iiwa.urdf'
     urdf = os.path.join(
         get_package_share_directory('kuka_bringup'),
         'urdf',
         urdf_file_name)
 
+    map_name='playpen_map.yaml'
+    map_path=os.path.join(get_package_share_directory('kuka_navigation2'),
+        'map',
+        map_name)
+
+
 
     return LaunchDescription([
+
+
 
         launch_ros.actions.Node(
             package='rviz2',
@@ -34,13 +42,13 @@ def generate_launch_description():
             output='screen'),
 
 
-        #launch_ros.actions.Node(package='kuka_bringup', node_executable='dummy_joint_states', output='screen'),
-        launch_ros.actions.Node(
-            package='joint_state_publisher',
-            node_executable='joint_state_publisher',
-            output='screen',
-            arguments=[urdf],
-            parameters=[{'use_gui': True}]),
+        launch_ros.actions.Node(package='kuka_bringup', node_executable='dummy_joint_states', output='screen'),
+        #launch_ros.actions.Node(
+        #    package='joint_state_publisher',
+        #    node_executable='joint_state_publisher',
+        #    output='screen',
+        #    arguments=[urdf],
+        #    parameters=[{'use_gui': True}]),
 
 
     ])
