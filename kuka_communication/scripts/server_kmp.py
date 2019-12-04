@@ -54,7 +54,8 @@ def cl_lightcyan(msge): return '\033[96m' + msge + '\033[0m'
 class UDPSocket:
     #   M: __init__ ===========================
     def __init__(self):
-        self.BUFFER_SIZE = 1024
+        self.BUFFER_SIZE = 4096
+        #self.BUFFER_SIZE = 10000
         self.isconnected = False
         self.isFinished = (False, None)
         self.hasError = (False, None)
@@ -65,11 +66,11 @@ class UDPSocket:
         self.udp = None
 
         #TODO: Do something with isready, which is relevant for us.
-
-        try:
-            threading.Thread(target=self.connect_to_socket).start()
-        except:
-            print(cl_pink("Error: ") + "Unable to start connection thread")
+        threading.Thread(target=self.connect_to_socket).start()
+        #try:
+        #    threading.Thread(target=self.connect_to_socket).start()
+        #except:
+        #    print(cl_pink("Error: ") + "Unable to start connection thread")
 
     def close(self):
         self.isconnected = False
@@ -89,6 +90,8 @@ class UDPSocket:
         print(cl_cyan('Starting up on:'), 'IP:', ros_host, 'Port:', ros_port)
         try:
             self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.udp.settimeout(0.1)
+            self.udp.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,1048576)
             self.udp.bind((ros_host, ros_port))
         except:
             print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address:", ros_host, ros_port)
@@ -96,16 +99,21 @@ class UDPSocket:
 
 
         print(cl_cyan('Waiting for a connection...'))
-        data, self.client_address = self.udp.recvfrom(self.BUFFER_SIZE)
+        while (not self.isconnected):
+            try:
+                data, self.client_address = self.udp.recvfrom(self.BUFFER_SIZE)
+                self.isconnected = True
+            except:
+                t=0
         print(cl_cyan('Connection from: '), self.client_address)
         print(cl_cyan('Message: '), data.decode('utf-8'))
 
         self.udp.sendto("hello KUKA".encode('utf-8'), self.client_address)
         print("Responded KUKA")
-        self.isconnected = True
 
 
         timee = time.time() #For debugging purposes
+        count = 0
         while self.isconnected:
             try:
                 data, self.client_address = self.udp.recvfrom(self.BUFFER_SIZE)
@@ -127,26 +135,22 @@ class UDPSocket:
                         self.odometry = cmd_splt
                 if len(cmd_splt) and cmd_splt[0] == 'laserScan':
                     if cmd_splt[2] == '1801':
-                        self.laserScanB1 = cmd_splt
+                        self.laserScanB1.append(cmd_splt)
+                        # print(cmd_splt)
+                        count = count + 1
+                        print(count)
                     elif cmd_splt[2] == '1802':
-                        self.laserScanB4 = cmd_splt
-
-
-                el = time.time() - timee
-                #if (el > 20.0):
-                    #msg = 'setPose ' + str(100) + " " + str(0) + " " + str(0)
-                    #self.send(msg)
-                    #msg = 'shutdown'
-                    #self.send(msg)
-                    #print('Message: ', msg)
-                    #self.isconnected = False
+                        self.laserScanB4.append(cmd_splt)
+                        count = count + 1
+                        print(count)
 
             except:
-                elapsed_time = time.time() - last_read_time
-                if elapsed_time > 5.0:  # Didn't receive a pack in 5s
-                   print("exception!!")
-                   self.isconnected = False
-                   print(cl_lightred('No packet received from iiwa for 5s!'))
+                t=0
+                #elapsed_time = time.time() - last_read_time
+                #if elapsed_time > 5.0:  # Didn't receive a pack in 5s
+                #  print("exception!!")
+                #  self.isconnected = False
+                #  print(cl_lightred('No packet received from iiwa for 5s!'))
 
         print("SHUTTING DOWN")
         self.udp.close()
@@ -204,8 +208,10 @@ class KukaCommunication:
             #string_callback(pub_isFinished, self.udp_soc.isFinished)
             #string_callback(pub_hasError,self.udp_soc.hasError)
             self.odom_callback(pub_odometry,self.udp_soc.odometry)
-            self.scan_callback(pub_laserscan1, self.udp_soc.laserScanB1)
-            self.scan_callback(pub_laserscan4, self.udp_soc.laserScanB4)
+            if len(self.udp_soc.laserScanB1):
+                self.scan_callback(pub_laserscan1, self.udp_soc.laserScanB1.pop(0))
+            if len(self.udp_soc.laserScanB4):
+                self.scan_callback(pub_laserscan1, self.udp_soc.laserScanB4.pop(0))
             #TODO: Rate igjen? Charlotte?
             #self.rate.sleep() #100 hz rate.sleep()
 
@@ -233,7 +239,7 @@ class KukaCommunication:
 
 
             odom = Odometry()
-            odom.header.stamp = self.getTimestamp(float(kuka_timestamp))
+            odom.header.stamp = self.getTimestamp2(self.kuka_communication_node.get_clock().now().nanoseconds)
             odom.header.frame_id = "odom"
 
             point = Point()
@@ -285,9 +291,9 @@ class KukaCommunication:
         if (len(values) == 4 and values[1] != self.last_scan_timestamp):
             kuka_timestamp = values[1]
             self.last_scan_timestamp =kuka_timestamp
-
             scan = LaserScan()
-            scan.header.stamp = self.getTimestamp(float(kuka_timestamp))
+            #scan.header.stamp = self.getTimestamp(float(kuka_timestamp))
+            scan.header.stamp = self.getTimestamp2(self.kuka_communication_node.get_clock().now().nanoseconds)
             if values[2] == '1801':
                 scan.header.frame_id = "scan_1"
             elif values[2] == '1802':
@@ -297,7 +303,6 @@ class KukaCommunication:
             scan.angle_max = (135*math.pi)/180
             scan.range_min = 0.12 # disse må finnes ut av
             scan.range_max = 3.5 # finn ut
-
             ranges=values[3].split(",")
             try:
                 scan.ranges=[float(i) for i in ranges if len(i.strip())]
@@ -312,18 +317,17 @@ class KukaCommunication:
         self.udp_soc.send(data.data)  # e.g 'setPosition 45 60 0 -25 0 95 0' for going to start position
 
     def shutdown_callback(self, data):
+        print(data)
         msg = 'shutdown'
         self.udp_soc.send(msg)
         #self.udp_soc.isconnected = False
 
 
     def twist_callback(self, data):
-        print(data)
         msg = 'setTwist ' + str(data.linear.x) + " " + str(data.linear.y) + " " + str(data.angular.z)
         self.udp_soc.send(msg)
 
     def pose_callback(self, data):
-        print(data)
         msg = 'setPose ' + str(data.position.x) + " " + str(data.position.y) + " " + str(data.orientation.z)
         self.udp_soc.send(msg)
 
@@ -341,6 +345,13 @@ class KukaCommunication:
         timestamp = Time()
         timestamp.sec=math.floor(kuka_timestamp)
         timestamp.nanosec=int((kuka_timestamp-timestamp.sec)*10**9)
+        return timestamp
+
+    def getTimestamp2(self,nano):
+        t = nano * 10 ** -9
+        timestamp = Time()
+        timestamp.sec = math.floor(t)
+        timestamp.nanosec = int((t - timestamp.sec) * 10 ** 9)
         return timestamp
 
     def euler_to_quaternion(self, roll, pitch, yaw):
@@ -400,7 +411,13 @@ def main(args=None):
     rclpy.init(args=None)
     kuka_communication_node = rclpy.create_node("kuka_communication_node")
     udp = UDPSocket()
-    comm = KukaCommunication(kuka_communication_node,udp)
+    KukaCommunication(kuka_communication_node,udp)
+
+    #try:
+    #    threading.Thread(target=KukaCommunication(kuka_communication_node,udp)).start()
+    #except:
+    #    print(cl_pink("Error: ") + "Unable to start connection thread")
+    #comm = KukaCommunication(kuka_communication_node,udp)
 
 
 if __name__ == '__main__':
