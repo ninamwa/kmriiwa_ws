@@ -64,6 +64,11 @@ install(
     scripts/client_lib_kmp.py
     scripts/server_kmp.py
     scripts/UDPconnector_withListener.py
+    scripts/test.py
+    scripts/view_frames.py
+    scripts/buffer.py
+    scripts/kmp_comm.py
+    scripts/server_TCP.py
     DESTINATION lib/${PROJECT_NAME}
 )
 
