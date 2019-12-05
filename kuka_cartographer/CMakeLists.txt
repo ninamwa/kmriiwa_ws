@@ -39,7 +39,7 @@ endif()
 # Install
 ################################################################################
 install(
-  DIRECTORY launch config rviz
+  DIRECTORY launch config rviz created_maps
   DESTINATION share/${PROJECT_NAME}
 )
 
