@@ -211,7 +211,7 @@ class KukaCommunication:
             if len(self.udp_soc.laserScanB1):
                 self.scan_callback(pub_laserscan1, self.udp_soc.laserScanB1.pop(0))
             if len(self.udp_soc.laserScanB4):
-                self.scan_callback(pub_laserscan1, self.udp_soc.laserScanB4.pop(0))
+                self.scan_callback(pub_laserscan4, self.udp_soc.laserScanB4.pop(0))
             #TODO: Rate igjen? Charlotte?
             #self.rate.sleep() #100 hz rate.sleep()
 
