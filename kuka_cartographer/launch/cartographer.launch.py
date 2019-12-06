@@ -17,7 +17,7 @@ def generate_launch_description():
     rviz_config_dir = os.path.join(
         get_package_share_directory('kuka_cartographer'),
         'rviz',
-        'tb3_cartographer.rviz'),
+        'kuka_cartographer.rviz'),
 
     cartographer_config_dir = os.path.join(
         get_package_share_directory('kuka_cartographer'),
@@ -29,7 +29,7 @@ def generate_launch_description():
         'state_pub_pkg_dir',
         default=os.path.join(get_package_share_directory('kuka_bringup'), 'launch')),
 
-    state_pub_pkg_dir2 = os.path.join(get_package_share_directory('kuka_bringup'), 'launch'),
+    state_publisher_launch_file_dir = os.path.join(get_package_share_directory('kuka_bringup'), 'launch')
 
     return LaunchDescription([
 
@@ -59,9 +59,9 @@ def generate_launch_description():
         #        parameters=[{'use_sim_time': use_sim_time}],
         #        arguments=['-resolution', resolution, '-publish_period_sec', publish_period_sec]),
 
-        #IncludeLaunchDescription(
-        #    PythonLaunchDescriptionSource([state_pub_pkg_dir, '/state_publisher.launch.py']),
-        #),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([state_publisher_launch_file_dir, '/state_publisher.launch.py']),
+        ),
 
         launch_ros.actions.Node(
             package='rviz2',
