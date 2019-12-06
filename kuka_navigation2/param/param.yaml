@@ -13,7 +13,7 @@ amcl:
     do_beamskip: false
     global_frame_id: "map"
     lambda_short: 0.1
-    laser_likelihood_max_dist: 2.0
+    laser_likelihood_max_dist: 4.0
     laser_max_range: 100.0
     laser_min_range: -1.0
     laser_model_type: "likelihood_field"
@@ -55,27 +55,27 @@ dwb_controller:
   ros__parameters:
     use_sim_time: False
     debug_trajectory_details: True
-    min_vel_x: 0
-    min_vel_y: -0.26
-    max_vel_x: 0
-    max_vel_y: 0.26
-    max_vel_theta: 1.0
-    min_speed_xy: 0.0
-    max_speed_xy: 0.26
-    min_speed_theta: 0.0
+    min_vel_x: -1
+    min_vel_y: -0.56
+    max_vel_x: 1
+    max_vel_y: 0.56
+    max_vel_theta: 0.51
+    min_speed_xy: -0.56
+    max_speed_xy: 0.56
+    min_speed_theta: -0.51
     min_x_velocity_threshold: 0.001
     # Add high threshold velocity for turtlebot 3 issue.
     # https://github.com/ROBOTIS-GIT/turtlebot3_simulations/issues/75
     min_y_velocity_threshold: 0.001
     min_theta_velocity_threshold: 0.001
-    acc_lim_x: 0
-    acc_lim_y: 2.5
-    acc_lim_theta: 3.2
-    decel_lim_x: 0
-    decel_lim_y: -2.5
-    decel_lim_theta: -3.2
+    acc_lim_x: 0.5
+    acc_lim_y: 0.5
+    acc_lim_theta: 0.5
+    decel_lim_x: -1
+    decel_lim_y: -1
+    decel_lim_theta: -1
     vx_samples: 20
-    vy_samples: 5
+    vy_samples: 20
     vtheta_samples: 20
     sim_time: 1.7
     linear_granularity: 0.05
@@ -100,14 +100,14 @@ local_costmap:
       width: 3
       height: 3
       resolution: 0.05
-      robot_radius: 0.22
+      robot_radius: 0.54
       inflation_layer.cost_scaling_factor: 3.0
       obstacle_layer:
         enabled: True
       always_send_full_costmap: True
       observation_sources: scan
       scan:
-        topic: /scan
+        topic: scan
         max_obstacle_height: 2.0
         clearing: True
         marking: True
@@ -122,13 +122,13 @@ global_costmap:
   global_costmap:
     ros__parameters:
       use_sim_time: False
-      robot_radius: 0.22
+      robot_radius: 0.54
       obstacle_layer:
         enabled: True
       always_send_full_costmap: True
       observation_sources: scan
       scan:
-        topic: /scan
+        topic: scan
         max_obstacle_height: 2.0
         clearing: True
         marking: True

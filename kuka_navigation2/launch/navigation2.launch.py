@@ -14,7 +14,7 @@ def generate_launch_description():
         default=os.path.join(
             get_package_share_directory('kuka_navigation2'),
             'map',
-            'playpen_map.yaml'))
+            'lab.yaml'))
 
     param_dir = LaunchConfiguration(
         'params',
@@ -24,10 +24,11 @@ def generate_launch_description():
             'param.yaml'))
 
     nav2_launch_file_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
+    state_publisher_launch_file_dir = os.path.join(get_package_share_directory('kuka_bringup'), 'launch')
 
     rviz_config_dir = os.path.join(
         get_package_share_directory('nav2_bringup'),
-        'launch',
+        'rviz',
         'nav2_default_view.rviz')
 
     return LaunchDescription([
@@ -47,6 +48,10 @@ def generate_launch_description():
                 'map': map_dir,
                 'use_sim_time': use_sim_time,
                 'params': param_dir}.items(),
+        ),
+
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([state_publisher_launch_file_dir, '/state_publisher.launch.py']),
         ),
 
         Node(
