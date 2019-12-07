@@ -17,11 +17,11 @@ def generate_launch_description():
             'lab.yaml'))
 
     param_dir = LaunchConfiguration(
-        'params',
+        'params_file',
         default=os.path.join(
             get_package_share_directory('kuka_navigation2'),
             'param',
-            'param.yaml'))
+            'param2.yaml'))
 
     nav2_launch_file_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
     state_publisher_launch_file_dir = os.path.join(get_package_share_directory('kuka_bringup'), 'launch')
@@ -47,7 +47,7 @@ def generate_launch_description():
             launch_arguments={
                 'map': map_dir,
                 'use_sim_time': use_sim_time,
-                'params': param_dir}.items(),
+                'params_file': param_dir}.items(),
         ),
 
         IncludeLaunchDescription(
