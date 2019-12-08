@@ -21,7 +21,7 @@ def generate_launch_description():
         default=os.path.join(
             get_package_share_directory('kuka_navigation2'),
             'param',
-            'param2.yaml'))
+            'param_reducedVel.yaml'))
 
     nav2_launch_file_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
     state_publisher_launch_file_dir = os.path.join(get_package_share_directory('kuka_bringup'), 'launch')
