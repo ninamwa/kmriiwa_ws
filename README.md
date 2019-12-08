@@ -1,4 +1,20 @@
 # kuka_ws
 
+Repository for specialization project in Robotics & Automation, at NTNU Fall 2019, by Charlotte Heggem and Nina Marie Wahl. 
 
-The packages added that are part of the KUKA software can be added to KUKAJavaLib. External jar packages are added to the overall project folder.
+**Title:** 
+
+**Intention:**
+This project aims to create a communication API between a KMR iiwa robot from KUKA and ROS2. The ROS packages Cartographer and Navigation2 is used to verify wheter the communication works as expected or not. 
+
+**System requirements:** 
+
+- Ubuntu 18.04.3
+- Python 2.7
+- ROS Eloquent (Dashing branch is not up to date)
+
+
+**Required ROS Packages:**
+- Cartographer
+- Navigation2
+- tf2
