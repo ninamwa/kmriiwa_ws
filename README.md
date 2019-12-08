@@ -10,7 +10,7 @@ This project aims to create a communication API between a KMR iiwa robot from KU
 **System requirements:** 
 
 - Ubuntu 18.04.3
-- Python 2.7
+- Python 3.6.9
 - ROS Eloquent (Dashing branch is not up to date)
 
 
