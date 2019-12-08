@@ -34,5 +34,5 @@ This will launch the communication node for the KMR iiwa, start Rviz with the co
 If you want to save the map which are created, this can be done by running the following command in a separate terminal:
 
 ```
-$ ros2 run nav2_map_server map_saver -f ~/map
+$ ros2 run nav2_map_server map_saver -f ~/PATH_TO/created_maps
 ```
