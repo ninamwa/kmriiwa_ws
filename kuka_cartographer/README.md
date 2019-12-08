@@ -36,3 +36,5 @@ If you want to save the map which are created, this can be done by running the f
 ```
 $ ros2 run nav2_map_server map_saver -f ~/PATH_TO/created_maps
 ```
+
+The PATH_TO needs to be changed based on where your project is saved. 
