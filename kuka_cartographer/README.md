@@ -6,6 +6,7 @@ This package handles the use of the Cartographer package for realtime SLAM and c
 The following packages needs to be installed:
 - Cartographer
 - Cartographer_ros
+- Nav2_map_server (if you want to save the map)
 
 
 
