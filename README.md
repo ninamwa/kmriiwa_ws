@@ -17,4 +17,5 @@ This project aims to create a communication API between a KMR iiwa robot from KU
 **Required ROS Packages:**
 - Cartographer
 - Navigation2
-- tf2
+- Gazebo packages
+- Joint State Publisher
