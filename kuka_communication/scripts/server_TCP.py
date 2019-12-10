@@ -75,12 +75,13 @@ class TCPSocket:
     def connect_to_socket(self):
         # TODO: REPLACE THIS WHEN CONFIG.TXT IS FIXED
 
-        ros_host="192.168.10.116"
+        ros_host="192.168.10.102"
         ros_port = 30008
+
 
         os.system('clear')
         print(cl_pink('\n=========================================='))
-        print(cl_pink('<   <  < << INITIALIZE UDPconnection>> >  >   >'))
+        print(cl_pink('<   <  < << INITIALIZE TCPconnection>> >  >   >'))
         print(cl_pink('=========================================='))
         print(cl_pink(' KUKA API for ROS2'))
         print(cl_pink('==========================================\n'))
@@ -130,7 +131,7 @@ class TCPSocket:
                     if len(cmd_splt) and cmd_splt[0] == 'laserScan':
                         if cmd_splt[2] == '1801':
                             self.laserScanB1.append(cmd_splt)
-                            # print(cmd_splt)
+                            #print(cmd_splt)
                             count = count + 1
                         elif cmd_splt[2] == '1802':
                             self.laserScanB4.append(cmd_splt)
@@ -138,9 +139,9 @@ class TCPSocket:
 
             except:
                 elapsed_time = time.time() - last_read_time
-                if elapsed_time > 5.0:  # Didn't receive a pack in 5s
-                    self.isconnected = False
-                    print(cl_lightred('No packet received from iiwa for 5s!'))
+                #if elapsed_time > 5.0:  # Didn't receive a pack in 5s
+                #    self.isconnected = False
+                #    print(cl_lightred('No packet received from iiwa for 5s!'))
 
         print("SHUTTING DOWN")
         self.connection.shutdown(socket.SHUT_RDWR)
@@ -174,11 +175,16 @@ class TCPSocket:
         if(msglength>0 and msglength<5000):
             msg = self.connection.recv(msglength)
             diff_msg = msglength - len(msg)
+            now = time.time()
+            bol = False
             while(diff_msg>0):
-                print("diff_msg: " + str(diff_msg))
+                bol = True
+                #print("diff_msg time: " + str(diff_msg))
                 newmsg = self.connection.recv(diff_msg)
                 msg.extend(newmsg)
                 diff_msg = msglength - len(msg)
+            if bol:
+                print("Difftime: " + str(time.time()-now))
         return msg
 
 

@@ -61,8 +61,6 @@ install(
   PROGRAMS
     scripts/server_UDP.py
     scripts/dummy_data.py
-    scripts/view_frames.py
-    scripts/buffer.py
     scripts/server_TCP.py
     DESTINATION lib/${PROJECT_NAME}
 )

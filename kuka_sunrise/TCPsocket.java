@@ -3,14 +3,14 @@ package API_0612;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.nio.charset.Charset;
-import java.net.Socket;
+import java.net.ServerSocket;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 public class TCPsocket {
 	public boolean isConnected;
-	public Socket TCPConn;
+	public ServerSocket TCPConn;
 	DatagramPacket package_out;
 	DatagramPacket package_in;
 	public PrintWriter outputStream;
@@ -23,12 +23,12 @@ public class TCPsocket {
 		TCPConn = tcpsocketConnection();
 	}
 	
-	public Socket tcpsocketConnection()
+	public ServerSocket tcpsocketConnection()
 	{
 		while (true){
 			try{
 				int COMport = 30008;
-				TCPConn = new Socket("192.168.10.116",COMport);
+				TCPConn = new ServerSocket("192.168.10.102",COMport);
 				TCPConn.setReuseAddress(true);
 				System.out.println("KUKA connecting to ROS over TCP");
 				break;
