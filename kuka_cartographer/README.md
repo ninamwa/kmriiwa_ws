@@ -18,7 +18,7 @@ As of now, the launch file is not correctly launching the cartographer nodes, an
 You need four terminals where you are running the commands: 
 
 ```
-$ ros2 run kuka_communication server_TCP.py 
+$ ros2 run kuka_communication client_TCP.py 
 ```
 ```
 $ ros2 launch kuka_cartographer cartographer.launch.py
