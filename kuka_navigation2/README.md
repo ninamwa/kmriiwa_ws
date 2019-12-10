@@ -14,7 +14,7 @@ The following packages needs to be installed:
 You need two terminals where you are running the commands: 
 
 ```
-$ ros2 run kuka_communication server_TCP.py 
+$ ros2 run kuka_communication client_TCP.py 
 ```
 ```
 $ ros2 launch kuka_navigation2 navigation2.launch.py map:=$HOME/PATH_TO/map/lab.yaml
