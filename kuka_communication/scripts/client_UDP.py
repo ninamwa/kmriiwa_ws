@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
 
-# KUKA API for ROS
-import struct
 
-version = '26092019'
-
-# Marhc 2017 Saeid Mokaram  saeid.mokaram@gmail.com
-# Sheffield Robotics    http://www.sheffieldrobotics.ac.uk/
-# The university of sheffield   http://www.sheffield.ac.uk/
-
-# This script generats a ROS node for comunicating with KUKA iiwa
-# Dependencies: conf.txt, ROS server, Rospy, KUKA iiwa java SDK, KUKA iiwa robot.
 
 #######################################################################################################################
 import _thread as thread
@@ -29,8 +19,6 @@ from builtin_interfaces.msg import Time
 from tf2_ros.transform_broadcaster import TransformBroadcaster
 from tf2_ros import StaticTransformBroadcaster
 from rclpy.qos import qos_profile_sensor_data
-
-
 
 
 def cl_black(msge): return '\033[30m' + msge + '\033[0m'
@@ -52,10 +40,10 @@ def cl_lightcyan(msge): return '\033[96m' + msge + '\033[0m'
 
 #######################################################################################################################
 #   Class: Kuka iiwa TCP communication    #####################
-class TCPSocket:
+class UDPSocket:
     #   M: __init__ ===========================
     def __init__(self):
-        self.BUFFER_SIZE = 4000
+        self.BUFFER_SIZE = 4096
         #self.BUFFER_SIZE = 10000
         self.isconnected = False
         self.isFinished = (False, None)
@@ -68,131 +56,114 @@ class TCPSocket:
 
         #TODO: Do something with isready, which is relevant for us.
         threading.Thread(target=self.connect_to_socket).start()
+        #try:
+        #    threading.Thread(target=self.connect_to_socket).start()
+        #except:
+        #    print(cl_pink("Error: ") + "Unable to start connection thread")
 
     def close(self):
         self.isconnected = False
 
     def connect_to_socket(self):
         # TODO: REPLACE THIS WHEN CONFIG.TXT IS FIXED
-
-        ros_host="192.168.10.102"
-        ros_port = 30008
-
+        ros_host="192.168.10.116"
+        ros_port = 30001
 
         os.system('clear')
         print(cl_pink('\n=========================================='))
-        print(cl_pink('<   <  < << INITIALIZE TCPconnection>> >  >   >'))
+        print(cl_pink('<   <  < << INITIALIZE UDPconnection>> >  >   >'))
         print(cl_pink('=========================================='))
         print(cl_pink(' KUKA API for ROS2'))
         print(cl_pink('==========================================\n'))
 
         print(cl_cyan('Starting up on:'), 'IP:', ros_host, 'Port:', ros_port)
         try:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            server_address= (ros_host,ros_port)
-            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
-            self.sock.bind(server_address)
+            self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.udp.settimeout(0.1)
+            self.udp.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,1048576)
+            self.udp.bind((ros_host, ros_port))
         except:
-           print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address:", ros_host, ros_port)
+            print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address:", ros_host, ros_port)
+            os._exit(-1)
 
-        self.sock.listen(3)
+
         print(cl_cyan('Waiting for a connection...'))
         while (not self.isconnected):
             try:
-                self.connection, client_address = self.sock.accept()
-                self.sock.settimeout(0.01)
+                data, self.client_address = self.udp.recvfrom(self.BUFFER_SIZE)
                 self.isconnected = True
             except:
                 t=0
-        print(cl_cyan('Connection from: '), client_address)
-        time.sleep(1) # wait for FDI
+        print(cl_cyan('Connection from: '), self.client_address)
+        print(cl_cyan('Message: '), data.decode('utf-8'))
 
+        self.udp.sendto("hello KUKA".encode('utf-8'), self.client_address)
+        print("Responded KUKA")
+
+
+        timee = time.time() #For debugging purposes
         count = 0
         while self.isconnected:
             try:
+                data, self.client_address = self.udp.recvfrom(self.BUFFER_SIZE)
+                data = data.decode('utf-8')
                 last_read_time = time.time()  # Keep received time
-                data = self.recvmsg()
-
-                for pack in (data.decode("utf-8")).split(">"):  # parsing data pack
-                    cmd_splt = pack.split()
-                    #cmd_splt=(data.decode("utf-8")).split(">")[1].split()
-                    if len(cmd_splt) and cmd_splt[0] == 'isFinished':
-                        if cmd_splt[1] == "false":
-                            self.isFinished = False
-                        elif cmd_splt[1] == "true":
-                            self.isFinished = True
-                    if len(cmd_splt) and cmd_splt[0] == 'hasError':
-                        if cmd_splt[1] == "false":
-                            self.hasError = False
-                        elif cmd_splt[1] == "true":
-                            self.hasError = True
-                    if len(cmd_splt) and cmd_splt[0] == 'odometry':
-                            self.odometry = cmd_splt
-                    if len(cmd_splt) and cmd_splt[0] == 'laserScan':
-                        if cmd_splt[2] == '1801':
-                            self.laserScanB1.append(cmd_splt)
-                            #print(cmd_splt)
-                            count = count + 1
-                        elif cmd_splt[2] == '1802':
-                            self.laserScanB4.append(cmd_splt)
-                            count = count + 1
+                # Process the received data package
+                cmd_splt=data.split(">")[1].split()
+                if len(cmd_splt) and cmd_splt[0] == 'isFinished':
+                    if cmd_splt[1] == "false":
+                        self.isFinished = False
+                    elif cmd_splt[1] == "true":
+                        self.isFinished = True
+                if len(cmd_splt) and cmd_splt[0] == 'hasError':
+                    if cmd_splt[1] == "false":
+                        self.hasError = False
+                    elif cmd_splt[1] == "true":
+                        self.hasError = True
+                if len(cmd_splt) and cmd_splt[0] == 'odometry':
+                        self.odometry = cmd_splt
+                if len(cmd_splt) and cmd_splt[0] == 'laserScan':
+                    if cmd_splt[2] == '1801':
+                        self.laserScanB1.append(cmd_splt)
+                        # print(cmd_splt)
+                        count = count + 1
+                        print(count)
+                    elif cmd_splt[2] == '1802':
+                        self.laserScanB4.append(cmd_splt)
+                        count = count + 1
+                        print(count)
 
             except:
-                elapsed_time = time.time() - last_read_time
+                t=0
+                #elapsed_time = time.time() - last_read_time
                 #if elapsed_time > 5.0:  # Didn't receive a pack in 5s
-                #    self.isconnected = False
-                #    print(cl_lightred('No packet received from iiwa for 5s!'))
+                #  print("exception!!")
+                #  self.isconnected = False
+                #  print(cl_lightred('No packet received from iiwa for 5s!'))
 
         print("SHUTTING DOWN")
-        self.connection.shutdown(socket.SHUT_RDWR)
-        self.connection.close()
-        self.sock.close()
+        self.udp.close()
         self.isconnected = False
         print(cl_lightred('Connection is closed!'))
         rclpy.shutdown()
 
-
+    # Each send command runs as a thread. May need to control the maximum running time (valid time to send a command).
     def send(self, cmd):
         try:
-            self.connection.sendall((cmd + '\r\n').encode("UTF-8"))
+            thread.start_new_thread(self.__send, (cmd,))
         except:
             print(cl_red('Error: ') + "sending message thread failed")
 
-    def recvmsg(self):
-        header_len = 10
-        msglength=0
-
-        byt_len = ""
-        byt_len = self.connection.recv(header_len)
-        diff_header = header_len - len(byt_len)
-        while (diff_header > 0):
-            byt_len.extend(self.connection.recv(diff_header))
-            diff_header= header_len-len(byt_len)
-
-        msglength = int(byt_len.decode("utf-8")) + 2   #include crocodile and space
-        msg = ""
-
-        if(msglength>0 and msglength<5000):
-            msg = self.connection.recv(msglength)
-            diff_msg = msglength - len(msg)
-            now = time.time()
-            bol = False
-            while(diff_msg>0):
-                bol = True
-                #print("diff_msg time: " + str(diff_msg))
-                newmsg = self.connection.recv(diff_msg)
-                msg.extend(newmsg)
-                diff_msg = msglength - len(msg)
-            if bol:
-                print("Difftime: " + str(time.time()-now))
-        return msg
+    def __send(self, cmd):
+        encoded_cmd = cmd.encode() # Encode to bytes
+        self.udp.sendto(encoded_cmd, self.client_address)
 
 
 ###   Class: Kuka iiwa ROS node    ###
 class KukaCommunication:
     def __init__(self,node,connection):
         self.kuka_communication_node = node
-        self.tcp_soc = connection
+        self.udp_soc = connection
 
         self.last_odom_timestamp = 0
         self.last_scan_timestamp = 0
@@ -201,8 +172,13 @@ class KukaCommunication:
         sub_twist = self.kuka_communication_node.create_subscription(Twist, 'cmd_vel', self.twist_callback, qos_profile_sensor_data)
         sub_pose = self.kuka_communication_node.create_subscription(Pose, 'pose', self.pose_callback, qos_profile_sensor_data)
         sub_shutdown = self.kuka_communication_node.create_subscription(String, 'shutdown', self.shutdown_callback, qos_profile_sensor_data)
+        kuka_subscriber = self.kuka_communication_node.create_subscription(String, 'kuka_command', self.callback, qos_profile_sensor_data)
+        # TODO: RATE er enda ikke implementert
+        # self.rate = self.kuka_node.create_rate(100) # 100 hz
 
         # Make Publishers for all kuka_iiwa data
+        pub_isFinished = self.kuka_communication_node.create_publisher(String, 'isFinished', qos_profile_sensor_data)
+        pub_hasError = self.kuka_communication_node.create_publisher(String, 'hasError', qos_profile_sensor_data)
         pub_odometry = self.kuka_communication_node.create_publisher(Odometry, 'odom', qos_profile_sensor_data)
         pub_laserscan1 = self.kuka_communication_node.create_publisher(LaserScan, 'scan_1', qos_profile_sensor_data)
         pub_laserscan4 = self.kuka_communication_node.create_publisher(LaserScan, 'scan_2', qos_profile_sensor_data)
@@ -211,18 +187,22 @@ class KukaCommunication:
         # Create tf broadcaster
         self.tf_broadcaster = TransformBroadcaster(node)
 
-        while not self.tcp_soc.isconnected:
+        while not self.udp_soc.isconnected:
             pass
         print('Ready to start')
 
         thread.start_new_thread(self.executor, ())
 
-        while rclpy.ok() and self.tcp_soc.isconnected:
-            self.odom_callback(pub_odometry,self.tcp_soc.odometry)
-            if len(self.tcp_soc.laserScanB1):
-                self.scan_callback(pub_laserscan1, self.tcp_soc.laserScanB1.pop(0))
-            if len(self.tcp_soc.laserScanB4):
-                self.scan_callback(pub_laserscan4, self.tcp_soc.laserScanB4.pop(0))
+        while rclpy.ok() and self.udp_soc.isconnected:
+            #string_callback(pub_isFinished, self.udp_soc.isFinished)
+            #string_callback(pub_hasError,self.udp_soc.hasError)
+            self.odom_callback(pub_odometry,self.udp_soc.odometry)
+            if len(self.udp_soc.laserScanB1):
+                self.scan_callback(pub_laserscan1, self.udp_soc.laserScanB1.pop(0))
+            if len(self.udp_soc.laserScanB4):
+                self.scan_callback(pub_laserscan4, self.udp_soc.laserScanB4.pop(0))
+            #TODO: Rate igjen? Charlotte?
+            #self.rate.sleep() #100 hz rate.sleep()
 
 
     #TODO: Hva skal vi gjøre her? Publishe alt som strings eller lage egendefinerte ROS meldinger?
@@ -248,7 +228,7 @@ class KukaCommunication:
 
 
             odom = Odometry()
-            odom.header.stamp = self.getTimestamp(self.kuka_communication_node.get_clock().now().nanoseconds)
+            odom.header.stamp = self.getTimestamp2(self.kuka_communication_node.get_clock().now().nanoseconds)
             odom.header.frame_id = "odom"
 
             point = Point()
@@ -301,7 +281,8 @@ class KukaCommunication:
             kuka_timestamp = values[1]
             self.last_scan_timestamp =kuka_timestamp
             scan = LaserScan()
-            scan.header.stamp = self.getTimestamp(self.kuka_communication_node.get_clock().now().nanoseconds)
+            #scan.header.stamp = self.getTimestamp(float(kuka_timestamp))
+            scan.header.stamp = self.getTimestamp2(self.kuka_communication_node.get_clock().now().nanoseconds)
             if values[2] == '1801':
                 scan.header.frame_id = "scan_1"
             elif values[2] == '1802':
@@ -311,30 +292,33 @@ class KukaCommunication:
             scan.angle_max = (135*math.pi)/180
             scan.range_min = 0.12 # disse må finnes ut av
             scan.range_max = 3.5 # finn ut
+            ranges=values[3].split(",")
             try:
-                scan.ranges = [float(s) for s in values[3].split(',')]
+                scan.ranges=[float(i) for i in ranges if len(i.strip())]
+                #scan.intensities=[float(10) for i in ranges]
             except ValueError as e:
-                print("Error", e)
+                print("error", e)
 
-            if len(scan.ranges) == 541:
-                publisher.publish(scan)
-            else:
-                print(len(scan.ranges)) ##FOR DEBUGGING
+            publisher.publish(scan)
 
+
+    def callback(self, data):
+        self.udp_soc.send(data.data)  # e.g 'setPosition 45 60 0 -25 0 95 0' for going to start position
 
     def shutdown_callback(self, data):
         print(data)
-        msg = "shutdown"
-        self.tcp_soc.send(msg)
+        msg = 'shutdown'
+        self.udp_soc.send(msg)
         #self.udp_soc.isconnected = False
+
 
     def twist_callback(self, data):
         msg = 'setTwist ' + str(data.linear.x) + " " + str(data.linear.y) + " " + str(data.angular.z)
-        self.tcp_soc.send(msg)
+        self.udp_soc.send(msg)
 
     def pose_callback(self, data):
         msg = 'setPose ' + str(data.position.x) + " " + str(data.position.y) + " " + str(data.orientation.z)
-        self.tcp_soc.send(msg)
+        self.udp_soc.send(msg)
 
 
     def executor(self):
@@ -346,21 +330,31 @@ class KukaCommunication:
         except:
             print(cl_red('Error: ') + "rclpy shutdown failed")
 
-    def getTimestamp(self,nano):
+    def getTimestamp(self, kuka_timestamp):
+        timestamp = Time()
+        timestamp.sec=math.floor(kuka_timestamp)
+        timestamp.nanosec=int((kuka_timestamp-timestamp.sec)*10**9)
+        return timestamp
+
+    def getTimestamp2(self,nano):
         t = nano * 10 ** -9
         timestamp = Time()
         timestamp.sec = math.floor(t)
         timestamp.nanosec = int((t - timestamp.sec) * 10 ** 9)
         return timestamp
 
-
     def euler_to_quaternion(self, roll, pitch, yaw):
+
         qx = math.sin(roll/2) * math.cos(pitch/2) * math.cos(yaw/2) - math.cos(roll/2) * math.sin(pitch/2) * math.sin(yaw/2)
         qy = math.cos(roll/2) * math.sin(pitch/2) * math.cos(yaw/2) + math.sin(roll/2) * math.cos(pitch/2) * math.sin(yaw/2)
         qz = math.cos(roll/2) * math.cos(pitch/2) * math.sin(yaw/2) - math.sin(roll/2) * math.sin(pitch/2) * math.cos(yaw/2)
         qw = math.cos(roll/2) * math.cos(pitch/2) * math.cos(yaw/2) + math.sin(roll/2) * math.sin(pitch/2) * math.sin(yaw/2)
 
         return [qx, qy, qz, qw]
+
+    def listToString(list):
+        listString = str(list.x) + " " + str(list.y) + " " + str(list.z)
+        return listString
 
     def send_static_transform(self):
         broadcaster1 = StaticTransformBroadcaster(self.kuka_communication_node)
@@ -405,8 +399,8 @@ def read_conf():
 def main(args=None):
     rclpy.init(args=None)
     kuka_communication_node = rclpy.create_node("kuka_communication_node")
-    tcp = TCPSocket()
-    KukaCommunication(kuka_communication_node,tcp)
+    udp = UDPSocket()
+    KukaCommunication(kuka_communication_node,udp)
 
     #try:
     #    threading.Thread(target=KukaCommunication(kuka_communication_node,udp)).start()

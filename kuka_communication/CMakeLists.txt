@@ -59,9 +59,9 @@ install(
 
 install(
   PROGRAMS
-    scripts/server_UDP.py
+    scripts/client_UDP.py
     scripts/dummy_data.py
-    scripts/server_TCP.py
+    scripts/client_TCP.py
     DESTINATION lib/${PROJECT_NAME}
 )
 
