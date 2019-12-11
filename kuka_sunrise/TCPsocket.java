@@ -30,7 +30,7 @@ public class TCPsocket {
 				int COMport = 30008;
 				TCPConn = new ServerSocket("192.168.10.102",COMport);
 				TCPConn.setReuseAddress(true);
-				System.out.println("KUKA connecting to ROS over TCP");
+				System.out.println("Waiting for a connection");
 				break;
 			}
 			catch(IOException e1){
