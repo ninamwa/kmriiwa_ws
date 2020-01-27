@@ -9,7 +9,7 @@ version = '26092019'
 # Sheffield Robotics    http://www.sheffieldrobotics.ac.uk/
 # The university of sheffield   http://www.sheffield.ac.uk/
 
-# This script generats a ROS node for comunicating with KUKA iiwa
+# This script generats a ROS node for communicating with KUKA iiwa
 # Dependencies: conf.txt, ROS server, Rospy, KUKA iiwa java SDK, KUKA iiwa robot.
 
 #######################################################################################################################
