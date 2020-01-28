@@ -51,7 +51,7 @@ def cl_lightcyan(msge): return '\033[96m' + msge + '\033[0m'
 
 #######################################################################################################################
 #   Class: Kuka iiwa TCP communication    #####################
-class UDPSocket:
+class udpsocket:
     #   M: __init__ ===========================
     def __init__(self):
         self.BUFFER_SIZE = 4096
@@ -410,7 +410,7 @@ def read_conf():
 def main(args=None):
     rclpy.init(args=None)
     kuka_communication_node = rclpy.create_node("kuka_communication_node")
-    udp = UDPSocket()
+    udp = udpsocket()
     KukaCommunication(kuka_communication_node,udp)
 
     #try:

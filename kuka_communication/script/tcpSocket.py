@@ -23,11 +23,8 @@ def cl_pink(msge): return '\033[95m' + msge + '\033[0m'
 def cl_lightcyan(msge): return '\033[96m' + msge + '\033[0m'
 
 
-#######################################################################################################################
-#   Class: Kuka iiwa TCP communication    #####################
 class TCPSocket:
-    #   M: __init__ ===========================
-    def __init__(self, ip, port):
+    def __init__(self, ip, port,node):
         self.BUFFER_SIZE = 4000
         #self.BUFFER_SIZE = 10000
         self.isconnected = False
@@ -38,7 +35,7 @@ class TCPSocket:
         self.laserScanB1 = []
         self.laserScanB4 = []
         self.udp = None
-
+        self.node_name=node
         #TODO: Do something with isready, which is relevant for us.
         threading.Thread(target=self.connect_to_socket).start()
 
@@ -46,19 +43,16 @@ class TCPSocket:
         self.isconnected = False
 
     def connect_to_socket(self):
-        # TODO: REPLACE THIS WHEN CONFIG.TXT IS FIXED
-
         ros_host="192.168.10.116"
         ros_port = 30008
 
-        os.system('clear')
-        print(cl_pink('\n=========================================='))
-        print(cl_pink('<   <  < << INITIALIZE UDPconnection>> >  >   >'))
-        print(cl_pink('=========================================='))
-        print(cl_pink(' KUKA API for ROS2'))
-        print(cl_pink('==========================================\n'))
+        #print(cl_pink('\n=========================================='))
+        #print(cl_pink('<   <  < << INITIALIZE UDPconnection>> >  >   >'))
+        #print(cl_pink('=========================================='))
+        #print(cl_pink(' KUKA API for ROS2'))
+        #print(cl_pink('==========================================\n'))
 
-        print(cl_cyan('Starting up on:'), 'IP:', ros_host, 'Port:', ros_port)
+        print(cl_cyan('Starting up node:'), self.node_name, 'IP:', ros_host, 'Port:', ros_port)
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             server_address= (ros_host,ros_port)
@@ -68,7 +62,7 @@ class TCPSocket:
            print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address:", ros_host, ros_port)
 
         self.sock.listen(3)
-        print(cl_cyan('Waiting for a connection...'))
+        #print(cl_cyan('Waiting for a connection...'))
         while (not self.isconnected):
             try:
                 self.connection, client_address = self.sock.accept()
@@ -76,7 +70,7 @@ class TCPSocket:
                 self.isconnected = True
             except:
                 t=0
-        print(cl_cyan('Connection from: '), client_address)
+        #print(cl_cyan('Connection from: '), client_address)
         time.sleep(1) # wait for FDI
 
         count = 0
@@ -153,3 +147,9 @@ class TCPSocket:
                 msg.extend(newmsg)
                 diff_msg = msglength - len(msg)
         return msg
+
+def main():
+    t = TCPSocket()
+
+if __name__ == '__main__':
+    main()

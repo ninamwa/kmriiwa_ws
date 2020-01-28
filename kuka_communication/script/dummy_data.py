@@ -15,25 +15,40 @@ from tf2_ros.transform_broadcaster import TransformBroadcaster
 from tf2_ros import StaticTransformBroadcaster
 from rclpy.qos import qos_profile_sensor_data
 from builtin_interfaces.msg import Time
+from rcl_interfaces.srv import SetParameters
+from rcl_interfaces.msg import Parameter
+from rcl_interfaces.msg import ParameterValue
+from TCPSocket import TCPSocket
+from UDPSocket import UDPSocket
 
 
-class Kuka:
+class Kuka(Node):
     def __init__(self):
-        rclpy.init(args=None)
-        kuka_communication_node = rclpy.create_node("kuka_communication_node")
-        pub_odometry = kuka_communication_node.create_publisher(Odometry, 'odom', qos_profile_sensor_data)
-        scan_pub = kuka_communication_node.create_publisher(LaserScan, 'scan_1', qos_profile_sensor_data)
-        scan_pub2 = kuka_communication_node.create_publisher(LaserScan, 'scan_2', qos_profile_sensor_data)
-        tf_broadcaster = TransformBroadcaster(kuka_communication_node)
+        super().__init__('kuka_communication_node')
+
+        #self.client = self.create_client(SetParameters, '/controller_server/set_parameters')
+        #self.request = SetParameters.Request()
+        #while not self.client.wait_for_service(timeout_sec=10.0):
+        #    self.get_logger(        ).info('Waiting for service')
+
+        ip = '192.168.10.117'
+        port = 30001
+        #self.soc = TCPSocket(ip, port)
+        self.soc = UDPSocket(ip, port)
+
+
+        pub_odometry = self.create_publisher(Odometry, 'odom', qos_profile_sensor_data)
+        scan_pub = self.create_publisher(LaserScan, 'scan', qos_profile_sensor_data)
+        #scan_pub2 = kuka_communication_node.create_publisher(LaserScan, 'scan_2', qos_profile_sensor_data)
+        tf_broadcaster = TransformBroadcaster(self)
 
         num_readings = 100
         laser_frequency = 40
         ranges = []
         intensities = []
-        print("HEI")
 
-        broadcaster1 = StaticTransformBroadcaster(kuka_communication_node)
-        broadcaster2 = StaticTransformBroadcaster(kuka_communication_node)
+        broadcaster1 = StaticTransformBroadcaster(self)
+        broadcaster2 = StaticTransformBroadcaster(self)
         static_transformStamped = TransformStamped()
         static_transformStamped.header.frame_id = "laser_B4_link"
         static_transformStamped.child_frame_id = "scan_2"
@@ -45,14 +60,16 @@ class Kuka:
         static_transformStamped.transform.rotation.y = quat[1]
         static_transformStamped.transform.rotation.z = quat[2]
         static_transformStamped.transform.rotation.w = quat[3]
-        broadcaster1.sendTransform(static_transformStamped)
+        #broadcaster1.sendTransform(static_transformStamped)
         static_transformStamped.header.frame_id = "laser_B1_link"
-        static_transformStamped.child_frame_id = "scan_1"
+        static_transformStamped.child_frame_id = "scan"
         broadcaster2.sendTransform(static_transformStamped)
 
         a = 0.0
-        while (True):
+        st=0
 
+
+        while (False):
             # time.sleep(1)
 
             count = 0
@@ -60,8 +77,8 @@ class Kuka:
             # scan.header.frame_id = "scan"
             scan.angle_min = -1.57
             scan.angle_max = 1.57
-            scan.header.stamp = getTimestamp(kuka_communication_node.get_clock().now().nanoseconds)
-            scan.header.frame_id = "scan_1"
+            scan.header.stamp = getTimestamp(self.get_clock().now().nanoseconds)
+            scan.header.frame_id = "scan"
             scan.angle_increment = 3.14 / num_readings
             scan.time_increment = (1 / laser_frequency) / (num_readings)
             scan.range_min = 0.0
@@ -76,7 +93,7 @@ class Kuka:
             # scan.header.frame_id = "scan"
             scan.angle_min = -1.57
             scan.angle_max = 1.57
-            scan.header.stamp = getTimestamp(kuka_communication_node.get_clock().now().nanoseconds)
+            scan.header.stamp = getTimestamp(self.get_clock().now().nanoseconds)
             scan.header.frame_id = "scan_2"
             scan.angle_increment = 3.14 / num_readings
             scan.time_increment = (1 / laser_frequency) / (num_readings)
@@ -86,7 +103,7 @@ class Kuka:
             for i in range(1, num_readings - 1):
                 scan.ranges = [float(10) for i in range(0, num_readings)]
                 scan.intensities = [float(100) for i in range(0, num_readings)]
-            scan_pub2.publish(scan)
+            #scan_pub2.publish(scan)
 
             count = count + 1
 
@@ -99,7 +116,7 @@ class Kuka:
 
             odom = Odometry()
             odom.header.frame_id = "odom"
-            odom.header.stamp = getTimestamp(kuka_communication_node.get_clock().now().nanoseconds)
+            odom.header.stamp = getTimestamp(self.get_clock().now().nanoseconds)
 
             point = Point()
             point.x = float(x)
@@ -145,7 +162,45 @@ class Kuka:
             pub_odometry.publish(odom)
             tf_broadcaster.sendTransform(odom_tf)
 
+            if (st==300):
+                self.send_request(0.6)
+
+            if (st == 600):
+                self.send_request(0.7)
+
             a = a + 1
+            print(st)
+            st = st +1
+        time.sleep(3)
+        print("hei")
+        count=0
+        while (self.soc.isconnected):
+            time.sleep(0.03)
+            s = ""
+            num = 600
+            for i in range(1,num):
+                s += ' 10.00'
+            self.soc.send(s)
+            count +=1
+            print(count)
+
+    def send_request(self,value):
+
+        pv = ParameterValue()
+        pv.type = 3
+        pv.double_value = value
+        p = Parameter()
+        p.name = 'max_vel_x'
+        p.value = pv
+        self.request.parameters = [p]
+        wait = self.client.call_async(self.request)
+        rclpy.spin_until_future_complete(self, wait)
+        if wait.result() is not None:
+            print(wait.result())
+            #self.get_logger().info('Request was ' + self.request.parameters[0].name + '. Response is ' + str(wait.result().results.successful)) # + wait.result().results[1])
+        else:
+            self.get_logger().info("Request failed")
+
 
 def euler_to_quaternion(roll, pitch, yaw):
     qx = math.sin(roll / 2) * math.cos(pitch / 2) * math.cos(yaw / 2) - math.cos(roll / 2) * math.sin(
@@ -166,11 +221,16 @@ def getTimestamp(nano):
         timestamp.nanosec=int((t-timestamp.sec)*10**9)
         return timestamp
 
+
+
+
 def main(args=None):
-    try:
-        threading.Thread(target=Kuka).start()
-    except:
-        print("Error: Unable to start connection thread")
+    rclpy.init(args=args)
+    node = Kuka()
+    while rclpy.ok():
+        rclpy.spin_once(node)
+    node.destroy_node()
+    rclpy.shutdown()
 
 
 if __name__ == '__main__':

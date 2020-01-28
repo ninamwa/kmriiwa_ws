@@ -16,11 +16,12 @@ from builtin_interfaces.msg import Time
 from tf2_ros.transform_broadcaster import TransformBroadcaster
 from tf2_ros import StaticTransformBroadcaster
 from rclpy.qos import qos_profile_sensor_data
-from scripts.TCPSocket import TCPSocket
-from scripts.UDPSocket import UDPSocket
-
 from rclpy.utilities import remove_ros_args
 import argparse
+
+from script.tcpSocket import TCPSocket
+from script.udpSocket import UDPSocket
+
 
 def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 
@@ -41,9 +42,9 @@ class KmpLaserScanNode(Node):
             ip=None
 
         if connection_type == 'TCP':
-            self.soc = TCPSocket(ip, port)
+            self.soc = TCPSocket(ip, port,'kmp_laserscan_node')
         elif connection_type == 'UDP':
-            self.soc = UDPSocket(ip, port)
+            self.soc = UDPSocket(ip, port,'kmp_laserscan_node')
         else:
             self.soc = None
 
@@ -57,18 +58,18 @@ class KmpLaserScanNode(Node):
         self.send_static_transform()
 
 
-        while not self.tcp_soc.isconnected:
+        while not self.soc.isconnected:
             pass
-        print('Ready to start')
+        print('kmp_laserscan_node ready')
 
         thread.start_new_thread(self.run, ())
 
     def run(self):
-        while rclpy.ok() and self.tcp_soc.isconnected:
-            if len(self.tcp_soc.laserScanB1):
-                self.scan_callback(self.pub_laserscan1, self.tcp_soc.laserScanB1.pop(0))
-            if len(self.tcp_soc.laserScanB4):
-                self.scan_callback(self.pub_laserscan4, self.tcp_soc.laserScanB4.pop(0))
+        while rclpy.ok() and self.soc.isconnected:
+            if len(self.soc.laserScanB1):
+                self.scan_callback(self.pub_laserscan1, self.soc.laserScanB1.pop(0))
+            if len(self.soc.laserScanB4):
+                self.scan_callback(self.pub_laserscan4, self.soc.laserScanB4.pop(0))
 
 
 
@@ -77,7 +78,7 @@ class KmpLaserScanNode(Node):
             kuka_timestamp = values[1]
             self.last_scan_timestamp =kuka_timestamp
             scan = LaserScan()
-            scan.header.stamp = self.getTimestamp(self.kuka_communication_node.get_clock().now().nanoseconds)
+            scan.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
             if values[2] == '1801':
                 scan.header.frame_id = "scan_1"
             elif values[2] == '1802':
@@ -115,8 +116,8 @@ class KmpLaserScanNode(Node):
         return [qx, qy, qz, qw]
 
     def send_static_transform(self):
-        broadcaster1 = StaticTransformBroadcaster(self.kuka_communication_node)
-        broadcaster2 = StaticTransformBroadcaster(self.kuka_communication_node)
+        broadcaster1 = StaticTransformBroadcaster(self)
+        broadcaster2 = StaticTransformBroadcaster(self)
         static_transformStamped = TransformStamped()
         static_transformStamped.header.frame_id = "laser_B4_link"
         static_transformStamped.child_frame_id = "scan_2"

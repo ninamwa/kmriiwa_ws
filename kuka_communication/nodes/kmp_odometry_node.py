@@ -1,26 +1,21 @@
 #!/usr/bin/env python3
 
 import _thread as thread
-import time
-import os
 import sys
 import math
 import rclpy
 from rclpy.node import Node
-import socket
-from std_msgs.msg import String
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, TransformStamped
 from nav_msgs.msg import Odometry
-from sensor_msgs.msg import LaserScan
 from builtin_interfaces.msg import Time
 from tf2_ros.transform_broadcaster import TransformBroadcaster
-from tf2_ros import StaticTransformBroadcaster
 from rclpy.qos import qos_profile_sensor_data
-from scripts.TCPSocket import TCPSocket
-from scripts.UDPSocket import UDPSocket
-
 from rclpy.utilities import remove_ros_args
 import argparse
+
+from script.tcpSocket import TCPSocket
+from script.udpSocket import UDPSocket
+
 
 def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 
@@ -42,9 +37,9 @@ class KmpOdometryNode(Node):
 
 
         if connection_type == 'TCP':
-            self.soc = TCPSocket(ip,port)
+            self.soc = TCPSocket(ip,port,'kmp_odometry_node')
         elif connection_type == 'UDP':
-            self.soc=UDPSocket(ip,port)
+            self.soc=UDPSocket(ip,port,'kmp_odometry_node')
         else:
             self.soc=None
 
@@ -58,7 +53,7 @@ class KmpOdometryNode(Node):
 
         while not self.soc.isconnected:
             pass
-        print('Ready to start')
+        print('kmp_odometry_node ready')
 
         thread.start_new_thread(self.run, ())
 
@@ -80,7 +75,7 @@ class KmpOdometryNode(Node):
 
 
             odom = Odometry()
-            odom.header.stamp = self.getTimestamp(self.kmp_odometry_node.get_clock().now().nanoseconds)
+            odom.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
             odom.header.frame_id = "odom"
 
             point = Point()

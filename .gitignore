@@ -60,3 +60,4 @@ build-*/
 *.gch
 /.project
 .classpath
+.idea

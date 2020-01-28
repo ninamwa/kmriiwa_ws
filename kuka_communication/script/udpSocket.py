@@ -4,7 +4,6 @@ import threading
 import time
 import os
 import rclpy
-from rclpy.node import Node
 import socket
 
 
@@ -27,11 +26,8 @@ def cl_pink(msge): return '\033[95m' + msge + '\033[0m'
 def cl_lightcyan(msge): return '\033[96m' + msge + '\033[0m'
 
 
-#######################################################################################################################
-#   Class: Kuka iiwa TCP communication    #####################
 class UDPSocket:
-    #   M: __init__ ===========================
-    def __init__(self,ip,port):
+    def __init__(self,ip,port,node):
         self.BUFFER_SIZE = 4096
         #self.BUFFER_SIZE = 10000
         self.isconnected = False
@@ -42,7 +38,7 @@ class UDPSocket:
         self.laserScanB1 = []
         self.laserScanB4 = []
         self.udp = None
-
+        self.node_name=node
         #TODO: Do something with isready, which is relevant for us.
         threading.Thread(target=self.connect_to_socket).start()
         #try:
@@ -54,40 +50,39 @@ class UDPSocket:
         self.isconnected = False
 
     def connect_to_socket(self):
-        # TODO: REPLACE THIS WHEN CONFIG.TXT IS FIXED
-        ros_host="192.168.10.116"
+        ros_host="192.168.10.117"
         ros_port = 30001
 
-        os.system('clear')
-        print(cl_pink('\n=========================================='))
-        print(cl_pink('<   <  < << INITIALIZE UDPconnection>> >  >   >'))
-        print(cl_pink('=========================================='))
-        print(cl_pink(' KUKA API for ROS2'))
-        print(cl_pink('==========================================\n'))
+        #print(cl_pink('\n=========================================='))
+        #print(cl_pink('<   <  < << INITIALIZE UDPconnection>> >  >   >'))
+        #print(cl_pink('=========================================='))
+        #print(cl_pink(' KUKA API for ROS2'))
+        #print(cl_pink('==========================================\n'))
 
-        print(cl_cyan('Starting up on:'), 'IP:', ros_host, 'Port:', ros_port)
+        #print(cl_cyan('Starting up on:'), 'IP:', ros_host, 'Port:', ros_port)
+        print(cl_cyan('Starting up node:'), self.node_name, 'IP:', ros_host, 'Port:', ros_port)
         try:
             self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.udp.settimeout(0.1)
             self.udp.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,1048576)
             self.udp.bind((ros_host, ros_port))
         except:
-            print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address:", ros_host, ros_port)
+            print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address/node:",node, ros_host, ros_port)
             os._exit(-1)
 
 
-        print(cl_cyan('Waiting for a connection...'))
+        #print(cl_cyan('Waiting for a connection...'))
         while (not self.isconnected):
             try:
                 data, self.client_address = self.udp.recvfrom(self.BUFFER_SIZE)
                 self.isconnected = True
             except:
                 t=0
-        print(cl_cyan('Connection from: '), self.client_address)
-        print(cl_cyan('Message: '), data.decode('utf-8'))
+        #print(cl_cyan('Connection from: '), self.client_address)
+        #print(cl_cyan('Message: '), data.decode('utf-8'))
 
         self.udp.sendto("hello KUKA".encode('utf-8'), self.client_address)
-        print("Responded KUKA")
+        #print("Responded KUKA")
 
 
         timee = time.time() #For debugging purposes

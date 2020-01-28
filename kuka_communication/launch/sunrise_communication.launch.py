@@ -32,16 +32,12 @@ def generate_launch_description(argv=sys.argv[1:]):
         #    output="screen",
         #    parameters=[{'connection':connection}])
 
-        launch_ros.actions.Node(
-            package="kuka_communication",
-            node_executable="test.py",
-            node_name="test",
-            output="screen",
-            arguments=['-c', connection_type, '-ro', robot]),
-
-
-
-
+        #launch_ros.actions.Node(
+        #    package="kuka_communication",
+        #    node_executable="test.py",
+        #    node_name="test",
+        #    output="screen",
+        #    arguments=['-c', connection_type, '-ro', robot]),
 
         launch_ros.actions.Node(
             package="kuka_communication",

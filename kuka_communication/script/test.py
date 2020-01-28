@@ -5,7 +5,8 @@ from rclpy.node import Node
 import sys
 from rclpy.utilities import remove_ros_args
 import argparse
-from TCPSocket import TCPSocket
+from tcpSocket import TCPSocket
+#from nodes.test2 import Test2
 from nodes.test2 import Test2
 
 
@@ -17,7 +18,8 @@ class Test(Node):
         #print(hh)
         self.get_logger().info('HEI')
         print(TCPSocket)
-        tt = Test2(1234)
+        #tt = Test2(1234)
+
 
 
 def main(argv=sys.argv[1:]):

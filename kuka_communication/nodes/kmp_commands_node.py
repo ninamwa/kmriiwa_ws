@@ -6,10 +6,13 @@ from rclpy.node import Node
 from std_msgs.msg import String
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, TransformStamped
 from rclpy.qos import qos_profile_sensor_data
-from scripts.TCPSocket import TCPSocket
-from scripts.UDPSocket import UDPSocket
 from rclpy.utilities import remove_ros_args
 import argparse
+
+from script.tcpSocket import TCPSocket
+from script.udpSocket import UDPSocket
+
+
 
 def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 
@@ -17,7 +20,7 @@ def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 
 class KmpCommandsNode(Node):
     def __init__(self,connection_type,robot):
-        super().__init__('kmp_odometry_node')
+        super().__init__('kmp_commands_node')
 
         if robot == 'KMR1':
             port = 30001
@@ -31,20 +34,20 @@ class KmpCommandsNode(Node):
 
 
         if connection_type == 'TCP':
-            self.soc = TCPSocket(ip,port)
+            self.soc = TCPSocket(ip,port,'kmp_commands_node')
         elif connection_type == 'UDP':
-            self.soc=UDPSocket(ip,port)
+            self.soc=UDPSocket(ip,port,'kmp_commands_node')
         else:
             self.soc=None
 
         # Make a listener for relevant topics
-        sub_twist = self.kuka_communication_node.create_subscription(Twist, 'cmd_vel', self.twist_callback, qos_profile_sensor_data)
-        sub_pose = self.kuka_communication_node.create_subscription(Pose, 'pose', self.pose_callback, qos_profile_sensor_data)
-        sub_shutdown = self.kuka_communication_node.create_subscription(String, 'shutdown', self.shutdown_callback, qos_profile_sensor_data)
+        sub_twist = self.create_subscription(Twist, 'cmd_vel', self.twist_callback, qos_profile_sensor_data)
+        sub_pose = self.create_subscription(Pose, 'pose', self.pose_callback, qos_profile_sensor_data)
+        sub_shutdown = self.create_subscription(String, 'shutdown', self.shutdown_callback, qos_profile_sensor_data)
 
         while not self.soc.isconnected:
             pass
-        print('Ready to start')
+        print('kmp_commands_node ready')
 
         #Dette er brukt for odom og laserscan, tror ikke det er nodvendig ettersom subscriberne har callback, men lar de staa i tilfelle.
 

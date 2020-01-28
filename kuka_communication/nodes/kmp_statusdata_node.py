@@ -9,8 +9,8 @@ from rclpy.node import Node
 from kuka_communication.msg import KmpStatusdata
 from builtin_interfaces.msg import Time
 from rclpy.qos import qos_profile_sensor_data
-from scripts.TCPSocket import TCPSocket
-from scripts.UDPSocket import UDPSocket
+from script.tcpSocket import TCPSocket
+from script.udpSocket import UDPSocket
 
 from rclpy.utilities import remove_ros_args
 import argparse
@@ -21,7 +21,7 @@ def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 
 class KmpStatusNode(Node):
     def __init__(self,connection_type,robot):
-        super().__init__('kmp_odometry_node')
+        super().__init__('kmp_statusdata_node')
 
         if robot == 'KMR1':
             port = 30001
@@ -35,9 +35,9 @@ class KmpStatusNode(Node):
 
 
         if connection_type == 'TCP':
-            self.soc = TCPSocket(ip,port)
+            self.soc = TCPSocket(ip,port,'kmp_statusdata_node')
         elif connection_type == 'UDP':
-            self.soc=UDPSocket(ip,port)
+            self.soc=UDPSocket(ip,port,'kmp_statusdata_node')
         else:
             self.soc=None
 
@@ -49,7 +49,7 @@ class KmpStatusNode(Node):
 
         while not self.soc.isconnected:
             pass
-        print('Ready to start')
+        print('kmp_statusdata_node ready')
 
         thread.start_new_thread(self.run, ())
 

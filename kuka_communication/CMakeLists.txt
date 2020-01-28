@@ -26,7 +26,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 # Install the python module for this package
-ament_python_install_package(scripts/)
+ament_python_install_package(script/)
 ament_python_install_package(nodes/)
 
 
@@ -78,12 +78,14 @@ install(
 
 install(
   PROGRAMS
-    scripts/server_UDP.py
-    scripts/dummy_data.py
-    scripts/view_frames.py
-    scripts/buffer.py
-    scripts/server_TCP.py
-    scripts/test.py
+    script/server_UDP.py
+    script/dummy_data.py
+    script/view_frames.py
+    script/buffer.py
+    script/server_TCP.py
+    script/test.py
+    script/tcpSocket.py
+    script/udpSocket.py
     nodes/kmp_commands_node.py
     nodes/kmp_laserscan_node.py
     nodes/kmp_odometry_node.py
