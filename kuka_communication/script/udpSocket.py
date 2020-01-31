@@ -37,8 +37,11 @@ class UDPSocket:
         self.odometry = []
         self.laserScanB1 = []
         self.laserScanB4 = []
+        self.kmp_statusdata = None
         self.udp = None
         self.node_name=node
+        self.ip=ip
+        self.port=port
         #TODO: Do something with isready, which is relevant for us.
         threading.Thread(target=self.connect_to_socket).start()
         #try:
@@ -50,8 +53,8 @@ class UDPSocket:
         self.isconnected = False
 
     def connect_to_socket(self):
-        ros_host="192.168.10.117"
-        ros_port = 30001
+        #ros_host="192.168.10.117"
+        #ros_port = 30001
 
         #print(cl_pink('\n=========================================='))
         #print(cl_pink('<   <  < << INITIALIZE UDPconnection>> >  >   >'))
@@ -60,14 +63,14 @@ class UDPSocket:
         #print(cl_pink('==========================================\n'))
 
         #print(cl_cyan('Starting up on:'), 'IP:', ros_host, 'Port:', ros_port)
-        print(cl_cyan('Starting up node:'), self.node_name, 'IP:', ros_host, 'Port:', ros_port)
+        print(cl_cyan('Starting up node:'), self.node_name, 'IP:', self.ip, 'Port:', self.port)
         try:
             self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.udp.settimeout(0.1)
             self.udp.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF,1048576)
-            self.udp.bind((ros_host, ros_port))
+            self.udp.bind((self.ip, self.port))
         except:
-            print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address/node:",node, ros_host, ros_port)
+            print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address/node:",self.node_name, self.ip, self.port)
             os._exit(-1)
 
 
@@ -105,7 +108,7 @@ class UDPSocket:
                     elif cmd_splt[1] == "true":
                         self.hasError = True
                 if len(cmd_splt) and cmd_splt[0] == 'odometry':
-                        self.odometry = cmd_splt
+                    self.odometry = cmd_splt
                 if len(cmd_splt) and cmd_splt[0] == 'laserScan':
                     if cmd_splt[2] == '1801':
                         self.laserScanB1.append(cmd_splt)
@@ -115,7 +118,7 @@ class UDPSocket:
                     elif cmd_splt[2] == '1802':
                         self.laserScanB4.append(cmd_splt)
                         count = count + 1
-                        print(count)
+                        #print(count)
 
             except:
                 t=0

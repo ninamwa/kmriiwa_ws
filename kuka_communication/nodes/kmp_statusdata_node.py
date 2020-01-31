@@ -22,22 +22,22 @@ def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 class KmpStatusNode(Node):
     def __init__(self,connection_type,robot):
         super().__init__('kmp_statusdata_node')
-
+        self.name='kmp_statusdata_node'
         if robot == 'KMR1':
             port = 30001
-            ip = 1010
+            ip = '10.22.27.87'
         elif robot == 'KMR2':
-            port = 1223
-            ip= 1212
+            port = 30001
+            ip= '192.168.10.117'
         else:
             port=None
             ip=None
 
 
         if connection_type == 'TCP':
-            self.soc = TCPSocket(ip,port,'kmp_statusdata_node')
+            self.soc = TCPSocket(ip,port,self.name)
         elif connection_type == 'UDP':
-            self.soc=UDPSocket(ip,port,'kmp_statusdata_node')
+            self.soc=UDPSocket(ip,port,self.name)
         else:
             self.soc=None
 
@@ -49,7 +49,7 @@ class KmpStatusNode(Node):
 
         while not self.soc.isconnected:
             pass
-        print('kmp_statusdata_node ready')
+        self.get_logger().info('Node is ready')
 
         thread.start_new_thread(self.run, ())
 
@@ -60,15 +60,16 @@ class KmpStatusNode(Node):
 
 
     def status_callback(self,publisher,values):
-        msg = KmpStatusdata()
-        msg.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
-        msg.header.frame_id = "baselink"
+        if values != None:
+            msg = KmpStatusdata()
+            msg.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
+            msg.header.frame_id = "baselink"
 
 
-        #TODO: Fyll inn med riktig statusdata - dette maa ogsaa gjores i selve meldingsfila - den er naa random.
-        msg.data= str(values[0])
+            #TODO: Fyll inn med riktig statusdata - dette maa ogsaa gjores i selve meldingsfila - den er naa random.
+            #msg.data= str(values[0])
 
-        publisher.publish(msg)
+            publisher.publish(msg)
 
 
     def getTimestamp(self,nano):
@@ -83,7 +84,6 @@ def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-c', '--connection')
     parser.add_argument('-ro', '--robot')
-    print(argv)
     args = parser.parse_args(remove_ros_args(args=argv))
 
     rclpy.init(args=argv)

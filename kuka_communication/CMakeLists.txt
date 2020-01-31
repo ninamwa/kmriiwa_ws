@@ -72,7 +72,7 @@ endif()
 
 # Install python scripts
 install(
-  DIRECTORY launch
+  DIRECTORY launch param
   DESTINATION share/${PROJECT_NAME}
 )
 
@@ -86,6 +86,7 @@ install(
     script/test.py
     script/tcpSocket.py
     script/udpSocket.py
+    script/dummy_odom.py
     nodes/kmp_commands_node.py
     nodes/kmp_laserscan_node.py
     nodes/kmp_odometry_node.py
