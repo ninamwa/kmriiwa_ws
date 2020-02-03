@@ -91,6 +91,9 @@ install(
     nodes/kmp_laserscan_node.py
     nodes/kmp_odometry_node.py
     nodes/kmp_statusdata_node.py
+    nodes/lbr_statusdata_node.py
+    nodes/lbr_sensordata_node.py
+    nodes/lbr_commands_node.py
     nodes/test2.py
     DESTINATION lib/${PROJECT_NAME}
 )

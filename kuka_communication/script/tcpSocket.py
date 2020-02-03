@@ -26,50 +26,41 @@ def cl_lightcyan(msge): return '\033[96m' + msge + '\033[0m'
 class TCPSocket:
     def __init__(self, ip, port,node):
         self.BUFFER_SIZE = 4000
-        #self.BUFFER_SIZE = 10000
         self.isconnected = False
-        self.isFinished = (False, None)
-        self.hasError = (False, None)
-        self.isready = False
+        self.node_name = node
+        self.ip = ip
+        self.port = port
+        self.tcp = None
+
+        #Data
         self.odometry = []
         self.laserScanB1 = []
         self.laserScanB4 = []
-        self.kmp_statusdata = []
-        self.udp = None
-        self.node_name=node
-        self.ip=ip
-        self.port=port
-        #TODO: Do something with isready, which is relevant for us.
+        self.kmp_statusdata = None
+        self.lbr_statusdata = None
+
         threading.Thread(target=self.connect_to_socket).start()
 
     def close(self):
         self.isconnected = False
 
     def connect_to_socket(self):
-        #ros_host="192.168.10.116"
-        #ros_port = 30008
-
-        #print(cl_pink('\n=========================================='))
-        #print(cl_pink('<   <  < << INITIALIZE UDPconnection>> >  >   >'))
-        #print(cl_pink('=========================================='))
-        #print(cl_pink(' KUKA API for ROS2'))
-        #print(cl_pink('==========================================\n'))
 
         print(cl_cyan('Starting up node:'), self.node_name, 'IP:', self.ip, 'Port:', self.port)
         try:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             server_address= (self.ip,self.port)
-            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
-            self.sock.bind(server_address)
+            self.tcp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
+            self.tcp.bind(server_address)
         except:
            print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address:", self.ip, self.port)
 
-        self.sock.listen(3)
+        self.tcp.listen(3)
         #print(cl_cyan('Waiting for a connection...'))
         while (not self.isconnected):
             try:
-                self.connection, client_address = self.sock.accept()
-                self.sock.settimeout(0.01)
+                self.connection, client_address = self.tcp.accept()
+                self.tcp.settimeout(0.01)
                 self.isconnected = True
             except:
                 t=0
@@ -83,17 +74,7 @@ class TCPSocket:
                 data = self.recvmsg()
                 for pack in (data.decode("utf-8")).split(">"):  # parsing data pack
                     cmd_splt = pack.split()
-                    #cmd_splt=(data.decode("utf-8")).split(">")[1].split()
-                    if len(cmd_splt) and cmd_splt[0] == 'isFinished':
-                        if cmd_splt[1] == "false":
-                            self.isFinished = False
-                        elif cmd_splt[1] == "true":
-                            self.isFinished = True
-                    if len(cmd_splt) and cmd_splt[0] == 'hasError':
-                        if cmd_splt[1] == "false":
-                            self.hasError = False
-                        elif cmd_splt[1] == "true":
-                            self.hasError = True
+
                     if len(cmd_splt) and cmd_splt[0] == 'odometry':
                         self.odometry = cmd_splt
                         print('odom')
@@ -119,7 +100,7 @@ class TCPSocket:
         print("SHUTTING DOWN")
         self.connection.shutdown(socket.SHUT_RDWR)
         self.connection.close()
-        self.sock.close()
+        self.tcp.close()
         self.isconnected = False
         print(cl_lightred('Connection is closed!'))
         rclpy.shutdown()
@@ -154,9 +135,3 @@ class TCPSocket:
                 msg.extend(newmsg)
                 diff_msg = msglength - len(msg)
         return msg
-
-def main():
-    t = TCPSocket()
-
-if __name__ == '__main__':
-    main()

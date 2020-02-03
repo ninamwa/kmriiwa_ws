@@ -39,13 +39,6 @@ def generate_launch_description(argv=sys.argv[1:]):
             default_value=param_dir,
             description='Full path to parameter file to load'),
 
-        #launch_ros.actions.Node(
-        #    package="kuka_communication",
-        #    node_executable="test.py",
-        #    node_name="test",
-        #    output="screen",
-        #    arguments=['-c', connection_type, '-ro', robot]),
-
         launch_ros.actions.Node(
             package="kuka_communication",
             node_executable="kmp_commands_node.py",

@@ -29,19 +29,21 @@ def cl_lightcyan(msge): return '\033[96m' + msge + '\033[0m'
 class UDPSocket:
     def __init__(self,ip,port,node):
         self.BUFFER_SIZE = 4096
-        #self.BUFFER_SIZE = 10000
         self.isconnected = False
-        self.isFinished = (False, None)
-        self.hasError = (False, None)
-        self.isready = False
+        self.node_name = node
+        self.ip = ip
+        self.port = port
+        self.udp = None
+
+        #Data
         self.odometry = []
         self.laserScanB1 = []
         self.laserScanB4 = []
+        self.lbr_sensordata = []
         self.kmp_statusdata = None
-        self.udp = None
-        self.node_name=node
-        self.ip=ip
-        self.port=port
+        self.lbr_statusdata = None
+
+
         #TODO: Do something with isready, which is relevant for us.
         threading.Thread(target=self.connect_to_socket).start()
         #try:
@@ -53,14 +55,6 @@ class UDPSocket:
         self.isconnected = False
 
     def connect_to_socket(self):
-        #ros_host="192.168.10.117"
-        #ros_port = 30001
-
-        #print(cl_pink('\n=========================================='))
-        #print(cl_pink('<   <  < << INITIALIZE UDPconnection>> >  >   >'))
-        #print(cl_pink('=========================================='))
-        #print(cl_pink(' KUKA API for ROS2'))
-        #print(cl_pink('==========================================\n'))
 
         #print(cl_cyan('Starting up on:'), 'IP:', ros_host, 'Port:', ros_port)
         print(cl_cyan('Starting up node:'), self.node_name, 'IP:', self.ip, 'Port:', self.port)
@@ -97,16 +91,7 @@ class UDPSocket:
                 last_read_time = time.time()  # Keep received time
                 # Process the received data package
                 cmd_splt=data.split(">")[1].split()
-                if len(cmd_splt) and cmd_splt[0] == 'isFinished':
-                    if cmd_splt[1] == "false":
-                        self.isFinished = False
-                    elif cmd_splt[1] == "true":
-                        self.isFinished = True
-                if len(cmd_splt) and cmd_splt[0] == 'hasError':
-                    if cmd_splt[1] == "false":
-                        self.hasError = False
-                    elif cmd_splt[1] == "true":
-                        self.hasError = True
+
                 if len(cmd_splt) and cmd_splt[0] == 'odometry':
                     self.odometry = cmd_splt
                 if len(cmd_splt) and cmd_splt[0] == 'laserScan':
@@ -119,6 +104,12 @@ class UDPSocket:
                         self.laserScanB4.append(cmd_splt)
                         count = count + 1
                         #print(count)
+                if len(cmd_splt) and cmd_splt[0] == 'kmp_statusdata':
+                    self.kmp_statusdata = cmd_splt
+                if len(cmd_splt) and cmd_splt[0] == 'lbr_statusdata':
+                    self.lbr_statusdata = cmd_splt
+                if len(cmd_splt) and cmd_splt[0] == 'lbr_sensordata':
+                    self.lbr_sensordata = self.lbr_sensordata.append(cmd_splt)
 
             except:
                 t=0
