@@ -23,15 +23,16 @@ class KmpStatusNode(Node):
     def __init__(self,connection_type,robot):
         super().__init__('kmp_statusdata_node')
         self.name='kmp_statusdata_node'
+        self.declare_parameter('port')
+        port = int(self.get_parameter('port').value)
         if robot == 'KMR1':
-            port = 30001
-            ip = '10.22.27.87'
+            self.declare_parameter('/KMR1/ip')
+            ip = str(self.get_parameter('/KMR1/ip').value)
         elif robot == 'KMR2':
-            port = 30001
-            ip= '192.168.10.117'
+            self.declare_parameter('KMR2/ip')
+            ip = str(self.get_parameter('KMR2/ip').value)
         else:
-            port=None
-            ip=None
+            ip = None
 
 
         if connection_type == 'TCP':
