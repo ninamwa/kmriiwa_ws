@@ -61,3 +61,6 @@ build-*/
 /.project
 .classpath
 .idea
+/.metadata/
+.metadata/
+.metadata
