@@ -1,40 +1,51 @@
-package API_0612;
+package testwithrobot;
+
 
 import java.io.IOException;
+import java.net.*;
+import java.io.*;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.net.Socket;
+    
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import testwithrobot.ISocket;
 
-public class TCPsocket {
-	public boolean isConnected;
+public class TCPSocket implements ISocket{
+	public volatile boolean isConnected;
 	public Socket TCPConn;
 	DatagramPacket package_out;
 	DatagramPacket package_in;
 	public PrintWriter outputStream;
 	public BufferedReader inputStream;
 	private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
+	int COMport;
+	
 
 	
-	public TCPsocket() {
+	public TCPSocket(int port) {
 		isConnected = false;
-		TCPConn = tcpsocketConnection();
+		COMport = port;
+		TCPConn = connect();
+
 	}
 	
-	public Socket tcpsocketConnection()
+	public Socket connect()
 	{
 		while (true){
 			try{
-				int COMport = 30008;
-				TCPConn = new Socket("192.168.10.116",COMport);
+				TCPConn = new Socket("192.168.10.117",COMport);
 				TCPConn.setReuseAddress(true);
-				System.out.println("KUKA connecting to ROS over TCP");
+				System.out.println("KUKA connecting to ROS over TCP on port: "+ COMport);
 				break;
 			}
 			catch(IOException e1){
-				System.out.println("Could not connect to server: " +e1);
+				System.out.println("Could not connect to server with port : "+ this.COMport + " Error: " +e1);
 			return null;
 			}
 		}
@@ -52,11 +63,12 @@ public class TCPsocket {
 	
 	public void send_message(String buffer){
 		int len = (this.encode(buffer)).length;
-		String send_string = String.format("%010d", len) + ">" + " "+buffer;
+		String send_string = String.format("%010d", len) + " "+buffer;
 		outputStream.write(send_string);
 		outputStream.flush();
 	}
 	
+	@Override
 	public String receive_message(){
 		String line;
 		try{
@@ -71,15 +83,6 @@ public class TCPsocket {
 			}
 	}	
 
-	static String decode(byte[] data)  {
-    	String message = new String(data,0,data.length, UTF8_CHARSET);
-        return message;
-
-    }
-
-    static byte[] encode(String string) {
-        return string.getBytes(UTF8_CHARSET);
-    }
     
 		        
 	public void close(){
@@ -90,6 +93,22 @@ public class TCPsocket {
 		} catch (Exception e) {
 			System.out.println("ERROR closing the communication port to ROS!");
 		}
+	}
+	
+
+	public String decode(byte[] data) {
+		String message = new String(data,0,data.length, UTF8_CHARSET);
+        return message;
+	}
+
+	@Override
+	public byte[] encode(String string) {
+		return string.getBytes(UTF8_CHARSET);
+	}
+
+	@Override
+	public boolean isConnected() {
+		return this.isConnected;
 	}
 
 }

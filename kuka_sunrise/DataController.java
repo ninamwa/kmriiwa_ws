@@ -1,21 +1,36 @@
-package com.kuka.roboticsAPI;
+package testwithrobot;
 
+// Implemented classes
+import testwithrobot.TCPSocket;
+import testwithrobot.UDPSocket;
+import testwithrobot.ISocket;
+
+
+// RoboticsAPI
 import com.kuka.nav.fdi.DataConnectionListener;
 import com.kuka.nav.fdi.DataListener;
 import com.kuka.nav.fdi.data.CommandedVelocity;
 import com.kuka.nav.fdi.data.Odometry;
 import com.kuka.nav.fdi.data.RobotPose;
 import com.kuka.nav.provider.LaserScan;
-import com.kuka.task.ITaskLogger;
 
 public class DataController implements DataListener, DataConnectionListener{
-	private String odom;
-	private String laserscan;
-	boolean RUN;
-	ITaskLogger logger;
+	private Odometry last_odom;
+	private LaserScan last_laserscan_B1;
+	private LaserScan last_laserscan_B4;
+	private static int laser_B1 = 1801;
+	private static int laser_B4 = 1802;
+	public boolean fdi_isConnected;
+	ISocket laser_socket;
+	ISocket odometry_socket;
+
+	Odometry odom;
 	
-	public DataController(ITaskLogger log) {
-		this.logger = log;
+
+	public DataController(ISocket laser_socket, ISocket odometry_socket) {
+		this.fdi_isConnected=false;
+		this.laser_socket = laser_socket;
+		this.odometry_socket = odometry_socket;
 	}
 
 
@@ -26,61 +41,83 @@ public class DataController implements DataListener, DataConnectionListener{
 	}
 
 	@Override
-	public void onNewLaserData(LaserScan arg0) {
-		this.logger.info("New LaserData in Datacontroller");
-		this.logger.info(arg0.toString());
-
-
+	public void onNewLaserData(LaserScan scan) {
+		if (scan.getLaserId() == laser_B1){
+			last_laserscan_B1 = scan;
+		}else if (scan.getLaserId()== laser_B4){
+			last_laserscan_B4 = scan;
+		}
+		// TODO: sending both lasers
+		if(fdi_isConnected && this.laser_socket.isConnected()){
+			String scan_data = ">laserScan " +  scan.getTimestamp() + " " + scan.getLaserId()  + " " + scan.getRangesAsString();
+			try{
+				this.laser_socket.send_message(scan_data);
+			}catch(Exception e){
+				System.out.println("Could not send laserdata to ROS: " + e);
+		}
+		}
 	}
 
 	@Override
-	public void onNewOdometryData(Odometry arg0) {
-		this.logger.info("New OdometryData in Datacontroller");
-		this.logger.info(arg0.toString());
-
-		
-
+	public void onNewOdometryData(Odometry odom) {
+		last_odom = odom;
+		if(fdi_isConnected && this.odometry_socket.isConnected()){
+			try{
+				String odom_data = ">odometry " + odom.getTimestamp() + " " + odom.getPose().toString() + " " + odom.getVelocity().toString();
+				this.odometry_socket.send_message(odom_data);
+			}catch(Exception e){
+				System.out.println("Could not send odometry data to ROS: " + e);
+			}
+	}
 	}
 
 	@Override
 	public void onNewRobotPoseData(RobotPose arg0) {
-		this.logger.info("New RobotPoseData in Datacontroller");
-		
+		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void onConnectionClosed() {
-		RUN = false;
-		this.logger.info("Connection closed in Datacontroller");
-
+		System.out.println("FDIConnection closed");
+		fdi_isConnected = false;
 		
 	}
 
 	@Override
 	public void onConnectionFailed(Exception arg0) {
-		RUN = false;
-		this.logger.info("Connection failed in Datacontroller");
+		System.out.println("FDIConnection failed");
+		System.out.println(arg0);
+		fdi_isConnected = false;
 
 	}
 
 	@Override
 	public void onConnectionSuccessful() {
-		RUN = true;
-		this.logger.info("Connection successfull in Datacontroller");
+		System.out.println("FDIConnection successful");
+		fdi_isConnected = true;
 		
 	}
 
 	@Override
 	public void onConnectionTimeout() {
-		// TODO Auto-generated method stub
-		this.logger.info("Connection timeout in Datacontroller");
-
-		
+		System.out.println("FDIConnection timeout");
 	}
 
 	@Override
 	public void onReceiveError(Exception arg0) {
-		this.logger.info("Receive error in Datacontroller");
+		System.out.println("FDIconnection - Received error");
+		System.out.println(arg0);
+		
+	}
+
+
+	public void setLaserSocket(ISocket laser_socket2) {
+			this.laser_socket = laser_socket2;
+	}
+
+
+	public void setOdometrySocket(ISocket odometry_socket2) {
+		this.odometry_socket = odometry_socket2;
 		
 	}
 	

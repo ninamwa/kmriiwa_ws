@@ -1,9 +1,12 @@
-package API_0612;
+package testwithrobot;
 
 
+// RoboticsAPI
 import com.kuka.jogging.provider.api.common.ICartesianJoggingSupport;
 import com.kuka.roboticsAPI.deviceModel.kmp.SunriseOmniMoveMobilePlatform;
 //import com.kuka.service.remoteControlSupport.internal.jog.interfaces.IRemoteControlJogger;
+
+// Java Util
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
