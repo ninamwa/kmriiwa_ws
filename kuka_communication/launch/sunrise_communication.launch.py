@@ -13,24 +13,31 @@ import argparse
 
 
 def generate_launch_description(argv=sys.argv[1:]):
+    #parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    #parser.add_argument('-ro', '--robot')
+    #print(argv)
+    #args = parser.parse_args(remove_ros_args(args=argv))
+    #print(args)
 
-    connection_type='TCP'
-    robot = argv[len(argv)-1]
-    ip='12345'
-    #connection = LaunchConfiguration('connection', default='UDP')
+
+    connection_type_TCP='TCP'
+    connection_type_UDP = 'UDP'
+    #robot = argv[len(argv)-1]
+    #robot = args.robot
+    robot='KMR2'
+
+    param_dir = LaunchConfiguration(
+        'param_dir',
+        default=os.path.join(
+            get_package_share_directory('kuka_communication'),
+            'param',
+            'bringup.yaml'))
 
     return LaunchDescription([
-        # DeclareLaunchArgument(
-        #    'connection',
-        #    default_value='UDP',
-        #    description='What type of connection to use to KMR'),
-
-        # launch_ros.actions.Node(
-        #    package="kuka_communication",
-        #    node_executable="test.py",
-        #    node_name="test",
-        #    output="screen",
-        #    parameters=[{'connection':connection}])
+        DeclareLaunchArgument(
+            'param_dir',
+            default_value=param_dir,
+            description='Full path to parameter file to load'),
 
         #launch_ros.actions.Node(
         #    package="kuka_communication",
@@ -44,29 +51,31 @@ def generate_launch_description(argv=sys.argv[1:]):
             node_executable="kmp_commands_node.py",
             node_name="kmp_commands_node",
             output="screen",
-            arguments=['-c', connection_type, '-ro', robot]),
+            emulate_tty=True,
+            arguments=['-c', connection_type_UDP,'-ro', robot],
+            parameters=[param_dir]),
 
-        launch_ros.actions.Node(
-            package="kuka_communication",
-            node_executable="kmp_laserscan_node.py",
-            node_name="kmp_laserscan_node",
-            output="screen",
-            arguments=['-c', connection_type, '-ro', robot]),
+        #launch_ros.actions.Node(
+        #    package="kuka_communication",
+        #    node_executable="kmp_laserscan_node.py",
+        #    node_name="kmp_laserscan_node",
+        #    output="screen",
+        #    emulate_tty=True,
+        #    arguments=['-c', connection_type_UDP, '-ro', robot]),
 
-        launch_ros.actions.Node(
-            package="kuka_communication",
-            node_executable="kmp_odometry_node.py",
-            node_name="kmp_odometry_node",
-            output="screen",
-            arguments=['-c', connection_type,'-ro',robot]),
+        #launch_ros.actions.Node(
+        #    package="kuka_communication",
+        #    node_executable="kmp_odometry_node.py",
+        #    node_name="kmp_odometry_node",
+        #    output="screen",
+        #    emulate_tty=True,
+        #    arguments=['-c', connection_type_UDP,'-ro',robot]),
 
         launch_ros.actions.Node(
             package="kuka_communication",
             node_executable="kmp_statusdata_node.py",
             node_name="kmp_statusdata_node",
             output="screen",
-            arguments=['-c', connection_type, '-ro', robot]),
-
-
-
+            emulate_tty=True,
+            arguments=['-c', connection_type_UDP, '-ro', robot]),
     ])

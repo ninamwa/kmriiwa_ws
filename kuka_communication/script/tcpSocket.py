@@ -34,8 +34,11 @@ class TCPSocket:
         self.odometry = []
         self.laserScanB1 = []
         self.laserScanB4 = []
+        self.kmp_statusdata = []
         self.udp = None
         self.node_name=node
+        self.ip=ip
+        self.port=port
         #TODO: Do something with isready, which is relevant for us.
         threading.Thread(target=self.connect_to_socket).start()
 
@@ -43,8 +46,8 @@ class TCPSocket:
         self.isconnected = False
 
     def connect_to_socket(self):
-        ros_host="192.168.10.116"
-        ros_port = 30008
+        #ros_host="192.168.10.116"
+        #ros_port = 30008
 
         #print(cl_pink('\n=========================================='))
         #print(cl_pink('<   <  < << INITIALIZE UDPconnection>> >  >   >'))
@@ -52,14 +55,14 @@ class TCPSocket:
         #print(cl_pink(' KUKA API for ROS2'))
         #print(cl_pink('==========================================\n'))
 
-        print(cl_cyan('Starting up node:'), self.node_name, 'IP:', ros_host, 'Port:', ros_port)
+        print(cl_cyan('Starting up node:'), self.node_name, 'IP:', self.ip, 'Port:', self.port)
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            server_address= (ros_host,ros_port)
+            server_address= (self.ip,self.port)
             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
             self.sock.bind(server_address)
         except:
-           print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address:", ros_host, ros_port)
+           print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address:", self.ip, self.port)
 
         self.sock.listen(3)
         #print(cl_cyan('Waiting for a connection...'))
@@ -78,7 +81,6 @@ class TCPSocket:
             try:
                 last_read_time = time.time()  # Keep received time
                 data = self.recvmsg()
-
                 for pack in (data.decode("utf-8")).split(">"):  # parsing data pack
                     cmd_splt = pack.split()
                     #cmd_splt=(data.decode("utf-8")).split(">")[1].split()
@@ -93,21 +95,26 @@ class TCPSocket:
                         elif cmd_splt[1] == "true":
                             self.hasError = True
                     if len(cmd_splt) and cmd_splt[0] == 'odometry':
-                            self.odometry = cmd_splt
+                        self.odometry = cmd_splt
+                        print('odom')
                     if len(cmd_splt) and cmd_splt[0] == 'laserScan':
                         if cmd_splt[2] == '1801':
                             self.laserScanB1.append(cmd_splt)
                             # print(cmd_splt)
+                            print(count)
                             count = count + 1
+
                         elif cmd_splt[2] == '1802':
                             self.laserScanB4.append(cmd_splt)
                             count = count + 1
 
             except:
-                elapsed_time = time.time() - last_read_time
-                if elapsed_time > 5.0:  # Didn't receive a pack in 5s
-                    self.isconnected = False
-                    print(cl_lightred('No packet received from iiwa for 5s!'))
+                t = 0
+                # elapsed_time = time.time() - last_read_time
+                # if elapsed_time > 5.0:  # Didn't receive a pack in 5s
+                #  print("exception!!")
+                #  self.isconnected = False
+                #  print(cl_lightred('No packet received from iiwa for 5s!'))
 
         print("SHUTTING DOWN")
         self.connection.shutdown(socket.SHUT_RDWR)
@@ -135,7 +142,7 @@ class TCPSocket:
             byt_len.extend(self.connection.recv(diff_header))
             diff_header= header_len-len(byt_len)
 
-        msglength = int(byt_len.decode("utf-8")) + 2   #include crocodile and space
+        msglength = int(byt_len.decode("utf-8")) + 1   #include crocodile and space
         msg = ""
 
         if(msglength>0 and msglength<5000):

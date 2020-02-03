@@ -20,23 +20,25 @@ def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 
 class KmpCommandsNode(Node):
     def __init__(self,connection_type,robot):
-        super().__init__('kmp_commands_node')
-
+        super().__init__('kmp_commands_node')#,allow_undeclared_parameters=True)
+        self.name = 'kmp_commands_node'
+        self.declare_parameter('port')
+        port = int(self.get_parameter('port').value)
         if robot == 'KMR1':
-            port = 30001
-            ip = 1010
+            self.declare_parameter('KMR1/ip')
+            ip = str(self.get_parameter('KMR1/ip').value)
         elif robot == 'KMR2':
-            port = 1223
-            ip= 1212
+            self.declare_parameter('KMR2/ip')
+            #print(str(self.get_parameter('KMR2/ip')))
+            #ip = str(self.get_parameter('KMR2/ip').value)
+            ip="192.168.10.117"
         else:
-            port=None
             ip=None
 
-
         if connection_type == 'TCP':
-            self.soc = TCPSocket(ip,port,'kmp_commands_node')
+            self.soc = TCPSocket(ip,port,self.name)
         elif connection_type == 'UDP':
-            self.soc=UDPSocket(ip,port,'kmp_commands_node')
+            self.soc=UDPSocket(ip,port,self.name)
         else:
             self.soc=None
 
@@ -47,7 +49,7 @@ class KmpCommandsNode(Node):
 
         while not self.soc.isconnected:
             pass
-        print('kmp_commands_node ready')
+        self.get_logger().info('Node is ready')
 
         #Dette er brukt for odom og laserscan, tror ikke det er nodvendig ettersom subscriberne har callback, men lar de staa i tilfelle.
 
@@ -64,6 +66,7 @@ class KmpCommandsNode(Node):
         #self.udp_soc.isconnected = False
 
     def twist_callback(self, data):
+        print(data)
         msg = 'setTwist ' + str(data.linear.x) + " " + str(data.linear.y) + " " + str(data.angular.z)
         self.soc.send(msg)
 
@@ -76,7 +79,6 @@ def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-c', '--connection')
     parser.add_argument('-ro', '--robot')
-    print(argv)
     args = parser.parse_args(remove_ros_args(args=argv))
 
     rclpy.init(args=argv)

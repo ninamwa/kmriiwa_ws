@@ -24,22 +24,22 @@ def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 class KmpOdometryNode(Node):
     def __init__(self,connection_type,robot):
         super().__init__('kmp_odometry_node')
-
+        self.name='kmp_odometry_node'
         if robot == 'KMR1':
-            port = 30001
-            ip = 1010
+            port = 30004
+            ip = '10.22.27.87'
         elif robot == 'KMR2':
-            port = 1223
-            ip= 1212
+            port = 30004
+            ip= '192.168.10.117'
         else:
             port=None
             ip=None
 
 
         if connection_type == 'TCP':
-            self.soc = TCPSocket(ip,port,'kmp_odometry_node')
+            self.soc = TCPSocket(ip,port,self.name)
         elif connection_type == 'UDP':
-            self.soc=UDPSocket(ip,port,'kmp_odometry_node')
+            self.soc=UDPSocket(ip,port,self.name)
         else:
             self.soc=None
 
@@ -53,7 +53,7 @@ class KmpOdometryNode(Node):
 
         while not self.soc.isconnected:
             pass
-        print('kmp_odometry_node ready')
+        self.get_logger().info('Node is ready')
 
         thread.start_new_thread(self.run, ())
 
@@ -144,16 +144,15 @@ def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-c', '--connection')
     parser.add_argument('-ro', '--robot')
-    print(argv)
     args = parser.parse_args(remove_ros_args(args=argv))
-
+    #args.robot='KMR2'
     rclpy.init(args=argv)
     odometry_node = KmpOdometryNode(args.connection,args.robot)
 
-    rclpy.spin(odometry_node)
+    #rclpy.spin(odometry_node)
 
-    #while rclpy.ok():
-    #    rclpy.spin_once(odometry_node)
+    while rclpy.ok():
+        rclpy.spin_once(odometry_node)
     try:
         odometry_node.destroy_node()
         rclpy.shutdown()
