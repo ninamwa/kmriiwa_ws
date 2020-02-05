@@ -99,7 +99,7 @@ class UDPSocket:
                         self.laserScanB1.append(cmd_splt)
                         # print(cmd_splt)
                         count = count + 1
-                        print(count)
+                        #print(count)
                     elif cmd_splt[2] == '1802':
                         self.laserScanB4.append(cmd_splt)
                         count = count + 1

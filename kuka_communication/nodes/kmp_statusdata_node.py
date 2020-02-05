@@ -60,16 +60,23 @@ class KmpStatusNode(Node):
 
 
 
-    def status_callback(self,publisher,values):
-        if values != None:
+    def status_callback(self,publisher,data):
+        # TODO: Fyll inn med riktig statusdata - dette maa ogsaa gjores i selve meldingsfila - den er naa random.
+        if data != None:
             msg = KmpStatusdata()
             msg.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
             msg.header.frame_id = "baselink"
-
-
-            #TODO: Fyll inn med riktig statusdata - dette maa ogsaa gjores i selve meldingsfila - den er naa random.
-            #msg.data= str(values[0])
-
+            status_elements = data.split(",")
+            for i in range(1, len(status_elements)-1):
+                split = status_elements[i].split(":")
+                if(split[0]=="OperationMode"):
+                    msg.operation_mode = split[1]
+                if (split[0] == "ReadyToMove"):
+                    msg.ready_to_move = bool(split[1])
+                if (split[0] == "WarningField"):
+                    msg.warning_field_clear = bool(split[1])
+                if (split[0] == "ProtectionField"):
+                    msg.protection_field_clear = bool(split[1])
             publisher.publish(msg)
 
 
