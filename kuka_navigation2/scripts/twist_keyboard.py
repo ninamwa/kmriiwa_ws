@@ -108,12 +108,6 @@ if __name__=="__main__":
                     print(msg)
                 status = (status + 1) % 15
 
-            elif key in stopBindings.keys():
-                st = String()
-                st.data="shutdown"
-                print(st)
-                stop_pub.publish(st)
-
             else:
                 x = 0
                 y = 0
@@ -122,14 +116,21 @@ if __name__=="__main__":
                 if (key == '\x03'):
                     break
 
-            twist = Twist()
-            twist.linear.x = x*speed
-            twist.linear.y = y*speed
-            twist.linear.z = z*speed
-            twist.angular.x = 0.0
-            twist.angular.y = 0.0
-            twist.angular.z = th*turn
-            pub.publish(twist)
+            if key in stopBindings.keys():
+                st = String()
+                st.data="shutdown"
+                print(st)
+                stop_pub.publish(st)
+            else:
+                twist = Twist()
+                twist.linear.x = x*speed
+                twist.linear.y = y*speed
+                twist.linear.z = z*speed
+                twist.angular.x = 0.0
+                twist.angular.y = 0.0
+                twist.angular.z = th*turn
+                pub.publish(twist)
+                print(twist)
 
     except Exception as e:
         print(e)

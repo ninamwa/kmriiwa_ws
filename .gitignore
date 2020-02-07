@@ -61,3 +61,7 @@ build-*/
 *.gch
 /.project
 .classpath
+.idea
+/.metadata/
+.metadata/
+.metadata

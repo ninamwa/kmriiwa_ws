@@ -23,9 +23,28 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
 # Install the python module for this package
-ament_python_install_package(scripts/)
+ament_python_install_package(script/)
+ament_python_install_package(nodes/)
+
+
+
+################################################################################
+# Declare ROS messages, services and actions
+################################################################################
+set(msg_files
+  "msg/KmpStatusdata.msg"
+)
+
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  ${msg_files}
+  DEPENDENCIES std_msgs
+  ADD_LINTER_TESTS
+)
+ament_export_dependencies(rosidl_default_runtime)
 
 
 #add_executable(dummy_joint_states dummy_joint_states.cpp)
@@ -53,15 +72,27 @@ endif()
 
 # Install python scripts
 install(
-  DIRECTORY launch
+  DIRECTORY launch param
   DESTINATION share/${PROJECT_NAME}
 )
 
 install(
   PROGRAMS
-    scripts/client_UDP.py
-    scripts/dummy_data.py
-    scripts/client_TCP.py
+    script/dummy_data.py
+    script/view_frames.py
+    script/buffer.py
+    script/test.py
+    script/tcpSocket.py
+    script/udpSocket.py
+    script/dummy_odom.py
+    nodes/kmp_commands_node.py
+    nodes/kmp_laserscan_node.py
+    nodes/kmp_odometry_node.py
+    nodes/kmp_statusdata_node.py
+    nodes/lbr_statusdata_node.py
+    nodes/lbr_sensordata_node.py
+    nodes/lbr_commands_node.py
+    nodes/test2.py
     DESTINATION lib/${PROJECT_NAME}
 )
 

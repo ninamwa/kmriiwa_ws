@@ -49,7 +49,7 @@ amcl_rclcpp_node:
 bt_navigator:
   ros__parameters:
     use_sim_time: True
-    bt_xml_filename: "navigate_w_replanning_and_recovery.xml"
+    bt_xml_filename: "navigate_w_replanning.xml"
     plugin_lib_names:
     - nav2_compute_path_to_pose_action_bt_node
     - nav2_follow_path_action_bt_node
@@ -165,7 +165,7 @@ global_costmap:
       use_sim_time: True
       plugin_names: ["static_layer", "obstacle_layer", "voxel_layer", "inflation_layer"]
       plugin_types: ["nav2_costmap_2d::StaticLayer", "nav2_costmap_2d::ObstacleLayer", "nav2_costmap_2d::VoxelLayer", "nav2_costmap_2d::InflationLayer"]
-      robot_radius: 0.22
+      robot_radius: 0.54
       obstacle_layer:
         enabled: True
         observation_sources: scan
