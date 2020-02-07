@@ -8,7 +8,7 @@ import math
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
-from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, TransformStamped
+from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, TransformStamped, PoseWithCovarianceStamped, PoseStamped
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
 from tf2_ros.transform_broadcaster import TransformBroadcaster
@@ -18,8 +18,8 @@ from builtin_interfaces.msg import Time
 from rcl_interfaces.srv import SetParameters
 from rcl_interfaces.msg import Parameter
 from rcl_interfaces.msg import ParameterValue
-from TCPSocket import TCPSocket
-from UDPSocket import UDPSocket
+from rclpy.action import ActionClient
+from nav2_msgs.action import NavigateToPose
 
 
 class Kuka(Node):
@@ -34,13 +34,23 @@ class Kuka(Node):
         ip = '192.168.10.117'
         port = 30001
         #self.soc = TCPSocket(ip, port)
-        self.soc = UDPSocket(ip, port)
+        #self.soc = UDPSocket(ip, port)
+
+
+        #Type of action, action name
+        self.action_client = ActionClient(self, NavigateToPose, '/NavigateToPose')
+        while not self.action_client.wait_for_server(timeout_sec=10.0):
+            self.get_logger(        ).info('Waiting for service')
+
 
 
         pub_odometry = self.create_publisher(Odometry, 'odom', qos_profile_sensor_data)
         scan_pub = self.create_publisher(LaserScan, 'scan', qos_profile_sensor_data)
         #scan_pub2 = kuka_communication_node.create_publisher(LaserScan, 'scan_2', qos_profile_sensor_data)
         tf_broadcaster = TransformBroadcaster(self)
+
+        initial_pub = self.create_publisher(PoseWithCovarianceStamped, 'initialpose', qos_profile_sensor_data)
+        goal_pub = self.create_publisher(PoseStamped, 'move_base_simple/goal', qos_profile_sensor_data)
 
         num_readings = 100
         laser_frequency = 40
@@ -69,8 +79,8 @@ class Kuka(Node):
         st=0
 
 
-        while (False):
-            # time.sleep(1)
+        while (True):
+            time.sleep(0.1)
 
             count = 0
             scan = LaserScan()
@@ -162,27 +172,72 @@ class Kuka(Node):
             pub_odometry.publish(odom)
             tf_broadcaster.sendTransform(odom_tf)
 
-            if (st==300):
-                self.send_request(0.6)
+            #if (st==300):
+            #    self.send_request(0.6)
 
-            if (st == 600):
-                self.send_request(0.7)
+            #if (st == 600):
+            #    self.send_request(0.7)
 
-            a = a + 1
+            #a = a + 1
+
+            if (st==25):
+                initial = PoseWithCovarianceStamped()
+
+                initial.header.frame_id = "map"
+                initial.header.stamp = getTimestamp(self.get_clock().now().nanoseconds)
+
+                point = Point()
+                point.x = 0.1
+                point.y = 0.0
+                point.z = 0.0
+
+                quat = Quaternion()
+                quat.x = 0.0
+                quat.y = 0.0
+                quat.z = 0.0
+                quat.w = 0.1
+
+                initial.pose.pose.position = point
+                initial.pose.pose.orientation = quat
+
+
+                initial_pub.publish(initial)
+
+            if (st==50):
+                self.send_goal()
+
             print(st)
             st = st +1
         time.sleep(3)
         print("hei")
         count=0
-        while (self.soc.isconnected):
-            time.sleep(0.03)
-            s = ""
-            num = 600
-            for i in range(1,num):
-                s += ' 10.00'
-            self.soc.send(s)
-            count +=1
-            print(count)
+
+    def send_goal(self):
+        goal = NavigateToPose.Goal()
+        goal.pose = PoseStamped()
+        goal.pose.header.frame_id = "map"
+        goal.pose.header.stamp = getTimestamp(self.get_clock().now().nanoseconds)
+
+        point = Point()
+        point.x = -2.44
+        point.y = -1.29
+        point.z = 0.0
+
+        quat = Quaternion()
+        quat.x = 0.0
+        quat.y = 0.0
+        quat.z = 0.0
+        quat.w = 1.0
+
+        goal.pose.pose.position = point
+        goal.pose.pose.orientation = quat
+
+        self.action_client.send_goal_async(goal, feedback_callback=self.feedback_callback)
+
+    def feedback_callback(self, feedback_msg):
+        feedback = feedback_msg.feedback
+        print(feedback)
+        self.get_logger().info('Received feedback: {0}'.format(feedback.partial_sequence))
 
     def send_request(self,value):
 
