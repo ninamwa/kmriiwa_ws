@@ -130,6 +130,7 @@ if __name__=="__main__":
                 twist.angular.y = 0.0
                 twist.angular.z = th*turn
                 pub.publish(twist)
+                print(twist)
 
     except Exception as e:
         print(e)
