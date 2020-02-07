@@ -74,20 +74,25 @@ class TCPSocket:
                 data = self.recvmsg()
                 for pack in (data.decode("utf-8")).split(">"):  # parsing data pack
                     cmd_splt = pack.split()
-
                     if len(cmd_splt) and cmd_splt[0] == 'odometry':
                         self.odometry = cmd_splt
-                        print('odom')
+                        #print('odom')
                     if len(cmd_splt) and cmd_splt[0] == 'laserScan':
                         if cmd_splt[2] == '1801':
                             self.laserScanB1.append(cmd_splt)
                             # print(cmd_splt)
-                            print(count)
+                            #print(count)
                             count = count + 1
 
                         elif cmd_splt[2] == '1802':
                             self.laserScanB4.append(cmd_splt)
                             count = count + 1
+                    if len(cmd_splt) and cmd_splt[0] == 'kmp_statusdata':
+                        self.kmp_statusdata = cmd_splt
+                    if len(cmd_splt) and cmd_splt[0] == 'lbr_statusdata':
+                        self.lbr_statusdata = cmd_splt
+                    if len(cmd_splt) and cmd_splt[0] == 'lbr_sensordata':
+                        self.lbr_sensordata = self.lbr_sensordata.append(cmd_splt)
 
             except:
                 t = 0

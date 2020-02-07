@@ -54,7 +54,7 @@ class KmpLaserScanNode(Node):
 
 
         # Make Publishers for relevant data
-        self.pub_laserscan1 = self.create_publisher(LaserScan, 'scan_1', qos_profile_sensor_data)
+        self.pub_laserscan1 = self.create_publisher(LaserScan, 'scan', qos_profile_sensor_data)
         self.pub_laserscan4 = self.create_publisher(LaserScan, 'scan_2', qos_profile_sensor_data)
         self.send_static_transform()
 
@@ -81,7 +81,7 @@ class KmpLaserScanNode(Node):
             scan = LaserScan()
             scan.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
             if values[2] == '1801':
-                scan.header.frame_id = "scan_1"
+                scan.header.frame_id = "scan"
             elif values[2] == '1802':
                 scan.header.frame_id="scan_2"
             scan.angle_increment = (0.5*math.pi)/180
@@ -132,7 +132,7 @@ class KmpLaserScanNode(Node):
         static_transformStamped.transform.rotation.w = quat[3]
         broadcaster1.sendTransform(static_transformStamped)
         static_transformStamped.header.frame_id = "laser_B1_link"
-        static_transformStamped.child_frame_id = "scan_1"
+        static_transformStamped.child_frame_id = "scan"
         broadcaster2.sendTransform(static_transformStamped)
 
 

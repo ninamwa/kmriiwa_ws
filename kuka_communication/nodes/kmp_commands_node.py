@@ -64,7 +64,6 @@ class KmpCommandsNode(Node):
         #self.udp_soc.isconnected = False
 
     def twist_callback(self, data):
-        print(data)
         msg = 'setTwist ' + str(data.linear.x) + " " + str(data.linear.y) + " " + str(data.angular.z)
         self.soc.send(msg)
 

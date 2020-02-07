@@ -23,6 +23,7 @@ class KmpStatusNode(Node):
     def __init__(self,connection_type,robot):
         super().__init__('kmp_statusdata_node')
         self.name='kmp_statusdata_node'
+        self.last_status_timestamp = 0
         self.declare_parameter('port')
         port = int(self.get_parameter('port').value)
         if robot == 'KMR1':
@@ -58,26 +59,33 @@ class KmpStatusNode(Node):
         while rclpy.ok() and self.soc.isconnected:
             self.status_callback(self.pub_kmp_statusdata, self.soc.kmp_statusdata)
 
-
-
     def status_callback(self,publisher,data):
         # TODO: Fyll inn med riktig statusdata - dette maa ogsaa gjores i selve meldingsfila - den er naa random.
         if data != None:
             msg = KmpStatusdata()
             msg.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
-            msg.header.frame_id = "baselink"
-            status_elements = data.split(",")
-            for i in range(1, len(status_elements)-1):
-                split = status_elements[i].split(":")
-                if(split[0]=="OperationMode"):
-                    msg.operation_mode = split[1]
-                if (split[0] == "ReadyToMove"):
-                    msg.ready_to_move = bool(split[1])
-                if (split[0] == "WarningField"):
-                    msg.warning_field_clear = bool(split[1])
-                if (split[0] == "ProtectionField"):
-                    msg.protection_field_clear = bool(split[1])
-            publisher.publish(msg)
+            status_elements = data[1].split(",")
+            if (status_elements[1] != self.last_status_timestamp):
+                self.last_status_timestamp = status_elements[1]
+                for i in range(2, len(status_elements)):
+                    split = status_elements[i].split(":")
+                    if(split[0]=="OperationMode"):
+                        msg.operation_mode = split[1]
+                    if (split[0] == "ReadyToMove"):
+                        msg.ready_to_move = bool(split[1])
+                    if (split[0] == "WarningField"):
+                        if (split[1] == "true"):
+                            msg.warning_field_clear = True
+                            msg.warning_field_clear = True
+                        else:
+                            msg.warning_field_clear = False
+                    if (split[0] == "ProtectionField"):
+                        if (split[1] == "true"):
+                            msg.protection_field_clear = True
+                        else:
+                            msg.protection_field_clear = False
+                publisher.publish(msg)
+
 
 
     def getTimestamp(self,nano):
