@@ -17,7 +17,7 @@ public class LBR_sensor_reader extends Thread{
 	int port;
 	ISocket socket;
 	String ConnectionType;
-
+	public volatile boolean close = false;
 
 	Boolean LBR_sensor_requested;
 
@@ -57,25 +57,37 @@ public class LBR_sensor_reader extends Thread{
 		
 	public class MonitorSensorConnectionThread extends Thread {
 		public void run(){
-			while(!(isSocketConnected())) {
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				System.out.println("");
+			while(!(isSocketConnected()) && (!(close))) {
+				
+				createSocket();
+				if (isSocketConnected()){
+					break;
+				}
+				try {
+					this.sleep(1000);
+				} catch (InterruptedException e) {
+					System.out.println("");
+				}
 			}
-			createSocket();
-			
-		}	
-			LBR_sensor_requested = true;
-			System.out.println("Connection with LBRsensorNode OK!");
-			run();
-		}	
-	}		
+			if(!close){
+				System.out.println("Connection with LBRsensorNode OK!");
+				LBR_sensor_requested = true;
+				runmainthread();					
+				}	
+		}
+	}
+	
+	public void runmainthread(){
+		this.run();
+	}
+	
 	
 	public void run() {
-		while(isSocketConnected())
+		while(isSocketConnected() && (!(close)))
 		{
 			sendTorque();
+			
+			// SLEEP BELOW
 
 		}
     }
@@ -89,6 +101,7 @@ public class LBR_sensor_reader extends Thread{
 	
 
 	public void close() {
+		close = true;
 		socket.close();
 	}
 	

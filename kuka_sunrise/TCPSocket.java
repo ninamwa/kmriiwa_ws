@@ -45,7 +45,7 @@ public class TCPSocket implements ISocket{
 				break;
 			}
 			catch(IOException e1){
-				System.out.println("Could not connect to server with port : "+ this.COMport + " Error: " +e1);
+				System.out.println("Could not connect to ROS over TCP on port : "+ this.COMport + " Error: " +e1);
 			return null;
 			}
 		}
@@ -55,7 +55,7 @@ public class TCPSocket implements ISocket{
 			isConnected=true;
 			return TCPConn;
 		}catch(Exception e){
-			System.out.println("Error creating I/O ports: " +e);
+			System.out.println("Error creating I/O ports for TCP communication on port: "+ this.COMport + " Error: " +e);
 			return null;
 		}
 		
@@ -78,7 +78,7 @@ public class TCPSocket implements ISocket{
 			return line;
 		
 			}catch(Exception e){
-				System.out.println("Could not read message: " +e);
+				System.out.println("Could not receive message from TCP connection on port: "+ this.COMport + " Error: " +e);
 				return "error";
 			}
 	}	
@@ -88,10 +88,10 @@ public class TCPSocket implements ISocket{
 	public void close(){
 		try {
 			TCPConn.close();
-			System.out.println("Connection to ROS closed");
+			System.out.println("TCP connection to ROS closed port: " + this.COMport);
 			isConnected=false;
 		} catch (Exception e) {
-			System.out.println("ERROR closing the communication port to ROS!");
+			System.out.println("ERROR closing the TCP communication port to ROS: " + this.COMport + " error: " + e);
 		}
 	}
 	

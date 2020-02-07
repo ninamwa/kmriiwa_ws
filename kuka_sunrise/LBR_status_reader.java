@@ -3,6 +3,7 @@ package testwithrobot;
 
 import com.kuka.roboticsAPI.deviceModel.LBR;
 import testwithrobot.UDPSocket;
+import testwithrobot.KMP_status_reader.MonitorKMPStatusConnectionsThread;
 import testwithrobot.TCPSocket;
 import testwithrobot.ISocket;
 
@@ -12,6 +13,7 @@ public class LBR_status_reader extends Thread{
 	int port;
 	ISocket socket;
 	String ConnectionType;
+	public volatile boolean close = false;
 
 
 	LBR lbr;
@@ -22,6 +24,12 @@ public class LBR_status_reader extends Thread{
 		this.lbr = robot;
 		this.ConnectionType = ConnectionType;
 		createSocket();
+		if (!(isSocketConnected())) {
+			System.out.println("Starting thread to connect KMP status node....");
+			Thread monitorLBRStatusConnections = new MonitorLBRStatusConnectionsThread();
+			monitorLBRStatusConnections.start();
+			}
+		
 		}
 	public void createSocket(){
 		if (this.ConnectionType == "TCP") {
@@ -58,13 +66,34 @@ public class LBR_status_reader extends Thread{
 	}
 	}
 	
+	public class MonitorLBRStatusConnectionsThread extends Thread {
+		public void run(){
+			while(!(isSocketConnected()) && (!(close))) {
+				
+				createSocket();
+				if (isSocketConnected()){
+					break;
+				}
+				try {
+					this.sleep(5000);
+				} catch (InterruptedException e) {
+					System.out.println("");
+				}
+			}
+			if(!close){
+				System.out.println("Connection with LBR status Node OK!");
+				runmainthread();					
+				}	
+		}
+	}
+	public void runmainthread(){
+		this.run();
+	}
+	
 
 	public void close() {
-		try {
+		close = true;
 		socket.close();
-		}catch(Exception e) {
-			System.out.println("Could not close LBR status connection to ROS: " + e);
-		}
 	}
 	
 	public boolean isSocketConnected() {

@@ -71,6 +71,10 @@ public class KMPjogger
       this._velocities[i] = 0.0D;
     }
     this._joggableDevice.jog(this._velocities);
+//    x = 05
+//    y = 0.28 & xy = 0.28
+//    theta = 0.25
+
   }
 
 

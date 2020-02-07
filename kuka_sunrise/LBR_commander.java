@@ -2,6 +2,7 @@ package testwithrobot;
 
 // Implemented classes
 import testwithrobot.UDPSocket;
+import testwithrobot.KMP_status_reader.MonitorKMPStatusConnectionsThread;
 import testwithrobot.TCPSocket;
 import testwithrobot.ISocket;
 
@@ -16,12 +17,14 @@ public class LBR_commander extends Thread{
 	int port;
 	ISocket socket;
 	String ConnectionType;
+	public volatile boolean close = false;
+	boolean isKMPConnected;
+
 	
 	LBR lbr;
 	String CommandStr;
 	boolean LBR_is_Moving;
 
-	
 	// Motion variables: LBR
 	ICommandContainer LBR_currentMotion;
 	
@@ -31,6 +34,11 @@ public class LBR_commander extends Thread{
 		this.shutdown = false;
 		this.ConnectionType = ConnectionType;
 		createSocket();
+		if (!(isSocketConnected())) {
+			System.out.println("Starting thread to connect KMP status node....");
+			Thread monitorLBRCommandConnections = new MonitorLBRCommandConnectionsThread();
+			monitorLBRCommandConnections.start();
+			}
 	}
 	
 	public void createSocket(){
@@ -44,7 +52,7 @@ public class LBR_commander extends Thread{
 	}
 	
 	public void run() {
-		while(isSocketConnected())
+		while(isSocketConnected() && (!(close)))
 		{   
 			String Commandstr = socket.receive_message(); 
 	    	String []splt = Commandstr.split(" ");
@@ -59,6 +67,33 @@ public class LBR_commander extends Thread{
 		}
     }
 	
+	public class MonitorLBRCommandConnectionsThread extends Thread {
+		int timeout = 3000;
+		public void run(){
+			while(!(isSocketConnected()) && (!(close))) {
+				if(isKMPConnected) {
+					timeout = 5000;
+				}
+				
+				createSocket();
+				if (isSocketConnected()){
+					break;
+				}
+				try {
+					this.sleep(timeout);
+				} catch (InterruptedException e) {
+					System.out.println("");
+				}
+			}
+			if(!close){
+				System.out.println("Connection with LBR Command Node OK!");
+				runmainthread();					
+				}	
+		}
+	}
+	public void runmainthread(){
+		this.run();
+	}
 	public boolean isLBRMoving() {
 		return LBR_is_Moving;
 	}
@@ -67,11 +102,15 @@ public class LBR_commander extends Thread{
 		return this.shutdown;
 	}
 	public void close() {
+		close = true;
 		socket.close();
 	}
 	
 	public boolean isSocketConnected() {
 		return socket.isConnected();
+	}
+	public void setKMPConnected(boolean KMPConnected) {
+		this.isKMPConnected = KMPConnected;
 	}
 	
 }

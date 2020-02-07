@@ -101,15 +101,16 @@ public class KMP_sensor_reader {
 	public class MonitorLaserConnectionThread extends Thread {
 		public void run(){
 			while(!(isLaserSocketConnected()) && (!(close))) {
+
+				createLaserSocket();
+				if(isLaserSocketConnected()){
+					break;
+				}	
 				try {
 					this.sleep(5000);
 				} catch (InterruptedException e) {
 					System.out.println("");
 				}
-				createLaserSocket();
-				if(isLaserSocketConnected()){
-					break;
-				}	
 			}
 			if(!close){
 				KMP_laser_requested = true;
@@ -117,7 +118,9 @@ public class KMP_sensor_reader {
 					fdiConnection();
 				}
 				listener.setLaserSocket(laser_socket);
-				subscribe_kmp_laser_data();					
+				subscribe_kmp_laser_data();	
+				System.out.println("Connection with KMP Laser Node OK!");
+
 				}	
 		}
 	}
@@ -125,14 +128,15 @@ public class KMP_sensor_reader {
 	public class MonitorOdometryConnectionThread extends Thread {
 		public void run(){
 			while(!(isOdometrySocketConnected()) && (!(close))) {
+				
+				createOdometrySocket();
+				if (isOdometrySocketConnected()){
+					break;
+				}
 				try {
 					this.sleep(5000);
 				} catch (InterruptedException e) {
 					System.out.println("");
-				}
-				createOdometrySocket();
-				if(isOdometrySocketConnected()){
-					break;
 				}
 			
 		}	
@@ -143,6 +147,7 @@ public class KMP_sensor_reader {
 				}
 				listener.setOdometrySocket(odometry_socket);
 				subscribe_kmp_odometry_data();
+				System.out.println("Connection with KMP Odometry Node OK!");
 				}
 		}
 	}
