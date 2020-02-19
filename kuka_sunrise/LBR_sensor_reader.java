@@ -6,7 +6,6 @@ import com.kuka.roboticsAPI.deviceModel.LBR;
 import com.kuka.roboticsAPI.sensorModel.TorqueSensorData;
 
 import testwithrobot.UDPSocket;
-import testwithrobot.LBR_sensor_reader.MonitorSensorConnectionThread;
 import testwithrobot.TCPSocket;
 import testwithrobot.ISocket;
 
@@ -64,7 +63,7 @@ public class LBR_sensor_reader extends Thread{
 					break;
 				}
 				try {
-					this.sleep(1000);
+					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					System.out.println("");
 				}

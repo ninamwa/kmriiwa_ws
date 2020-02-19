@@ -1,14 +1,11 @@
 package testwithrobot;
 
 
-import java.io.IOException;
 import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
-import java.net.Socket;
 import java.nio.charset.Charset;
 import testwithrobot.ISocket;
 
@@ -34,7 +31,7 @@ public class UDPSocket implements ISocket{
 		while (!isConnected){
 			try{
 				System.out.println("Connecting to ROS over UDP on port: " + COMport); 
-		    	String kuka_host = "192.168.10.102"; // KMR iiwa 2
+//		    	String kuka_host = "192.168.10.102"; // KMR iiwa 2
 		    	int kuka_port = this.COMport; // change this if cannot bind error
 		        InetSocketAddress socket_address = new InetSocketAddress(kuka_port);
 		    	
@@ -121,7 +118,7 @@ public class UDPSocket implements ISocket{
 	{
 		String line;
 		try{
-			udpConn.receive(package_in);;
+			udpConn.receive(package_in);
 			line = decode(package_in);
 	    	return line;
 		}

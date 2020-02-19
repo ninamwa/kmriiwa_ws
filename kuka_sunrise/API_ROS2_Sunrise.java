@@ -4,10 +4,9 @@ package testwithrobot;
 // Configuration
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.apache.log4j.BasicConfigurator;
 
-// Socket
-import java.net.InetSocketAddress;
 
 // Implementated classes
 import testwithrobot.KMP_commander;
@@ -19,15 +18,17 @@ import testwithrobot.LBR_status_reader;
 
 
 // RoboticsAPI
+import com.kuka.roboticsAPI.annotations.*;
 import com.kuka.roboticsAPI.applicationModel.RoboticsAPIApplication;
 import com.kuka.roboticsAPI.controllerModel.Controller;
 import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
 import com.kuka.roboticsAPI.deviceModel.LBR;
 
+@ResumeAfterPauseEvent(delay = 3000, afterRepositioning = false)
 public class API_ROS2_Sunrise extends RoboticsAPIApplication{
 	
 	private volatile boolean AppRunning;
-
+	private IAutomaticResumeFunction resumeFunction;
 
 	// Declare KMP
 	@Inject
@@ -40,15 +41,14 @@ public class API_ROS2_Sunrise extends RoboticsAPIApplication{
 	@Named("LBR_iiwa_14_R820_1")
 	public LBR lbr;
 	
-	// Declare tool
-// TODO:
+// TODO: declare tool
 	//@Inject
 	//@Named("name of tool")
 	//public Tool tool;
 	
 	// Define UDP ports
 	int KMP_status_port = 30001;
-	int KMP_command_port = 30008;
+	int KMP_command_port = 30002;
 	int KMP_laser_port = 30003;
 	int KMP_odometry_port = 30004;
 	int LBR_command_port = 30005;
@@ -71,6 +71,8 @@ public class API_ROS2_Sunrise extends RoboticsAPIApplication{
 	boolean OpenPorts;
 
 	public void initialize() {
+		System.out.println("Initializing Robotics API Application");
+
 		// Check if any of the requested ports are open, and close if any
 		CheckPorts = new CheckOpenPorts();
 		OpenPorts = CheckPorts.run();
@@ -80,7 +82,7 @@ public class API_ROS2_Sunrise extends RoboticsAPIApplication{
 		}
 		// Configure application
 		BasicConfigurator.configure();
-		System.out.println("Initializing Robotics API Application");
+		resumeFunction = getTaskFunction(IAutomaticResumeFunction.class);
 
 		// Configure robot;
 		controller = getController("KUKA_Sunrise_Cabinet_1");
@@ -89,12 +91,12 @@ public class API_ROS2_Sunrise extends RoboticsAPIApplication{
 		//tool.attachTo(lbr.getFlange());
 		
 		// Create nodes for communication
-		kmp_commander = new KMP_commander(KMP_command_port, kmp, UDPConnection);
+		kmp_commander = new KMP_commander(KMP_command_port, kmp, TCPConnection);
 		//lbr_commander = new LBR_commander(LBR_command_port, lbr, UDPConnection);
-		kmp_status_reader = new KMP_status_reader(KMP_status_port, kmp, UDPConnection, controller);
+		kmp_status_reader = new KMP_status_reader(KMP_status_port, kmp,TCPConnection, controller);
 		//lbr_status_reader = new LBR_status_reader(LBR_status_port, lbr,UDPConnection);
 		//lbr_sensor_reader = new LBR_sensor_reader(LBR_sensor_port,lbr, UDPConnection);
-		kmp_sensor_reader = new KMP_sensor_reader(KMP_laser_port, KMP_odometry_port, UDPConnection, UDPConnection);
+		kmp_sensor_reader = new KMP_sensor_reader(KMP_laser_port, KMP_odometry_port, TCPConnection, TCPConnection);
 		
 		// Check if a commander node is active
 		long startTime = System.currentTimeMillis();
@@ -108,8 +110,8 @@ public class API_ROS2_Sunrise extends RoboticsAPIApplication{
 					System.out.println("Application ready to run!");	
 					break;
 			}else if((System.currentTimeMillis() - startTime) > shutDownAfterMs){
-				shutdown_application();
 				System.out.println("Could not connect to a command node after " + shutDownAfterMs/1000 + "s. Shutting down.");	
+				shutdown_application();
 				break;
 			}				
 		}
@@ -137,6 +139,8 @@ public class API_ROS2_Sunrise extends RoboticsAPIApplication{
     	}
 	
 	public void run() {
+		setAutomaticallyResumable(true);
+
 		System.out.println("Running app!");
 		// Start all connected nodes
 		if(kmp_commander.isSocketConnected()) {
@@ -162,6 +166,7 @@ public class API_ROS2_Sunrise extends RoboticsAPIApplication{
 		if(kmp_sensor_reader.isRequested()) {
 			kmp_sensor_reader.start();
 		}
+		
 		while(AppRunning)
 		{    
 			AppRunning = (!(kmp_commander.getShutdown())); // || lbr_commander.getShutdown()
@@ -169,6 +174,17 @@ public class API_ROS2_Sunrise extends RoboticsAPIApplication{
 		System.out.println("Shutdown message received from ROS");
 		shutdown_application();
 	}
+	
+	private void setAutomaticallyResumable(boolean enable)
+	{
+		if(enable)
+		{
+			resumeFunction.enableApplicationResuming(getClass().getCanonicalName());
+			return;
+		}
+		resumeFunction.disableApplicationResuming(getClass().getCanonicalName());		
+	}
+	
 
 	public static void main(String[] args){
 		API_ROS2_Sunrise app = new API_ROS2_Sunrise();

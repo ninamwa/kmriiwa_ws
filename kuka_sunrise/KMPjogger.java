@@ -20,13 +20,13 @@ public class KMPjogger
 {
 
   
-  private static final int JOG_START_DELAY = 0;
+//  private static final int JOG_START_DELAY = 0;
 
   
-  private static final int JOG_UPDATE_PERIOD = 50;
+//  private static final int JOG_UPDATE_PERIOD = 50;
 
   
-  private static final int EXECUTOR_THREAD_POOL_SIZE = 2;
+//  private static final int EXECUTOR_THREAD_POOL_SIZE = 2;
 
   
   public ScheduledExecutorService _executor;

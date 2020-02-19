@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.kuka.roboticsAPI.applicationModel.RoboticsAPIApplication;
 
 public class CheckOpenPorts{
 	

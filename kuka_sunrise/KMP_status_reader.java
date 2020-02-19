@@ -1,27 +1,19 @@
 package testwithrobot;
 
 
-import java.util.Arrays;
-import java.util.List;
 //Implemented classes
 import java.util.concurrent.TimeUnit;
 
 import testwithrobot.UDPSocket;
-import testwithrobot.KMP_sensor_reader.MonitorLaserConnectionThread;
 import testwithrobot.TCPSocket;
 import testwithrobot.ISocket;
 
 //RoboticsAPI
 import com.kuka.roboticsAPI.controllerModel.Controller;
-import com.kuka.roboticsAPI.controllerModel.sunrise.ISafetyState;
-import com.kuka.roboticsAPI.controllerModel.sunrise.state.kmp.IMobilePlatformSafetyState;
-import com.kuka.roboticsAPI.controllerModel.sunrise.state.kmp.MobilePlatformSafetyState;
-import com.kuka.roboticsAPI.motionModel.kmp.MobilePlatformVelocityData;
 import com.kuka.generated.ioAccess.MobilePlatformStateSignalsIOGroup;
 import com.kuka.generated.ioAccess.ScannerSignalsIOGroup;
 import com.kuka.roboticsAPI.deviceModel.OperationMode;
 import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
-import com.kuka.roboticsAPI.deviceModel.kmp.SunriseOmniMoveMobilePlatform;
 //TODO: importere alle klasser fra SunriseOmniMoveMobilePlatform, scannerIO
 public class KMP_status_reader extends Thread{
 	
@@ -39,6 +31,7 @@ public class KMP_status_reader extends Thread{
 //	private double[] maximumVelocities; //GetMaximumVelocities
 	private volatile boolean WarningField = false;
 	private volatile boolean ProtectionField = false;
+//	TODO: SKAL VI HA EN SJEKK P� DENNE HER? IFT LESE PROT OG WARNING FIELD?
 	
 	public KMP_status_reader(int UDPport, KmpOmniMove robot,String ConnectionType, Controller controller) {
 		this.port = UDPport;
@@ -82,10 +75,7 @@ public class KMP_status_reader extends Thread{
 			}
 		}
  }
-	// always true when motion enable is held
-	private void updateInactiveFields() {
-//		this.inactive_fields =scannerIOGroup.getProtectionFieldMuted(); // true = muted , inactive
-	}
+
 	
 	private void updateOperationMode() {
 		this.operation_mode = kmp.getOperationMode();
@@ -100,25 +90,25 @@ public class KMP_status_reader extends Thread{
 //		signalnames =  Arrays.asList("WarningField_B1", "WarningField_B4", "WarningFieldComplete");
 		if(!(closed)){
 			try{
-				this.WarningField = this.scannerIOGroup.getWarningFieldComplete(); // Se signalnames i liste
+				this.WarningField = this.scannerIOGroup.getWarningFieldComplete(); // 
 			}catch(Exception e){
-				System.out.println("Could not read warning field: " + e);
+//					System.out.println("Could not read warning field: " + e);
+				}
+			}
 		}
-		}
-	}
 	
 	// scannerIO
 	private void updateProtectionFieldState() {
 //		signalnames =  Arrays.asList("WarningField_B1", "WarningField_B4", "WarningFieldComplete");
 		if(!(closed)){
 			try{
-				this.ProtectionField = this.scannerIOGroup.getProtectionFieldComplete(); // Se signalnames i liste
+				this.ProtectionField = this.scannerIOGroup.getProtectionFieldComplete();
 			}catch(Exception e){
-				System.out.println("Could not read protection field: " + e);
-			}
+//				System.out.println("Could not read protection field: " + e);
+				}
 		}
-	}
-	
+		}
+
 	
 	// TODO: Må se på output på de forskjellige. F.eks. list, må disse hentes ut separat?
 	private String generateStatusString() {
@@ -148,7 +138,7 @@ public class KMP_status_reader extends Thread{
 					break;
 				}
 				try {
-					this.sleep(5000);
+					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					System.out.println("");
 				}
@@ -175,4 +165,5 @@ public class KMP_status_reader extends Thread{
 	public boolean isSocketCreated() {
 		return !(socket==null);
 	}
+
 }

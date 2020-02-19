@@ -3,7 +3,6 @@ package testwithrobot;
 
 import com.kuka.roboticsAPI.deviceModel.LBR;
 import testwithrobot.UDPSocket;
-import testwithrobot.KMP_status_reader.MonitorKMPStatusConnectionsThread;
 import testwithrobot.TCPSocket;
 import testwithrobot.ISocket;
 
@@ -75,7 +74,7 @@ public class LBR_status_reader extends Thread{
 					break;
 				}
 				try {
-					this.sleep(5000);
+					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					System.out.println("");
 				}

@@ -1,7 +1,6 @@
 package testwithrobot;
 
 
-import java.net.Socket;
 
 
 public interface ISocket {

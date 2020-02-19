@@ -2,7 +2,6 @@ package testwithrobot;
 
 // Implemented classes
 import testwithrobot.UDPSocket;
-import testwithrobot.KMP_status_reader.MonitorKMPStatusConnectionsThread;
 import testwithrobot.TCPSocket;
 import testwithrobot.ISocket;
 
@@ -80,7 +79,7 @@ public class LBR_commander extends Thread{
 					break;
 				}
 				try {
-					this.sleep(timeout);
+					Thread.sleep(timeout);
 				} catch (InterruptedException e) {
 					System.out.println("");
 				}

@@ -1,6 +1,5 @@
 package testwithrobot;
 import java.net.InetSocketAddress;
-import java.util.concurrent.TimeUnit;
 
 
 // Implemented classes
@@ -107,7 +106,7 @@ public class KMP_sensor_reader {
 					break;
 				}	
 				try {
-					this.sleep(5000);
+					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					System.out.println("");
 				}
@@ -134,7 +133,7 @@ public class KMP_sensor_reader {
 					break;
 				}
 				try {
-					this.sleep(5000);
+					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					System.out.println("");
 				}
