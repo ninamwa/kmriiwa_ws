@@ -1,16 +1,16 @@
-package testwithrobot;
+package API_ROS2_Sunrise;
 
 
 //Implemented classes
 import java.util.concurrent.TimeUnit;
 
-import testwithrobot.UDPSocket;
-import testwithrobot.TCPSocket;
-import testwithrobot.ISocket;
 
 //RoboticsAPI
+import API_ROS2_Sunrise.ISocket;
+import API_ROS2_Sunrise.TCPSocket;
+import API_ROS2_Sunrise.UDPSocket;
+
 import com.kuka.roboticsAPI.controllerModel.Controller;
-import com.kuka.generated.ioAccess.MobilePlatformStateSignalsIOGroup;
 import com.kuka.generated.ioAccess.ScannerSignalsIOGroup;
 import com.kuka.roboticsAPI.deviceModel.OperationMode;
 import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
@@ -23,15 +23,15 @@ public class KMP_status_reader extends Thread{
 	public volatile boolean closed = false;
 	
 	ScannerSignalsIOGroup scannerIOGroup;
-	MobilePlatformStateSignalsIOGroup MPStateSignalsIOGroup;
 	
 	KmpOmniMove kmp;
 	private OperationMode operation_mode = null;
-	private Object isReadyToMove = null; //IsReadyToMove() 
-//	private double[] maximumVelocities; //GetMaximumVelocities
+	private Object isReadyToMove = null; 
 	private volatile boolean WarningField = false;
 	private volatile boolean ProtectionField = false;
-//	TODO: SKAL VI HA EN SJEKK PÅ DENNE HER? IFT LESE PROT OG WARNING FIELD?
+	private boolean KMP_is_Moving = false;
+	private boolean KMPemergencyStop;
+
 	
 	public KMP_status_reader(int UDPport, KmpOmniMove robot,String ConnectionType, Controller controller) {
 		this.port = UDPport;
@@ -58,7 +58,7 @@ public class KMP_status_reader extends Thread{
 	public void run() {
 		while(isSocketConnected() && (!(closed)))
 		{	
-//FIND OUT HOW MUCH TO SLEEP. SAMME RATE SOM ODOMETRY?
+// TODO: FIND OUT HOW MUCH TO SLEEP. SAMME RATE SOM ODOMETRY?
 			updateOperationMode();
 			updateReadyToMove();
 			updateWarningFieldState();
@@ -110,9 +110,16 @@ public class KMP_status_reader extends Thread{
 		}
 
 	
-	// TODO: MÃ¥ se pÃ¥ output pÃ¥ de forskjellige. F.eks. list, mÃ¥ disse hentes ut separat?
+	// TODO: LEGG INN KMP_is_MOVING
 	private String generateStatusString() {
-		return 	">kmp_statusdata ,"  + System.nanoTime() + ",OperationMode:"+ this.operation_mode.toString() + ",ReadyToMove:" + this.isReadyToMove + ",WarningField:" + this.WarningField + ",ProtectionField:" + this.ProtectionField;
+		return 	">kmp_statusdata ,"  + System.nanoTime() + 
+				",OperationMode:"+ this.operation_mode.toString() + 
+				",ReadyToMove:" + this.isReadyToMove + 
+				",WarningField:" + this.WarningField + 
+				",ProtectionField:" + this.ProtectionField + 
+				",isKMPmoving:" + KMP_is_Moving + 
+				",KMPsafetyStop:" + KMPemergencyStop;
+	
 	}
 	
 	public void sendStatus() {
@@ -121,7 +128,7 @@ public class KMP_status_reader extends Thread{
 			try{
 				this.socket.send_message(toSend);
 				if(closed){
-					System.out.println("STATUS POSTER SELV OM HAN IKKE FÅR LOV :D");
+					System.out.println("KMP status sender selv om han ikke får lov");
 				}
 			}catch(Exception e){
 				System.out.println("Could not send Operation mode to ROS: " + e);
@@ -150,8 +157,17 @@ public class KMP_status_reader extends Thread{
 				}	
 		}
 	}
+	
 	public void runmainthread(){
 		this.run();
+	}
+	
+	public void setKMPisMoving(boolean moving){
+		KMP_is_Moving = moving;
+	}
+	
+	public void setKMPemergencyStop(boolean stop){
+		KMPemergencyStop  = stop;
 	}
 
 	public void close() {

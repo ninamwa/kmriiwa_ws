@@ -1,13 +1,14 @@
-package testwithrobot;
+package API_ROS2_Sunrise;
 
 // Implemented classes
-import testwithrobot.KMPjogger;
-import testwithrobot.UDPSocket;
-import testwithrobot.TCPSocket;
-import testwithrobot.ISocket;
 
 
 // RoboticsAPI
+import API_ROS2_Sunrise.ISocket;
+import API_ROS2_Sunrise.KMPjogger;
+import API_ROS2_Sunrise.TCPSocket;
+import API_ROS2_Sunrise.UDPSocket;
+
 import com.kuka.jogging.provider.api.common.ICartesianJoggingSupport;
 import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
 import com.kuka.roboticsAPI.executionModel.ICommandContainer;
@@ -163,6 +164,10 @@ public class KMP_commander extends Thread{
 	public void setEmergencyStop(boolean es){
 		this.EmergencyStop = es;
 	}
+	public boolean getEmergencyStop(){
+		return EmergencyStop;
+	}
+	
 	public void runmainthread(){
 		this.run();
 	}

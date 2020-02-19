@@ -1,13 +1,13 @@
-package testwithrobot;
+package API_ROS2_Sunrise;
 
 
-import com.kuka.roboticsAPI.deviceModel.ITorqueSensitiveRobot;
+import java.util.concurrent.TimeUnit;
+
+import API_ROS2_Sunrise.ISocket;
+import API_ROS2_Sunrise.TCPSocket;
+import API_ROS2_Sunrise.UDPSocket;
+
 import com.kuka.roboticsAPI.deviceModel.LBR;
-import com.kuka.roboticsAPI.sensorModel.TorqueSensorData;
-
-import testwithrobot.UDPSocket;
-import testwithrobot.TCPSocket;
-import testwithrobot.ISocket;
 
 
 
@@ -16,28 +16,25 @@ public class LBR_sensor_reader extends Thread{
 	int port;
 	ISocket socket;
 	String ConnectionType;
-	public volatile boolean close = false;
+	public volatile boolean closed = false;
 
 	Boolean LBR_sensor_requested;
 
-
-	ITorqueSensitiveRobot LBR_torque_reader;
-	TorqueSensorData LBR_sensor_data;
+	private double[] JointPosition;
+	private double[] MeasuredTorque;
 	
 	LBR lbr;
-	
 	
 	public LBR_sensor_reader(int UDPport, LBR robot, String ConnectionType) {
 		this.port = UDPport;
 		this.lbr = robot;
-		this.LBR_torque_reader = (ITorqueSensitiveRobot)lbr;
 		LBR_sensor_requested = false;
 		this.ConnectionType = ConnectionType;
 		createSocket();
 		
 		if(!(isSocketConnected())){
-			Thread monitorSensorConnections = new MonitorSensorConnectionThread();
-			monitorSensorConnections.start();
+			Thread monitorLBRsensorConnections = new MonitorSensorConnectionThread();
+			monitorLBRsensorConnections.start();
 		}else {
 			LBR_sensor_requested=true;
 		}
@@ -47,31 +44,32 @@ public class LBR_sensor_reader extends Thread{
 	public void createSocket(){
 		if (this.ConnectionType == "TCP") {
 			 socket = new TCPSocket(this.port);
-
 		}
+		
 		else {
 			socket = new UDPSocket(this.port);
 		}
 	}
 		
 	public class MonitorSensorConnectionThread extends Thread {
+		int timeout = 3000;
 		public void run(){
-			while(!(isSocketConnected()) && (!(close))) {
-				
+			while(!(isSocketConnected()) && (!(closed))) {
+
 				createSocket();
 				if (isSocketConnected()){
 					break;
 				}
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(timeout);
 				} catch (InterruptedException e) {
-					System.out.println("");
+					System.out.println("Waiting for connection to LBR commander node ..");
 				}
 			}
-			if(!close){
-				System.out.println("Connection with LBRsensorNode OK!");
-				LBR_sensor_requested = true;
-				runmainthread();					
+			if(!closed){
+				LBR_sensor_requested=true;
+				System.out.println("Connection with KMP Command Node OK!");
+				runmainthread();
 				}	
 		}
 	}
@@ -80,27 +78,55 @@ public class LBR_sensor_reader extends Thread{
 		this.run();
 	}
 	
-	
 	public void run() {
-		while(isSocketConnected() && (!(close)))
-		{
-			sendTorque();
+		while(isSocketConnected() && (!(closed)))
+		{	
+			//FIND OUT HOW MUCH TO SLEEP. SAMME RATE SOM ODOMETRY?
+			updateMeasuredTorque();
+			updateJointPosition();
+			sendStatus();
 			
-			// SLEEP BELOW
-
+			if(!isSocketConnected() || (closed)){
+				break;
+			}
+			try {
+				TimeUnit.MILLISECONDS.sleep(30);
+			} catch (InterruptedException e) {
+				System.out.println("KMP status thread could not sleep");
+			}
 		}
-    }
-	
-	
-	public void sendTorque() {
-		//LBR_sensor_data = LBR_torque_reader.measure();
-		String sensorString = LBR_sensor_data.toString();
-		socket.send_message(sensorString);
+	}
+
+	private void updateJointPosition() {
+		JointPosition = lbr.getCurrentJointPosition().getInternalArray();
+	}
+
+	private void updateMeasuredTorque() {
+		MeasuredTorque = lbr.getMeasuredTorque().getTorqueValues();
+	}
+
+	private String generateSensorString() {
+		return 	">lbr_sensordata ,"  + System.nanoTime() +  
+				",JointPosition:" + JointPosition + 
+				",MeasuredTorque:" + MeasuredTorque ;
 	}
 	
-
+	public void sendStatus() {
+		String sensorString = generateSensorString();
+		if(isSocketConnected() && (!(closed))){
+			try{
+				this.socket.send_message(sensorString);
+				if(closed){
+					System.out.println("LBR sensor sender selv om han ikke får lov");
+				}
+			}catch(Exception e){
+				System.out.println("Could not send Operation mode to ROS: " + e);
+			}
+		}
+	}
+	
 	public void close() {
-		close = true;
+		closed = true;
 		socket.close();
 	}
 	

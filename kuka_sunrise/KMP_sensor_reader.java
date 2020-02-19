@@ -1,14 +1,15 @@
-package testwithrobot;
+package API_ROS2_Sunrise;
 import java.net.InetSocketAddress;
 
 
 // Implemented classes
-import testwithrobot.DataController;
-import testwithrobot.UDPSocket;
-import testwithrobot.TCPSocket;
-import testwithrobot.ISocket;
 
 // RoboticsAPI
+import API_ROS2_Sunrise.DataController;
+import API_ROS2_Sunrise.ISocket;
+import API_ROS2_Sunrise.TCPSocket;
+import API_ROS2_Sunrise.UDPSocket;
+
 import com.kuka.nav.fdi.FDIConnection;
 
 

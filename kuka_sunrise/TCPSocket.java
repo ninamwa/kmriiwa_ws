@@ -1,4 +1,4 @@
-package testwithrobot;
+package API_ROS2_Sunrise;
 
 
 import java.io.IOException;
@@ -11,7 +11,8 @@ import java.net.Socket;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import testwithrobot.ISocket;
+
+import API_ROS2_Sunrise.ISocket;
 
 public class TCPSocket implements ISocket{
 	public volatile boolean isConnected;
@@ -71,7 +72,6 @@ public class TCPSocket implements ISocket{
 		try{
 			while(!this.inputStream.ready()){}
 			line=this.inputStream.readLine();
-			System.out.println(line);
 			return line;
 		
 			}catch(Exception e){

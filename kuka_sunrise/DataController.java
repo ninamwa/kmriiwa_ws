@@ -1,11 +1,12 @@
-package testwithrobot;
+package API_ROS2_Sunrise;
 
 // Implemented classes
 
-import testwithrobot.ISocket;
 
 
 // RoboticsAPI
+import API_ROS2_Sunrise.ISocket;
+
 import com.kuka.nav.fdi.DataConnectionListener;
 import com.kuka.nav.fdi.DataListener;
 import com.kuka.nav.fdi.data.CommandedVelocity;
