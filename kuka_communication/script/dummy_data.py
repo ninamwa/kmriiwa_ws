@@ -38,15 +38,15 @@ class Kuka(Node):
 
 
         #Type of action, action name
-        self.action_client = ActionClient(self, NavigateToPose, '/NavigateToPose')
-        while not self.action_client.wait_for_server(timeout_sec=10.0):
-            self.get_logger(        ).info('Waiting for service')
+        #self.action_client = ActionClient(self, NavigateToPose, '/NavigateToPose')
+        #while not self.action_client.wait_for_server(timeout_sec=10.0):
+        #    self.get_logger(        ).info('Waiting for service')
 
 
 
         pub_odometry = self.create_publisher(Odometry, 'odom', qos_profile_sensor_data)
-        scan_pub = self.create_publisher(LaserScan, 'scan', qos_profile_sensor_data)
-        #scan_pub2 = kuka_communication_node.create_publisher(LaserScan, 'scan_2', qos_profile_sensor_data)
+        scan_pub = self.create_publisher(LaserScan, 'scan_1', qos_profile_sensor_data)
+        scan_pub2 = self.create_publisher(LaserScan, 'scan_2', qos_profile_sensor_data)
         tf_broadcaster = TransformBroadcaster(self)
 
         initial_pub = self.create_publisher(PoseWithCovarianceStamped, 'initialpose', qos_profile_sensor_data)
@@ -70,9 +70,9 @@ class Kuka(Node):
         static_transformStamped.transform.rotation.y = quat[1]
         static_transformStamped.transform.rotation.z = quat[2]
         static_transformStamped.transform.rotation.w = quat[3]
-        #broadcaster1.sendTransform(static_transformStamped)
+        broadcaster1.sendTransform(static_transformStamped)
         static_transformStamped.header.frame_id = "laser_B1_link"
-        static_transformStamped.child_frame_id = "scan"
+        static_transformStamped.child_frame_id = "scan_1"
         broadcaster2.sendTransform(static_transformStamped)
 
         a = 0.0
@@ -88,7 +88,7 @@ class Kuka(Node):
             scan.angle_min = -1.57
             scan.angle_max = 1.57
             scan.header.stamp = getTimestamp(self.get_clock().now().nanoseconds)
-            scan.header.frame_id = "scan"
+            scan.header.frame_id = "scan_1"
             scan.angle_increment = 3.14 / num_readings
             scan.time_increment = (1 / laser_frequency) / (num_readings)
             scan.range_min = 0.0
@@ -113,7 +113,7 @@ class Kuka(Node):
             for i in range(1, num_readings - 1):
                 scan.ranges = [float(10) for i in range(0, num_readings)]
                 scan.intensities = [float(100) for i in range(0, num_readings)]
-            #scan_pub2.publish(scan)
+            scan_pub2.publish(scan)
 
             count = count + 1
 
@@ -178,7 +178,7 @@ class Kuka(Node):
             #if (st == 600):
             #    self.send_request(0.7)
 
-            #a = a + 1
+            a = a + 1
 
             if (st==25):
                 initial = PoseWithCovarianceStamped()
@@ -206,8 +206,8 @@ class Kuka(Node):
             if (st==50):
                 self.send_goal()
 
-            print(st)
-            st = st +1
+            #print(st)
+            #st = st +1
         time.sleep(3)
         print("hei")
         count=0

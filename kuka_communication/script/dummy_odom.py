@@ -27,7 +27,9 @@ class dummy_odom(Node):
         st=0
 
 
-        while (False):
+        while (True):
+            time.sleep(0.1)
+
             x = 0.0
             y = 0.0
             th = a
@@ -54,7 +56,6 @@ class dummy_odom(Node):
             odom.pose.pose.position = point
             odom.pose.pose.orientation = odom_quat
 
-            # TODO: Sjekk om denne egentlig skal være base_footprint
             odom.child_frame_id = "base_footprint"
             linear = Vector3()
             linear.x = vx
@@ -82,7 +83,7 @@ class dummy_odom(Node):
 
             pub_odometry.publish(odom)
             tf_broadcaster.sendTransform(odom_tf)
-            a = a + 1
+            a = a + 0.01
 
 def euler_to_quaternion(roll, pitch, yaw):
     qx = math.sin(roll / 2) * math.cos(pitch / 2) * math.cos(yaw / 2) - math.cos(roll / 2) * math.sin(
