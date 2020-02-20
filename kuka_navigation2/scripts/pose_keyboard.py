@@ -45,6 +45,7 @@ if __name__=="__main__":
     y = 0.0
     z = 0.0
     th = 0.0
+    status=0
 
     try:
         print(msg)
@@ -65,6 +66,10 @@ if __name__=="__main__":
                 th = 0.0
                 if (key == '\x03'):
                     break
+
+            if (status == 14):
+                print(msg)
+            status = (status + 1) % 15
 
             p = Pose()
             p.position.x = x

@@ -102,11 +102,7 @@ if __name__=="__main__":
                     speed=1.0
                 if turn > 1.0:
                     turn=1.0
-
                 print(vels(speed,turn))
-                if (status == 14):
-                    print(msg)
-                status = (status + 1) % 15
 
             else:
                 x = 0
@@ -115,6 +111,11 @@ if __name__=="__main__":
                 th = 0
                 if (key == '\x03'):
                     break
+
+            if (status == 14):
+                print(msg)
+            status = (status + 1) % 15
+
 
             if key in stopBindings.keys():
                 st = String()
