@@ -41,7 +41,7 @@ class LbrCommandsNode(Node):
             self.soc=None
 
         # Make a listener for relevant topics
-        #sub_twist = self.create_subscription(Twist, 'cmd_vel', self.twist_callback, qos_profile_sensor_data)
+        sub_manipulator_vel = self.create_subscription(String, 'manipulator_vel', self.manipulatorVel_callback, qos_profile_sensor_data)
         sub_shutdown = self.create_subscription(String, 'shutdown', self.shutdown_callback, qos_profile_sensor_data)
 
         while not self.soc.isconnected:
@@ -55,11 +55,9 @@ class LbrCommandsNode(Node):
         self.soc.send(msg)
         #self.udp_soc.isconnected = False
 
-    def twist_callback(self, data):
-        print(data)
-        msg = 'setTwist ' + str(data.linear.x) + " " + str(data.linear.y) + " " + str(data.angular.z)
+    def manipulatorVel_callback(self, data):
+        msg = 'setLBRmotion ' + data.data
         self.soc.send(msg)
-
 
 
 def main(argv=sys.argv[1:]):
