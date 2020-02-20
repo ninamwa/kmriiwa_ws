@@ -36,6 +36,7 @@ ament_python_install_package(nodes/)
 ################################################################################
 set(msg_files
   "msg/KmpStatusdata.msg"
+  "msg/LbrStatusdata.msg"
 )
 
 

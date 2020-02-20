@@ -43,8 +43,6 @@ class KmpStatusNode(Node):
         else:
             self.soc=None
 
-        self.last_odom_timestamp = 0
-
         # Make Publisher for statusdata
         self.pub_kmp_statusdata = self.create_publisher(KmpStatusdata, 'kmp_statusdata', qos_profile_sensor_data)
 
@@ -71,19 +69,31 @@ class KmpStatusNode(Node):
                     split = status_elements[i].split(":")
                     if(split[0]=="OperationMode"):
                         msg.operation_mode = split[1]
-                    if (split[0] == "ReadyToMove"):
-                        msg.ready_to_move = bool(split[1])
-                    if (split[0] == "WarningField"):
+                    elif (split[0] == "ReadyToMove"):
                         if (split[1] == "true"):
-                            msg.warning_field_clear = True
+                            msg.ready_to_move = True
+                        else:
+                            msg.ready_to_move = False
+                    elif (split[0] == "WarningField"):
+                        if (split[1] == "true"):
                             msg.warning_field_clear = True
                         else:
                             msg.warning_field_clear = False
-                    if (split[0] == "ProtectionField"):
+                    elif (split[0] == "ProtectionField"):
                         if (split[1] == "true"):
                             msg.protection_field_clear = True
                         else:
                             msg.protection_field_clear = False
+                    elif (split[0] == "isKMPmoving"):
+                        if (split[1] == "true"):
+                            msg.is_kmp_moving = True
+                        else:
+                            msg.is_kmp_moving = False
+                    elif (split[0] == "KMPsafetyStop"):
+                        if (split[1] == "true"):
+                            msg.kmp_safetystop = True
+                        else:
+                            msg.kmp_safetystop = False
                 publisher.publish(msg)
 
 

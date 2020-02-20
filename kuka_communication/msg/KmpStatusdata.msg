@@ -14,3 +14,5 @@ string operation_mode
 bool ready_to_move
 bool warning_field_clear
 bool protection_field_clear
+bool is_kmp_moving
+bool kmp_safetystop

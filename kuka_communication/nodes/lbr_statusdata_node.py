@@ -22,6 +22,7 @@ class LbrStatusNode(Node):
     def __init__(self,connection_type,robot):
         super().__init__('lbr_statusdata_node')
         self.name='lbr_statusdata_node'
+        self.last_status_timestamp = 0
         self.declare_parameter('port')
         port = int(self.get_parameter('port').value)
         if robot == 'KMR1':
@@ -41,7 +42,6 @@ class LbrStatusNode(Node):
         else:
             self.soc=None
 
-        self.last_odom_timestamp = 0
 
         # Make Publisher for statusdata
         self.pub_lbr_statusdata = self.create_publisher(LbrStatusdata, 'lbr_statusdata', qos_profile_sensor_data)
@@ -59,18 +59,36 @@ class LbrStatusNode(Node):
 
 
 
-    def status_callback(self,publisher,values):
-        if values != None:
+    def status_callback(self,publisher,data):
+        if data != None:
             msg = LbrStatusdata()
             msg.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
-            msg.header.frame_id = "baselink"
-
-
-            #TODO: Fyll inn med riktig statusdata - dette maa ogsaa gjores i selve meldingsfila - den er naa random.
-            #msg.data= str(values[0])
-
-            publisher.publish(msg)
-
+            status_elements = data[1].split(",")
+            if (status_elements[1] != self.last_status_timestamp):
+                self.last_status_timestamp = status_elements[1]
+                for i in range(2, len(status_elements)):
+                    split = status_elements[i].split(":")
+                    if (split[0] == "ReadyToMove"):
+                        if (split[1] == "true"):
+                            msg.ready_to_move = True
+                        else:
+                            msg.ready_to_move = False
+                    elif (split[0] == "isLBRmoving"):
+                        if (split[1] == "true"):
+                            msg.is_lbr_moving = True
+                        else:
+                            msg.is_lbr_moving = False
+                    elif (split[0] == "LBRhasActiveCommand"):
+                        if (split[1] == "true"):
+                            msg.lbr_has_active_command = True
+                        else:
+                            msg.lbr_has_active_command = False
+                    elif (split[0] == "LBRsafetyStop"):
+                        if (split[1] == "true"):
+                            msg.lbr_safetystop = True
+                        else:
+                            msg.lbr_safetystop = False
+                publisher.publish(msg)
 
     def getTimestamp(self,nano):
         t = nano * 10 ** -9
