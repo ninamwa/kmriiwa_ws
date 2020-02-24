@@ -1,4 +1,4 @@
-package testwithrobot;
+package API_ROS2_Sunrise;
 
 
 // RoboticsAPI
@@ -20,13 +20,13 @@ public class KMPjogger
 {
 
   
-  private static final int JOG_START_DELAY = 0;
+//  private static final int JOG_START_DELAY = 0;
 
   
-  private static final int JOG_UPDATE_PERIOD = 50;
+//  private static final int JOG_UPDATE_PERIOD = 50;
 
   
-  private static final int EXECUTOR_THREAD_POOL_SIZE = 2;
+//  private static final int EXECUTOR_THREAD_POOL_SIZE = 2;
 
   
   public ScheduledExecutorService _executor;
@@ -71,6 +71,10 @@ public class KMPjogger
       this._velocities[i] = 0.0D;
     }
     this._joggableDevice.jog(this._velocities);
+//    x = 05
+//    y = 0.28 & xy = 0.28
+//    theta = 0.25
+
   }
 
 

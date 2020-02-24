@@ -1,12 +1,12 @@
-package testwithrobot;
+package API_ROS2_Sunrise;
 
 // Implemented classes
-import testwithrobot.TCPSocket;
-import testwithrobot.UDPSocket;
-import testwithrobot.ISocket;
+
 
 
 // RoboticsAPI
+import API_ROS2_Sunrise.ISocket;
+
 import com.kuka.nav.fdi.DataConnectionListener;
 import com.kuka.nav.fdi.DataListener;
 import com.kuka.nav.fdi.data.CommandedVelocity;
@@ -15,11 +15,9 @@ import com.kuka.nav.fdi.data.RobotPose;
 import com.kuka.nav.provider.LaserScan;
 
 public class DataController implements DataListener, DataConnectionListener{
-	private Odometry last_odom;
-	private LaserScan last_laserscan_B1;
-	private LaserScan last_laserscan_B4;
-	private static int laser_B1 = 1801;
-	private static int laser_B4 = 1802;
+
+//	private static int laser_B1 = 1801;
+//	private static int laser_B4 = 1802;
 	public boolean fdi_isConnected;
 	ISocket laser_socket;
 	ISocket odometry_socket;
@@ -42,11 +40,7 @@ public class DataController implements DataListener, DataConnectionListener{
 
 	@Override
 	public void onNewLaserData(LaserScan scan) {
-		if (scan.getLaserId() == laser_B1){
-			last_laserscan_B1 = scan;
-		}else if (scan.getLaserId()== laser_B4){
-			last_laserscan_B4 = scan;
-		}
+
 		// TODO: sending both lasers
 		if(fdi_isConnected && this.laser_socket.isConnected()){
 			String scan_data = ">laserScan " +  scan.getTimestamp() + " " + scan.getLaserId()  + " " + scan.getRangesAsString();
@@ -60,7 +54,6 @@ public class DataController implements DataListener, DataConnectionListener{
 
 	@Override
 	public void onNewOdometryData(Odometry odom) {
-		last_odom = odom;
 		if(fdi_isConnected && this.odometry_socket.isConnected()){
 			try{
 				String odom_data = ">odometry " + odom.getTimestamp() + " " + odom.getPose().toString() + " " + odom.getVelocity().toString();

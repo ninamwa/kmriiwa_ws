@@ -1,7 +1,6 @@
-package testwithrobot;
+package API_ROS2_Sunrise;
 
 
-import java.net.Socket;
 
 
 public interface ISocket {

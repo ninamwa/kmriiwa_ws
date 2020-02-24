@@ -1,15 +1,15 @@
-package testwithrobot;
+package API_ROS2_Sunrise;
 import java.net.InetSocketAddress;
-import java.util.concurrent.TimeUnit;
 
 
 // Implemented classes
-import testwithrobot.DataController;
-import testwithrobot.UDPSocket;
-import testwithrobot.TCPSocket;
-import testwithrobot.ISocket;
 
 // RoboticsAPI
+import API_ROS2_Sunrise.DataController;
+import API_ROS2_Sunrise.ISocket;
+import API_ROS2_Sunrise.TCPSocket;
+import API_ROS2_Sunrise.UDPSocket;
+
 import com.kuka.nav.fdi.FDIConnection;
 
 
@@ -101,15 +101,16 @@ public class KMP_sensor_reader {
 	public class MonitorLaserConnectionThread extends Thread {
 		public void run(){
 			while(!(isLaserSocketConnected()) && (!(close))) {
-				try {
-					this.sleep(5000);
-				} catch (InterruptedException e) {
-					System.out.println("");
-				}
+
 				createLaserSocket();
 				if(isLaserSocketConnected()){
 					break;
 				}	
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					System.out.println("");
+				}
 			}
 			if(!close){
 				KMP_laser_requested = true;
@@ -117,7 +118,9 @@ public class KMP_sensor_reader {
 					fdiConnection();
 				}
 				listener.setLaserSocket(laser_socket);
-				subscribe_kmp_laser_data();					
+				subscribe_kmp_laser_data();	
+				System.out.println("Connection with KMP Laser Node OK!");
+
 				}	
 		}
 	}
@@ -125,14 +128,15 @@ public class KMP_sensor_reader {
 	public class MonitorOdometryConnectionThread extends Thread {
 		public void run(){
 			while(!(isOdometrySocketConnected()) && (!(close))) {
+				
+				createOdometrySocket();
+				if (isOdometrySocketConnected()){
+					break;
+				}
 				try {
-					this.sleep(5000);
+					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					System.out.println("");
-				}
-				createOdometrySocket();
-				if(isOdometrySocketConnected()){
-					break;
 				}
 			
 		}	
@@ -143,6 +147,7 @@ public class KMP_sensor_reader {
 				}
 				listener.setOdometrySocket(odometry_socket);
 				subscribe_kmp_odometry_data();
+				System.out.println("Connection with KMP Odometry Node OK!");
 				}
 		}
 	}

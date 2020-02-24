@@ -1,20 +1,18 @@
-package testwithrobot;
+package API_ROS2_Sunrise;
 
 
 import java.io.IOException;
-import java.net.*;
-import java.io.*;
+
 import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
+
 import java.nio.charset.Charset;
 import java.net.Socket;
     
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import testwithrobot.ISocket;
+
+import API_ROS2_Sunrise.ISocket;
 
 public class TCPSocket implements ISocket{
 	public volatile boolean isConnected;
@@ -45,7 +43,7 @@ public class TCPSocket implements ISocket{
 				break;
 			}
 			catch(IOException e1){
-				System.out.println("Could not connect to server with port : "+ this.COMport + " Error: " +e1);
+				System.out.println("Could not connect to ROS over TCP on port : "+ this.COMport + " Error: " +e1);
 			return null;
 			}
 		}
@@ -55,7 +53,7 @@ public class TCPSocket implements ISocket{
 			isConnected=true;
 			return TCPConn;
 		}catch(Exception e){
-			System.out.println("Error creating I/O ports: " +e);
+			System.out.println("Error creating I/O ports for TCP communication on port: "+ this.COMport + " Error: " +e);
 			return null;
 		}
 		
@@ -74,11 +72,10 @@ public class TCPSocket implements ISocket{
 		try{
 			while(!this.inputStream.ready()){}
 			line=this.inputStream.readLine();
-			System.out.println(line);
 			return line;
 		
 			}catch(Exception e){
-				System.out.println("Could not read message: " +e);
+				System.out.println("Could not receive message from TCP connection on port: "+ this.COMport + " Error: " +e);
 				return "error";
 			}
 	}	
@@ -88,10 +85,10 @@ public class TCPSocket implements ISocket{
 	public void close(){
 		try {
 			TCPConn.close();
-			System.out.println("Connection to ROS closed");
+			System.out.println("TCP connection to ROS closed port: " + this.COMport);
 			isConnected=false;
 		} catch (Exception e) {
-			System.out.println("ERROR closing the communication port to ROS!");
+			System.out.println("ERROR closing the TCP communication port to ROS: " + this.COMport + " error: " + e);
 		}
 	}
 	
