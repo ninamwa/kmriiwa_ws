@@ -80,7 +80,6 @@ class TCPSocket:
                     if len(cmd_splt) and cmd_splt[0] == 'laserScan':
                         if cmd_splt[2] == '1801':
                             self.laserScanB1.append(cmd_splt)
-                            # print(cmd_splt)
                             #print(count)
                             count = count + 1
 
@@ -135,7 +134,7 @@ class TCPSocket:
             msg = self.connection.recv(msglength)
             diff_msg = msglength - len(msg)
             while(diff_msg>0):
-                print("diff_msg: " + str(diff_msg))
+                #print("diff_msg: " + str(diff_msg))
                 newmsg = self.connection.recv(diff_msg)
                 msg.extend(newmsg)
                 diff_msg = msglength - len(msg)

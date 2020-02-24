@@ -21,7 +21,7 @@ def generate_launch_description():
         default=os.path.join(
             get_package_share_directory('kuka_navigation2'),
             'param',
-            'waffle.yaml'))
+            'param_reducedVel2.yaml'))
 
     nav2_launch_file_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
     state_publisher_launch_file_dir = os.path.join(get_package_share_directory('kuka_bringup'), 'launch')
@@ -43,16 +43,16 @@ def generate_launch_description():
             description='Use simulation (Gazebo) clock if true'),
 
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([nav2_launch_file_dir, '/nav2_bringup_launch.py']),
+            PythonLaunchDescriptionSource([nav2_launch_file_dir, '/bringup_launch.py']),
             launch_arguments={
                 'map': map_dir,
                 'use_sim_time': use_sim_time,
                 'params_file': param_dir}.items(),
         ),
 
-        #IncludeLaunchDescription(
-        #    PythonLaunchDescriptionSource([state_publisher_launch_file_dir, '/state_publisher.launch.py']),
-        #),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([state_publisher_launch_file_dir, '/state_publisher.launch.py']),
+        ),
 
         #Node(
         #    package='kuka_navigation2',

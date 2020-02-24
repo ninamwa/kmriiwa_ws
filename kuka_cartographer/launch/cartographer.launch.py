@@ -19,6 +19,9 @@ def generate_launch_description():
         'rviz',
         'kuka_cartographer.rviz'),
 
+    rviz_config_dir2 = os.path.join(get_package_share_directory('realsense_examples'), 'config', 'rs_cartographer.rviz')
+    rviz_config_dir3 = os.path.join(get_package_share_directory('kuka_cartographer'),'rviz','kuka_cartographer_withd435.rviz'),
+
     cartographer_config_dir = os.path.join(
         get_package_share_directory('kuka_cartographer'),
         'config')
@@ -67,6 +70,7 @@ def generate_launch_description():
             package='rviz2',
             node_executable='rviz2',
             node_name='rviz2',
-            arguments=['-d', rviz_config_dir],
+            arguments=['-d', rviz_config_dir3],
+ 	        parameters=[{'use_sim_time': use_sim_time}],
             output='screen'),
     ])

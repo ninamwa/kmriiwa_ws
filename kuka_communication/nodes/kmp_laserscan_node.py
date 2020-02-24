@@ -90,14 +90,16 @@ class KmpLaserScanNode(Node):
             scan.range_min = 0.12 # disse må finnes ut av
             scan.range_max = 3.5 # finn ut
             try:
-                scan.ranges = [float(s) for s in values[3].split(',')]
+                scan.ranges = [float(s) for s in values[3].split(',') if len(s)>0]
             except ValueError as e:
+                print(values[3].split(','))
                 print("Error", e)
 
             if len(scan.ranges) == 541:
                 publisher.publish(scan)
             else:
-                print(len(scan.ranges)) ##FOR DEBUGGING
+                #print(len(scan.ranges)) ##FOR DEBUGGING
+                t=0
 
 
     def getTimestamp(self,nano):
@@ -141,7 +143,6 @@ def main(argv=sys.argv[1:]):
     parser.add_argument('-c', '--connection')
     parser.add_argument('-ro', '--robot')
     args = parser.parse_args(remove_ros_args(args=argv))
-    print(args)
     rclpy.init(args=argv)
     laserscan_node = KmpLaserScanNode(args.connection,args.robot)
 

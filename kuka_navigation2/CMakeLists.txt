@@ -49,6 +49,9 @@ install(
     scripts/twist_keyboard.py
     scripts/pose_keyboard.py
     scripts/navigation_node.py
+    scripts/manipulator_keyboard.py
+    scripts/test.py
+    scripts/keyboard.py
     DESTINATION lib/${PROJECT_NAME}
 )
 

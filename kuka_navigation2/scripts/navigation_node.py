@@ -26,6 +26,7 @@ class NavigationNode(Node):
     def __init__(self):
         super().__init__('navigation_node')
 
+
         self.warning_field_clear = True
         self.protection_field_clear = True
         self.bool=True
@@ -35,6 +36,8 @@ class NavigationNode(Node):
         #self.lowspeed = [0.13, 0.1, 0.2, 0.1]
         self.highspeed = [0.26, 0.0, 1.0, 0.26]
         self.lowspeed = [0.1, 0.0, 0.5, 0.1]
+        self.highestspeed = [0.5, 0.0, 1.5, 0.5]
+        self.last_update_time = 0
 
         #self.action_client = ActionClient(self, NavigateToPose, '/NavigateToPose')
         #self.waypoint_client = ActionClient(self, FollowWaypoints, '/FollowWaypoints')
@@ -50,7 +53,7 @@ class NavigationNode(Node):
 
         initial_pub = self.create_publisher(PoseWithCovarianceStamped, 'initialpose', qos_profile_sensor_data)
 
-        #sub_status = self.create_subscription(KmpStatusdata, 'kmp_statusdata', self.status_callback, qos_profile_sensor_data)
+        sub_status = self.create_subscription(KmpStatusdata, 'kmp_statusdata', self.status_callback, qos_profile_sensor_data)
         sub_status = self.create_subscription(Bool, 'clear', self.status2_callback, qos_profile_sensor_data)
 
         st=0
@@ -173,9 +176,7 @@ class NavigationNode(Node):
 
 
     def status_callback(self,data):
-        print(data)
-        if (data.warning_field_clear != self.warning_field_clear):
-            print(data.warning_field_clear)
+        if (data.warning_field_clear != self.warning_field_clear and self.get_clock().now().seconds_nanoseconds()[0]-self.last_update_time > 5.0):
             if (data.warning_field_clear == True):
                 self.send_velocity_request(self.highspeed)
             if (data.warning_field_clear == False):
@@ -183,6 +184,7 @@ class NavigationNode(Node):
                 self.send_velocity_request(self.lowspeed)
             self.warning_field_clear = data.warning_field_clear
             print(self.warning_field_clear)
+            self.last_update_time = self.get_clock().now().seconds_nanoseconds()[0]
 
     def status2_callback(self,data):
         print(data.data)

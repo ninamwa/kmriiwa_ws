@@ -45,7 +45,7 @@ def generate_launch_description(argv=sys.argv[1:]):
             node_name="kmp_commands_node",
             output="screen",
             emulate_tty=True,
-            arguments=['-c', connection_type_UDP,'-ro', robot],
+            arguments=['-c', connection_type_TCP,'-ro', robot],
             parameters=[param_dir]),
 
         launch_ros.actions.Node(
@@ -54,7 +54,7 @@ def generate_launch_description(argv=sys.argv[1:]):
            node_name="kmp_laserscan_node",
            output="screen",
            emulate_tty=True,
-           arguments=['-c', connection_type_UDP, '-ro', robot],
+           arguments=['-c', connection_type_TCP, '-ro', robot],
            parameters=[param_dir]),
 
         launch_ros.actions.Node(
@@ -63,7 +63,7 @@ def generate_launch_description(argv=sys.argv[1:]):
            node_name="kmp_odometry_node",
            output="screen",
            emulate_tty=True,
-           arguments=['-c', connection_type_UDP,'-ro',robot],
+           arguments=['-c', connection_type_TCP,'-ro',robot],
            parameters=[param_dir]),
 
         launch_ros.actions.Node(
@@ -72,6 +72,24 @@ def generate_launch_description(argv=sys.argv[1:]):
            node_name="kmp_statusdata_node",
            output="screen",
            emulate_tty=True,
-           arguments=['-c', connection_type_UDP, '-ro', robot],
+           arguments=['-c', connection_type_TCP, '-ro', robot],
            parameters=[param_dir]),
+
+        launch_ros.actions.Node(
+            package="kuka_communication",
+            node_executable="lbr_commands_node.py",
+            node_name="lbr_commands_node",
+            output="screen",
+            emulate_tty=True,
+            arguments=['-c', connection_type_TCP, '-ro', robot],
+            parameters=[param_dir]),
+
+        launch_ros.actions.Node(
+            package="kuka_communication",
+            node_executable="lbr_statusdata_node.py",
+            node_name="lbr_statusdata_node",
+            output="screen",
+            emulate_tty=True,
+            arguments=['-c', connection_type_TCP, '-ro', robot],
+            parameters=[param_dir]),
     ])

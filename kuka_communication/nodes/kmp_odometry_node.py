@@ -119,9 +119,9 @@ class KmpOdometryNode(Node):
             odom_tf.child_frame_id = odom.child_frame_id
             odom_tf.header.stamp = odom.header.stamp
 
-
-            publisher.publish(odom)
             self.tf_broadcaster.sendTransform(odom_tf)
+            publisher.publish(odom)
+
 
 
     def getTimestamp(self,nano):
