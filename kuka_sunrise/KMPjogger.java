@@ -70,10 +70,11 @@ public class KMPjogger
     {
       this._velocities[i] = 0.0D;
     }
+    try{
     this._joggableDevice.jog(this._velocities);
-//    x = 05
-//    y = 0.28 & xy = 0.28
-//    theta = 0.25
+    }catch(Exception e){
+    	System.out.println("Could not stop jogging device in KMPJogger");
+    }
 
   }
 
@@ -92,10 +93,13 @@ public class KMPjogger
 
 
   public void killJoggingExecution() {
-	  System.out.println("stop jogger");
+	  System.out.println("kill jogging execution in kmpjogger");
 	  if (this._executor != null) {
-      
-      this._executor.shutdown();
+      try{
+    	  this._executor.shutdown();
+      }catch(Exception e){
+    	  System.out.println("Could not stop executor in KMPjogger");
+      }
     } 
     stopDevice();
   }

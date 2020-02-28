@@ -10,20 +10,24 @@ import API_ROS2_Sunrise.UDPSocket;
 import com.kuka.roboticsAPI.deviceModel.LBR;
 
 
-
 public class LBR_sensor_reader extends Thread{
 	
-	int port;
-	ISocket socket;
-	String ConnectionType;
+	// Runtime variables
 	public volatile boolean closed = false;
-
 	Boolean LBR_sensor_requested;
 
+	// Robot
+	LBR lbr;
+	
+	// LBR sensor
 	private double[] JointPosition;
 	private double[] MeasuredTorque;
 	
-	LBR lbr;
+	// Socket
+	int port;
+	ISocket socket;
+	String ConnectionType;
+	
 	
 	public LBR_sensor_reader(int UDPport, LBR robot, String ConnectionType) {
 		this.port = UDPport;
@@ -84,25 +88,29 @@ public class LBR_sensor_reader extends Thread{
 			//FIND OUT HOW MUCH TO SLEEP. SAMME RATE SOM ODOMETRY?
 			updateMeasuredTorque();
 			updateJointPosition();
-			sendStatus();
 			
 			if(!isSocketConnected() || (closed)){
 				break;
 			}
+			sendStatus();
 			try {
 				TimeUnit.MILLISECONDS.sleep(30);
 			} catch (InterruptedException e) {
-				System.out.println("KMP status thread could not sleep");
+				System.out.println("LBR sensor thread could not sleep");
 			}
 		}
 	}
 
 	private void updateJointPosition() {
+		try{
 		JointPosition = lbr.getCurrentJointPosition().getInternalArray();
+		}catch(Exception e){}
 	}
 
 	private void updateMeasuredTorque() {
+		try{
 		MeasuredTorque = lbr.getMeasuredTorque().getTorqueValues();
+		}catch(Exception e){}
 	}
 
 	private String generateSensorString() {
@@ -128,6 +136,8 @@ public class LBR_sensor_reader extends Thread{
 	public void close() {
 		closed = true;
 		socket.close();
+		System.out.println("LBR sensor closed!");
+
 	}
 	
 	public boolean isSocketConnected() {

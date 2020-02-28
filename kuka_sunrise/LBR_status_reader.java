@@ -12,20 +12,24 @@ import com.kuka.roboticsAPI.deviceModel.LBR;
 
 public class LBR_status_reader extends Thread{
 	
+	// Runtime Variables
+	public volatile boolean closed = false;
+
+	// Robot
+	LBR lbr;
+	
+	// LBR status variables
+	private Object isReadyToMove = null;
+	private volatile boolean LBR_is_Moving= false;
+	private volatile boolean LBRemergencyStop = false;
+	private boolean hasActiveCommand;
+
+	// Socket
 	int port;
 	ISocket socket;
 	String ConnectionType;
-	public volatile boolean closed = false;
 
-
-	LBR lbr;
 	
-	private Object isReadyToMove = null;
-
-	private boolean LBR_is_Moving= false;
-	private boolean LBRemergencyStop = false;
-	
-	//
 	public LBR_status_reader(int UDPport, LBR robot, String ConnectionType) {
 		this.port = UDPport;
 		this.lbr = robot;
@@ -53,15 +57,15 @@ public class LBR_status_reader extends Thread{
 		{	
 			//FIND OUT HOW MUCH TO SLEEP. SAMME RATE SOM ODOMETRY?
 			updateReadyToMove();
-			sendStatus();
-			
+			updateActiveCommand();
 			if(!isSocketConnected() || (closed)){
 				break;
 			}
+			sendStatus();
 			try {
 				TimeUnit.MILLISECONDS.sleep(30);
 			} catch (InterruptedException e) {
-				System.out.println("KMP status thread could not sleep");
+				System.out.println("LBR status thread could not sleep");
 			}
 		}
  }
@@ -69,11 +73,18 @@ public class LBR_status_reader extends Thread{
 		this.isReadyToMove = lbr.isReadyToMove();
 	}
 	
+	private void updateActiveCommand(){
+		try{
+			hasActiveCommand = lbr.hasActiveMotionCommand();
+		}catch(Exception e){}
+	}
+	
 	
 	private String generateStatusString() {
 		return 	">lbr_statusdata ,"  + System.nanoTime() + 
 				",ReadyToMove:" + this.isReadyToMove + 
-				",LBRMoving:" + LBR_is_Moving + 
+				",isLBRmoving:" + LBR_is_Moving + 
+				",LBRhasActiveCommand:" + hasActiveCommand +
 				",LBRsafetyStop:" + LBRemergencyStop;
 	}
 	
@@ -128,6 +139,8 @@ public class LBR_status_reader extends Thread{
 	public void close() {
 		closed = true;
 		socket.close();
+		System.out.println("LBR status closed!");
+
 	}
 	
 	public boolean isSocketConnected() {

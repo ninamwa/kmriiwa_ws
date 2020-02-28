@@ -93,6 +93,7 @@ public class DataController implements DataListener, DataConnectionListener{
 
 	@Override
 	public void onConnectionTimeout() {
+		
 		System.out.println("FDIConnection timeout");
 	}
 
