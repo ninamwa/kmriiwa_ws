@@ -40,7 +40,7 @@ endif()
 # Install
 ################################################################################
 install(
-  DIRECTORY map launch param scripts
+  DIRECTORY map launch param scripts rviz
   DESTINATION share/${PROJECT_NAME}
 )
 
@@ -50,7 +50,7 @@ install(
     scripts/pose_keyboard.py
     scripts/navigation_node.py
     scripts/manipulator_keyboard.py
-    scripts/test.py
+    scripts/test_navigation.py
     scripts/keyboard.py
     DESTINATION lib/${PROJECT_NAME}
 )
