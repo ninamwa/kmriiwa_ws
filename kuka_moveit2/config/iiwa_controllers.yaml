@@ -1,0 +1,18 @@
+fake_joint_trajectory_controller:
+  ros__parameters:
+    joints:
+      - joint_a1
+      - joint_a2
+      - joint_a3
+      - joint_a4
+      - joint_a5
+      - joint_a6
+      - joint_a7
+    write_op_modes:
+      - joint_a1
+      - joint_a2
+      - joint_a3
+      - joint_a4
+      - joint_a5
+      - joint_a6
+      - joint_a7
