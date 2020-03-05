@@ -7,62 +7,50 @@ import API_ROS2_Sunrise.ISocket;
 import API_ROS2_Sunrise.TCPSocket;
 import API_ROS2_Sunrise.UDPSocket;
 
+// RoboticsAPI
 import com.kuka.roboticsAPI.deviceModel.JointPosition;
 import com.kuka.roboticsAPI.deviceModel.LBR;
 import com.kuka.roboticsAPI.executionModel.ICommandContainer;
+import com.kuka.roboticsAPI.geometricModel.AbstractFrame;
 import com.kuka.roboticsAPI.motionModel.IMotionContainer;
 import static com.kuka.roboticsAPI.motionModel.BasicMotions.ptp;
 
 
 public class LBR_commander extends Thread{
 	
-	// RuntimeVariables
-	public volatile boolean shutdown;
-	int port;
+	// Runtime Variables
+	public volatile boolean shutdown = false;
 	public volatile boolean closed = false;
-	boolean isKMPConnected;
 	public volatile boolean EmergencyStop = false;
-
+	boolean isKMPConnected;
 
 	// Robot Specific
 	LBR lbr;
-	double a1_min;
-	double a1_max; 
-	double a2_min; 
-	double a2_max;
-	double a3_min; 
-	double a3_max;
-	double a4_min;
-	double a4_max;		
-	double a5_min;
-	double a5_max;
-	double a6_min;
-	double a6_max;
-	double a7_min;
-	double a7_max;
 	
-	// Motion
-	boolean LBR_is_Moving;
+	// Motion: LBR
 	private JointPosition CommandedjointPos;
 	IMotionContainer currentmotion;
-	private final double defaultVelocity = 0.3;
+	private final double defaultVelocity = 0.2;
+	AbstractFrame drivePos;
+	ICommandContainer LBR_currentMotion;
+	public volatile boolean LBR_is_Moving = false;
 
 	// Socket
 	ISocket socket;
 	String ConnectionType;
 	String CommandStr;
+	int port;
 
-	// Motion variables: LBR
-	ICommandContainer LBR_currentMotion;
-	
-	public LBR_commander(int port, LBR robot, String ConnectionType) {
+
+	public LBR_commander(int port, LBR robot, String ConnectionType, AbstractFrame drivepos) {
 		this.port = port;
 		this.lbr = robot;
-		this.shutdown = false;
 		this.ConnectionType = ConnectionType;
-		LBR_is_Moving = false;
+		this.drivePos = drivepos;
+		lbr.setHomePosition(drivePos);
+		
 		createSocket();
-		setJointMaxAngles();
+		
 		if (!(isSocketConnected())) {
 			System.out.println("Starting thread to connect LBR command node....");
 			Thread monitorLBRCommandConnections = new MonitorLBRCommandConnectionsThread();
@@ -80,141 +68,89 @@ public class LBR_commander extends Thread{
 		}
 	}
 	
+	public boolean isSocketConnected() {
+		return socket.isConnected();
+	}
+	
 	public void run() {
+		Thread emergencystopthread = new MonitorEmergencyStopThread();
+		emergencystopthread.start();
+		
 		CommandedjointPos = lbr.getCurrentJointPosition();
+		
 		while(isSocketConnected() && (!(closed)))
 		{   
 			String Commandstr = socket.receive_message(); 
 	    	String []splt = Commandstr.split(" ");
+	    	
 	    	if ((splt[0]).equals("shutdown")){
+	    		System.out.println("LBR RECEIVED SHUTDOWN");
 				this.shutdown = true;
 				break;
 				}
 	    	
-			if ((splt[0]).equals("setLBRmotion")){
+			if ((splt[0]).equals("setLBRmotion")&& (!(getEmergencyStop()))){
 				JointLBRMotion(Commandstr);
 				}
 		}
     }
 	
 	private void JointLBRMotion(String commandstr) {
-		String []lineSplt = commandstr.split(" ");
-		int jointIndex = Character.getNumericValue(lineSplt[1].charAt(1)) - 1 ;
-		double direction = Double.parseDouble(lineSplt[2]);
-		double jointAngle = 0;
-		switch(jointIndex){
-			case -1: // stop all
-				if(LBR_is_Moving){
-					currentmotion.cancel();
-				}
-				LBR_is_Moving = false;
-				CommandedjointPos.set(lbr.getCurrentJointPosition());
-				break;
-			case 0: //A1
-				if(direction==-1){
-					jointAngle = a1_min;
-				}else if(direction==1){
-					jointAngle = a1_max;
-				}
-				break;
-			case 1: //A2
-				if(direction==-1){
-					jointAngle = a2_min;
-				}else if(direction==1){
-					jointAngle = a2_max;
-				}
-				break;
-			case 2: //A3
-				if(direction==-1){
-					jointAngle = a3_min;
-				}else if(direction==1){
-					jointAngle = a3_max;
-				}
-				break;
-			case 3: //A4
-				if(direction==-1){
-					jointAngle = a4_min;
-				}else if(direction==1){
-					jointAngle = a4_max;
-				}
-				break;
-			case 4:	//A5
-				if(direction==-1){
-					jointAngle = a5_min;
-				}else if(direction==1){
-					jointAngle = a5_max;
-				}
-				break;
-			case 5: //A6
-				if(direction==-1){
-					jointAngle = a6_min;
-				}else if(direction==1){
-					jointAngle = a6_max;
-				}
-				break;
-			case 6: //A7
-				if(direction==-1){
-					jointAngle = a7_min;
-				}else if(direction==1){
-					jointAngle = a7_max;
-				}
-				break;
-			case 9: // A10: Move to driveposition
-				if(LBR_is_Moving){
-					currentmotion.cancel();
-				}
-	            lbr.move(ptp(lbr.getFrame("/DrivePos")).setJointVelocityRel(defaultVelocity));
-	            LBR_is_Moving = false;
-	            CommandedjointPos.set(lbr.getCurrentJointPosition());
-	            break;
-			default:
-				System.out.println("Not a valid jointIndex: " +jointIndex);
+		if(isSocketConnected() && !(closed) && !(getEmergencyStop())){
+			String []lineSplt = commandstr.split(" ");
+			int jointIndex = Character.getNumericValue(lineSplt[1].charAt(1)) - 1 ;
+			double direction = Double.parseDouble(lineSplt[2]);
+			double jointAngle;
+				if(jointIndex==-1){ // A10: Stop all
+					if(LBR_is_Moving){
+						currentmotion.cancel();
+					}
+					LBR_is_Moving = false;
+					CommandedjointPos.set(lbr.getCurrentJointPosition());
+				}else if(jointIndex == 8){
+				 // A9: Move to driveposition
+					if(LBR_is_Moving){
+						currentmotion.cancel();
+					}
+				    lbr.move(ptp(drivePos).setJointVelocityRel(defaultVelocity));
+				    LBR_is_Moving = false;
+				    CommandedjointPos.set(lbr.getCurrentJointPosition());
+				}else{
+					jointAngle = setJointAngle(jointIndex, direction);
+					if(!(CommandedjointPos.get(jointIndex)==jointAngle)){
+						CommandedjointPos.set(jointIndex, jointAngle);
+						if(LBR_is_Moving){
+							currentmotion.cancel();
+						}
+						currentmotion = lbr.moveAsync(ptp(CommandedjointPos).setJointVelocityRel(defaultVelocity));
+						LBR_is_Moving = true;
+					}
+				}	
 		}
-		
-		if(!(jointIndex==-1 || jointIndex == 9)){
-			if (direction== 0){
-				jointAngle = lbr.getCurrentJointPosition().get(jointIndex);
-			}
-			if(!(CommandedjointPos.get(jointIndex)==jointAngle)){
-				CommandedjointPos.set(jointIndex, jointAngle);
-				if(LBR_is_Moving){
-					currentmotion.cancel();
-				}
-				currentmotion = lbr.moveAsync(ptp(CommandedjointPos).setJointVelocityRel(defaultVelocity));
-				LBR_is_Moving = true;
-			}
+	}
+	private double setJointAngle(int jointIndex, double direction) {
+		double jointAngle = lbr.getCurrentJointPosition().get(jointIndex);
+		if(direction==-1){
+			jointAngle = Math.ceil(lbr.getJointLimits().getMinJointPosition().get(jointIndex)*100)/100;
+		}else if(direction==1){
+			jointAngle = Math.floor(lbr.getJointLimits().getMaxJointPosition().get(jointIndex)*100)/100;
 		}
+		return jointAngle;
 	}
 	
 	public class MonitorEmergencyStopThread extends Thread {
 		public void run(){
-			while(!(isSocketConnected()) && (!(closed))) {
-				if (CheckEmergencyStop()){
-					if(!(EmergencyStop)){
-						System.out.println("EMERGENCY STOP");
+			while((isSocketConnected()) && (!(closed))) {
+				if (getEmergencyStop()){
 						if (LBR_is_Moving){
 							currentmotion.cancel();
-							LBR_is_Moving = false;		
+							CommandedjointPos.set(lbr.getCurrentJointPosition());
 						}
-					}
-					setEmergencyStop(true);
-				}else{
-					if(EmergencyStop){
-						setEmergencyStop(false);
-						System.out.println("Emergency liquidated!");
+						LBR_is_Moving = false;
 						}
-					}
 				}
 			}
 		}
-	
-	public boolean CheckEmergencyStop(){
-		boolean emergencystop = this.EmergencyStop;
-		try{
-			emergencystop = (lbr.getSafetyState().getSafetyStopSignal().toInt()==2); 
-		}catch(Exception e){}
-		return emergencystop;
-	}
 	
 	public void setEmergencyStop(boolean es){
 		this.EmergencyStop = es;
@@ -258,38 +194,27 @@ public class LBR_commander extends Thread{
 	public boolean getShutdown() {
 		return this.shutdown;
 	}
-	public void close() {
-		closed = true;
-		if(LBR_is_Moving){
-			currentmotion.cancel();
-		}
-		socket.close();
-	}
 	
-	public boolean isSocketConnected() {
-		return socket.isConnected();
-	}
 	public void setKMPConnected(boolean KMPConnected) {
 		this.isKMPConnected = KMPConnected;
 	}
 	
-	private void setJointMaxAngles() {
-		// Get min and max angles in radians for all joints
-		a1_min = Math.ceil(lbr.getJointLimits().getMinJointPosition().get(0)*100)/100;
-		a1_max = Math.floor(lbr.getJointLimits().getMaxJointPosition().get(0)*100)/100;
-		a2_min = Math.ceil(lbr.getJointLimits().getMinJointPosition().get(1)*100)/100;
-		a2_max =  Math.floor(lbr.getJointLimits().getMaxJointPosition().get(1)*100)/100;		
-		a3_min = Math.ceil(lbr.getJointLimits().getMinJointPosition().get(2)*100)/100;
-		a3_max =  Math.floor(lbr.getJointLimits().getMaxJointPosition().get(2)*100)/100;		
-		a4_min = Math.ceil(lbr.getJointLimits().getMinJointPosition().get(3)*100)/100;
-		a4_max =  Math.floor(lbr.getJointLimits().getMaxJointPosition().get(3)*100)/100;		
-		a5_min = Math.ceil(lbr.getJointLimits().getMinJointPosition().get(4)*100)/100;
-		a5_max =  Math.floor(lbr.getJointLimits().getMaxJointPosition().get(4)*100)/100;
-		a6_min = Math.ceil(lbr.getJointLimits().getMinJointPosition().get(5)*100)/100;
-		a6_max =  Math.floor(lbr.getJointLimits().getMaxJointPosition().get(5)*100)/100;
-		a7_min = Math.ceil(lbr.getJointLimits().getMinJointPosition().get(6)*100)/100;
-		a7_max =  Math.floor(lbr.getJointLimits().getMaxJointPosition().get(6)*100)/100;
-		
+	public void close(){
+		shutdown = true;
+		closed = true;
+		CommandedjointPos.set(lbr.getCurrentJointPosition());
+
+		if(LBR_is_Moving){
+			try{
+			currentmotion.cancel();
+			}catch(Exception e){
+				System.out.println("LBR could not stop motion: " +e);
+			}
+		}
+		socket.close();
+		System.out.println("LBR command closed!");
+
 	}
+
 	
 }

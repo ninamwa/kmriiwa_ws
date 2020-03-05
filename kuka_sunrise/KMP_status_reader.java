@@ -16,22 +16,26 @@ import com.kuka.roboticsAPI.deviceModel.OperationMode;
 import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
 //TODO: importere alle klasser fra SunriseOmniMoveMobilePlatform, scannerIO
 public class KMP_status_reader extends Thread{
+
+	// Runtime variables
+	public volatile boolean closed = false;
+	private volatile boolean KMP_is_Moving = false;
+	private volatile boolean KMPemergencyStop = false;
+
+	// Robot
+	KmpOmniMove kmp;
 	
+	// Status variables
+	private OperationMode operation_mode = null;
+	private Object isReadyToMove = null; 
+	ScannerSignalsIOGroup scannerIOGroup;
+	private volatile boolean WarningField = false;
+	private volatile boolean ProtectionField = false;
+
+	// Socket
 	int port;
 	ISocket socket;
 	String ConnectionType;
-	public volatile boolean closed = false;
-	
-	ScannerSignalsIOGroup scannerIOGroup;
-	
-	KmpOmniMove kmp;
-	private OperationMode operation_mode = null;
-	private Object isReadyToMove = null; 
-	private volatile boolean WarningField = false;
-	private volatile boolean ProtectionField = false;
-	private boolean KMP_is_Moving = false;
-	private boolean KMPemergencyStop;
-
 	
 	public KMP_status_reader(int UDPport, KmpOmniMove robot,String ConnectionType, Controller controller) {
 		this.port = UDPport;
@@ -88,25 +92,23 @@ public class KMP_status_reader extends Thread{
 	// scannerIO
 	private void updateWarningFieldState() {
 //		signalnames =  Arrays.asList("WarningField_B1", "WarningField_B4", "WarningFieldComplete");
-		if(!(closed)){
 			try{
-				this.WarningField = this.scannerIOGroup.getWarningFieldComplete(); // 
+				this.WarningField  = kmp.getMobilePlatformSafetyState().isWarningFieldBreached();
 			}catch(Exception e){
 //					System.out.println("Could not read warning field: " + e);
 				}
-			}
 		}
 	
 	// scannerIO
 	private void updateProtectionFieldState() {
 //		signalnames =  Arrays.asList("WarningField_B1", "WarningField_B4", "WarningFieldComplete");
-		if(!(closed)){
 			try{
-				this.ProtectionField = this.scannerIOGroup.getProtectionFieldComplete();
+				// TRUE IF VIOLATED
+				this.ProtectionField = kmp.getMobilePlatformSafetyState().isSafetyFieldBreached();
 			}catch(Exception e){
 //				System.out.println("Could not read protection field: " + e);
 				}
-		}
+		
 		}
 
 	
@@ -115,9 +117,9 @@ public class KMP_status_reader extends Thread{
 		return 	">kmp_statusdata ,"  + System.nanoTime() + 
 				",OperationMode:"+ this.operation_mode.toString() + 
 				",ReadyToMove:" + this.isReadyToMove + 
-				",WarningField:" + this.WarningField + 
-				",ProtectionField:" + this.ProtectionField + 
-				",isKMPmoving:" + KMP_is_Moving + 
+				",WarningField:" + !this.WarningField + 
+				",ProtectionField:" + !this.ProtectionField + 
+				",isKMPmoving:" + KMP_is_Moving +
 				",KMPsafetyStop:" + KMPemergencyStop;
 	
 	}
@@ -173,6 +175,8 @@ public class KMP_status_reader extends Thread{
 	public void close() {
 		closed = true;
 		socket.close();
+		System.out.println("KMP status closed!");
+
 	}
 	
 	public boolean isSocketConnected() {

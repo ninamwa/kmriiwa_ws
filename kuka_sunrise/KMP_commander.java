@@ -16,30 +16,32 @@ import com.kuka.roboticsAPI.executionModel.ICommandContainer;
 
 public class KMP_commander extends Thread{
 	
-	public volatile boolean shutdown;
+	// Runtime variables
+	public volatile boolean shutdown = false;
 	public volatile boolean closed = false;
 	public volatile boolean EmergencyStop = false;
-	public volatile boolean KMP_is_Moving;
-
-
-	int port;
-	ISocket socket;
-	String ConnectionType;
 	boolean isLBRConnected;
 
-	KMPjogger kmp_jogger;
+	// Robot
 	KmpOmniMove kmp;
 	
 	// Motion variables: KMP
 	ICommandContainer KMP_currentMotion;
-	double[] velocities = new double[3];
+	double[] velocities = {0.0,0.0,0.0};
+	KMPjogger kmp_jogger;
+	public volatile boolean KMP_is_Moving = false;
+
+	// Socket
+	int port;
+	ISocket socket;
+	String ConnectionType;
 	
 	public KMP_commander(int port, KmpOmniMove robot, String ConnectionType) {
 		this.port = port;
 		this.kmp = robot;
 		this.kmp_jogger = new KMPjogger((ICartesianJoggingSupport)kmp);
-		this.shutdown = false;
 		this.ConnectionType = ConnectionType;
+		
 		createSocket();
 		
 		if (!(isSocketConnected())) {
@@ -51,10 +53,10 @@ public class KMP_commander extends Thread{
 
 	public void createSocket(){
 		if (this.ConnectionType == "TCP") {
-			 this.socket = new TCPSocket(this.port);
+			 socket = new TCPSocket(port);
 		}
 		else {
-			this.socket = new UDPSocket(this.port);
+			 socket = new UDPSocket(port);
 		}
 	}
 	
@@ -62,77 +64,60 @@ public class KMP_commander extends Thread{
 		Thread emergencyStopThread = new MonitorEmergencyStopThread();
 		emergencyStopThread.start();
 		
-		while(isSocketConnected() && (!closed))
+		while(isSocketConnected() && (!(closed)))
 		{
-			String Commandstr =this.socket.receive_message(); 
+			String Commandstr = socket.receive_message(); 
 	    	String []splt = Commandstr.split(" ");
+	    
 	    	if ((splt[0]).equals("shutdown")){
-				this.closed = true;	
-				this.shutdown = true;	
+	    		System.out.println("KMP received shutdown");
+				shutdown = true;	
 				break;
 				}
 	    	
-			if ((splt[0]).equals("setTwist") && (!(EmergencyStop))){
-				setNewVelocity(Commandstr);
-				}
-			
+	    	if ((splt[0]).equals("setTwist") && !getEmergencyStop()){
+					setNewVelocity(Commandstr);
+					}
+	    	
 		}
-		System.out.println("KMP_COMMAND DISCONNECTED");
     }
 	
 	public class MonitorEmergencyStopThread extends Thread {
 		public void run(){
-			while(!(isSocketConnected()) && (!(closed))) {
-				if (CheckEmergencyStop()){
-					if(!(EmergencyStop)){
-						System.out.println("EMERGENCY STOP");
-						if (KMP_is_Moving){
-							kmp_jogger.killJoggingExecution();
-							KMP_is_Moving = false;		
-						}
-					}
-					setEmergencyStop(true);
-				}else{
-					if(EmergencyStop){
-						setEmergencyStop(false);
-						System.out.println("Emergency liquidated!");
-						}
+			while((isSocketConnected()) && (!(closed))) {
+				if (getEmergencyStop()){
+					setNewVelocity("vel 0 0 0");
 					}
 				}
 			}
 		}
 	
-	// TODO: HVA SKJER HVIS JOG STOPPER AV PROTECTION ZONE????	- nå stopper den bare å venter. forhåpentligvis får vi kjøre igjen.
-	public boolean CheckEmergencyStop(){
-		boolean emergencystop = this.EmergencyStop;
-		try{
-			emergencystop = (kmp.getSafetyState().getSafetyStopSignal().toInt()==2);
-		}catch(Exception e){}
-		return emergencystop;
-	}
+	
 
 	public void setNewVelocity(String vel){
 		String []lineSplt = vel.split(" ");
-		if (lineSplt.length==4){
-			this.velocities[0] =Double.parseDouble(lineSplt[1]); // x
-			this.velocities[1] = Double.parseDouble(lineSplt[2]); // y
-			this.velocities[2] = Double.parseDouble(lineSplt[3]);  // theta
+
+		if(lineSplt.length==4){
+				this.velocities[0] =Double.parseDouble(lineSplt[1]); // x
+				this.velocities[1] = Double.parseDouble(lineSplt[2]); // y
+				this.velocities[2] = Double.parseDouble(lineSplt[3]);  // theta
+				
+				if(velocities[0] !=0 ||velocities[1] !=0 ||velocities[2] !=0 ) {
+					  if(KMP_is_Moving) {
+						  this.kmp_jogger.updateVelocities(this.velocities);
+					  }
+					  else {
+						  this.kmp_jogger.updateVelocities(this.velocities);
+						  this.kmp_jogger.startJoggingExecution();
+						  KMP_is_Moving = true;
+					  }
+				  }else {
+					  if(KMP_is_Moving) {
+						  this.kmp_jogger.killJoggingExecution();
+						  KMP_is_Moving=false;
+					  }
+				  }
 		}
-		if(velocities[0] !=0 ||velocities[1] !=0 ||velocities[2] !=0 ) {
-			  if(KMP_is_Moving) {
-				  this.kmp_jogger.updateVelocities(this.velocities);
-			  }
-			  else {
-				  this.kmp_jogger.updateVelocities(this.velocities);
-				  this.kmp_jogger.startJoggingExecution();
-				  KMP_is_Moving = true;
-			  }
-		  }else {
-			  if(KMP_is_Moving) {
-				  this.kmp_jogger.killJoggingExecution();
-				  KMP_is_Moving=false;
-			  }
-		  }
 	}
 	
 	public class MonitorKMPCommandConnectionsThread extends Thread {
@@ -161,18 +146,19 @@ public class KMP_commander extends Thread{
 	
 	
 	
-	public void setEmergencyStop(boolean es){
-		this.EmergencyStop = es;
+	public void setEmergencyStop(boolean stop){
+		this.EmergencyStop = stop;
 	}
+	
 	public boolean getEmergencyStop(){
-		return EmergencyStop;
+		return this.EmergencyStop;
 	}
 	
 	public void runmainthread(){
 		this.run();
 	}
 	
-	public boolean isKmpMoving() {
+	public boolean isKMPmoving() {
 		return KMP_is_Moving;
 	}
 	
@@ -182,9 +168,9 @@ public class KMP_commander extends Thread{
 	
 	public void close() {
 		closed = true;
-		setNewVelocity("vel 0 0 0");
-		try {
-			kmp_jogger.killJoggingExecution();
+		shutdown = true;
+		try{
+			setNewVelocity("vel 0 0 0");
 		}catch(Exception e){
 			System.out.println("Could not kill jogging execution");
 		}
@@ -193,7 +179,8 @@ public class KMP_commander extends Thread{
 			}catch(Exception e){
 				System.out.println("Could not close KMP commander connection: " +e);
 			}
-	}
+		System.out.println("KMP commander closed!");
+ 	}
 	
 	public boolean isSocketConnected() {
 		return this.socket.isConnected();

@@ -15,6 +15,8 @@ import java.io.PrintWriter;
 import API_ROS2_Sunrise.ISocket;
 
 public class TCPSocket implements ISocket{
+	
+	
 	public volatile boolean isConnected;
 	public Socket TCPConn;
 	DatagramPacket package_out;
@@ -23,8 +25,6 @@ public class TCPSocket implements ISocket{
 	public BufferedReader inputStream;
 	private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
 	int COMport;
-	
-
 	
 	public TCPSocket(int port) {
 		isConnected = false;

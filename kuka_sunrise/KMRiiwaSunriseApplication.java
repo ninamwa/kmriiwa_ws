@@ -9,32 +9,36 @@ import org.apache.log4j.BasicConfigurator;
 
 
 // Implementated classes
-
-
-// RoboticsAPI
 import API_ROS2_Sunrise.KMP_commander;
 import API_ROS2_Sunrise.KMP_sensor_reader;
 import API_ROS2_Sunrise.KMP_status_reader;
 import API_ROS2_Sunrise.LBR_commander;
 import API_ROS2_Sunrise.LBR_sensor_reader;
 import API_ROS2_Sunrise.LBR_status_reader;
+import API_ROS2_Sunrise.SafetyStateListener;
 
+//RoboticsAPI
 import com.kuka.roboticsAPI.annotations.*;
 import com.kuka.roboticsAPI.applicationModel.RoboticsAPIApplication;
 import com.kuka.roboticsAPI.controllerModel.Controller;
 import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
 import com.kuka.roboticsAPI.deviceModel.LBR;
 
+// DEBUG APPLICATION PAUSE:
+import com.kuka.generated.ioAccess.ControlPanelIOGroup;
+
 // AUT MODE: 3s, T1/T2/CRR: 2s
-@ResumeAfterPauseEvent(delay = 3000, afterRepositioning = false)
+@ResumeAfterPauseEvent(delay = 0, afterRepositioning = false)
 public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 	
+	// Runtime Variables
 	private volatile boolean AppRunning;
 	private IAutomaticResumeFunction resumeFunction;
-
+	SafetyStateListener safetylistener;
+	
 	// Declare KMP
 	@Inject
-	@Named("KMR_200_2")
+	@Named("KMR_200_1")
 	public KmpOmniMove kmp;
 	public Controller controller;
 	
@@ -43,7 +47,7 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 	@Named("LBR_iiwa_14_R820_1")
 	public LBR lbr;
 	
-// TODO: declare tool
+	// TODO: declare tool
 	//@Inject
 	//@Named("name of tool")
 	//public Tool tool;
@@ -56,11 +60,12 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 	int LBR_command_port = 30005;
 	int LBR_status_port = 30006;
 	int LBR_sensor_port = 30007;
-
+	
+	// Connection types
 	String TCPConnection = "TCP";
 	String UDPConnection = "UDP";
 
-	// Implemented thread classes
+	// Implemented node classes
 	KMP_commander kmp_commander;
 	LBR_commander lbr_commander;
 	LBR_sensor_reader lbr_sensor_reader;
@@ -70,15 +75,16 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 
 	// Close open UDP ports if not closed successfully
 	CheckOpenPorts CheckPorts;
-	boolean OpenPorts;
+	
+	// Check if application is paused:
+	ControlPanelIOGroup ControlPanelIO;
+
 
 	public void initialize() {
 		System.out.println("Initializing Robotics API Application");
-
-		// Check if any of the requested ports are open, and close if any
+		// Check if any of the requested ports are open
 		CheckPorts = new CheckOpenPorts();
-		OpenPorts = CheckPorts.run();
-		if(OpenPorts){
+		if(CheckPorts.run()){
 			System.out.println("One or more of the Communication ports are open. Please restart the system by killing the process.");
 //			dispose();
 		}
@@ -92,13 +98,22 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 		lbr = getContext().getDeviceFromType(LBR.class);
 		//tool.attachTo(lbr.getFlange());
 		
+		// ControlPanelIO:
+		ControlPanelIO = new ControlPanelIOGroup(controller);
+
 		// Create nodes for communication
 		kmp_commander = new KMP_commander(KMP_command_port, kmp, TCPConnection);
-		lbr_commander = new LBR_commander(LBR_command_port, lbr, TCPConnection);
+		lbr_commander = new LBR_commander(LBR_command_port, lbr, TCPConnection, getApplicationData().getFrame("/DrivePos"));
 		kmp_status_reader = new KMP_status_reader(KMP_status_port, kmp,TCPConnection, controller);
-//		lbr_status_reader = new LBR_status_reader(LBR_status_port, lbr,UDPConnection);
-//		lbr_sensor_reader = new LBR_sensor_reader(LBR_sensor_port,lbr, UDPConnection);
+		lbr_status_reader = new LBR_status_reader(LBR_status_port, lbr,TCPConnection);
+		lbr_sensor_reader = new LBR_sensor_reader(LBR_sensor_port,lbr, TCPConnection);
 		kmp_sensor_reader = new KMP_sensor_reader(KMP_laser_port, KMP_odometry_port, TCPConnection, TCPConnection);
+		
+		
+		// SafetyStateListener
+		safetylistener = new SafetyStateListener(controller, lbr_commander,kmp_commander,lbr_status_reader,kmp_status_reader);
+		safetylistener.startSafetyStateListener();
+		
 		
 		// Check if a commander node is active
 		long startTime = System.currentTimeMillis();
@@ -117,18 +132,20 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 			}				
 		}
 	}
-
 	
+
 	public void shutdown_application(){
 		System.out.println("----- Shutting down Application -----");
-		
+		lbr_commander.closed=true;
+		kmp_commander.closed=true;
+
 		kmp_commander.close();
 		lbr_commander.close();
 
 		kmp_status_reader.close();
-//		lbr_status_reader.close();
+		lbr_status_reader.close();
 		
-//		lbr_sensor_reader.close();
+		lbr_sensor_reader.close();
 		kmp_sensor_reader.close();
 
     	System.out.println("Application terminated");
@@ -142,12 +159,12 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 	
 	public void run() {
 		setAutomaticallyResumable(true);
-		Thread updateVariables = new UpdateGlobalVariables();
-		updateVariables.start();
 
 		System.out.println("Running app!");
 		
 //		Start all connected nodes
+		kmp_commander.setPriority(Thread.MAX_PRIORITY);
+		lbr_commander.setPriority(Thread.MAX_PRIORITY);
 		if(kmp_commander.isSocketConnected()) {
 			kmp_commander.start();
 		}
@@ -159,21 +176,26 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 			lbr_commander.start();
 		
 		}
-		
-//		if(lbr_status_reader.isSocketConnected()) {
-//			lbr_status_reader.start();		
-//		}
+		if(lbr_status_reader.isSocketConnected()) {
+			lbr_status_reader.start();		
+		}
 
-//		if(lbr_sensor_reader.isRequested()) {
-//			lbr_sensor_reader.start();
-//		}
+		if(lbr_sensor_reader.isRequested()) {
+			lbr_sensor_reader.start();
+		}
 		
 		if(kmp_sensor_reader.isRequested()) {
 			kmp_sensor_reader.start();
 		}
+		Thread updatevar = new UpdateGlobalVariablesThread();
+		updatevar.start();
 		
+	
 		while(AppRunning)
 		{    
+			if(ControlPanelIO.getAPP_GREEN() && ControlPanelIO.getAPP_RED()){
+				System.out.println("Main app running when application is paused.");
+			}
 			AppRunning = (!(kmp_commander.getShutdown() || lbr_commander.getShutdown()));
 		}
 		System.out.println("Shutdown message received from ROS");
@@ -190,18 +212,18 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 		resumeFunction.disableApplicationResuming(getClass().getCanonicalName());		
 	}
 	
-	public class UpdateGlobalVariables extends Thread {
+	public class UpdateGlobalVariablesThread  extends Thread {
 		public void run(){
-			while(AppRunning) {
+			while(AppRunning){
 				lbr_status_reader.setLBRisMoving(lbr_commander.isLBRMoving());
-				lbr_status_reader.setLBRemergencyStop(lbr_commander.getEmergencyStop());
-				kmp_status_reader.setKMPisMoving(kmp_commander.isKmpMoving());
-				kmp_status_reader.setKMPemergencyStop(kmp_commander.getEmergencyStop());
+				kmp_status_reader.setKMPisMoving(kmp_commander.isKMPmoving());
 			}
 		}
 	}
+	
 	public static void main(String[] args){
 		KMRiiwaSunriseApplication app = new KMRiiwaSunriseApplication();
+
 		app.runApplication();
 	}
 	

@@ -12,6 +12,7 @@ import API_ROS2_Sunrise.ISocket;
 
 
 public class UDPSocket implements ISocket{
+	
 	public volatile boolean isConnected;
 	DatagramSocket udpConn;
 	DatagramPacket package_out;
