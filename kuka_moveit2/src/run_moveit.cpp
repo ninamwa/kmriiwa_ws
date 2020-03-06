@@ -61,24 +61,26 @@ public:
     , robot_state_publisher_(node_->create_publisher<moveit_msgs::msg::DisplayRobotState>("display_robot_state", 1))
     , trajectory_publisher_(node_->create_publisher<trajectory_msgs::msg::JointTrajectory>(
           "/fake_joint_trajectory_controller/joint_trajectory", 1))
+    , goal_pose_subscriber_(node_->create_subscription<geometry_msgs::msg::PoseStamped>(
+      "/moveit/goalpose", 10 ,std::bind(&MoveItCppDemo::goalpose_callback, this, std::placeholders::_1)))
   {
   }
 
-  void run()
+  void init()
   {
     RCLCPP_INFO(LOGGER, "Initialize MoveItCpp");
     moveit_cpp_ = std::make_shared<moveit::planning_interface::MoveItCpp>(node_);
     moveit_cpp_->getPlanningSceneMonitor()->setPlanningScenePublishingFrequency(100);
 
     RCLCPP_INFO(LOGGER, "Initialize PlanningComponent");
-    moveit::planning_interface::PlanningComponent arm("manipulator", moveit_cpp_);
+    arm = std::make_shared<moveit::planning_interface::PlanningComponent>("manipulator", moveit_cpp_);
 
     // A little delay before running the plan
     rclcpp::sleep_for(std::chrono::seconds(3));
 
     // Create collision object, planning shouldn't be too easy
     moveit_msgs::msg::CollisionObject collision_object;
-    collision_object.header.frame_id = "base_footprint";
+    collision_object.header.frame_id = "base_iiwa";
     collision_object.id = "box";
 
 
@@ -173,7 +175,7 @@ public:
 
 
     // Set joint state goal
-    RCLCPP_INFO(LOGGER, "Set goal");
+    //RCLCPP_INFO(LOGGER, "Set goal");
     //arm.setGoal("pose1");
 
     geometry_msgs::msg::PoseStamped pose_msg;
@@ -200,20 +202,20 @@ public:
     // pose_msg.pose.orientation.y= quat.y;
     // pose_msg.pose.orientation.z = quat.z; 
 
-    arm.setGoal(pose_msg,"tool0");
+    //arm.setGoal(pose_msg,"tool0");
 
     // Run actual plan
-    RCLCPP_INFO(LOGGER, "Plan to goal");
-    const auto plan_solution = arm.plan();
-    if (plan_solution)
-    {
-      visualizeTrajectory(*plan_solution.trajectory);
+    // RCLCPP_INFO(LOGGER, "Plan to goal");
+    // const auto plan_solution = arm.plan();
+    // if (plan_solution)
+    // {
+    //   visualizeTrajectory(*plan_solution.trajectory);
 
-      RCLCPP_INFO(LOGGER, "Sending the trajectory for execution");
-      moveit_msgs::msg::RobotTrajectory robot_trajectory;
-      plan_solution.trajectory->getRobotTrajectoryMsg(robot_trajectory);
-      trajectory_publisher_->publish(robot_trajectory.joint_trajectory);
-    }
+    //   RCLCPP_INFO(LOGGER, "Sending the trajectory for execution");
+    //   moveit_msgs::msg::RobotTrajectory robot_trajectory;
+    //   plan_solution.trajectory->getRobotTrajectoryMsg(robot_trajectory);
+    //   trajectory_publisher_->publish(robot_trajectory.joint_trajectory);
+    // }
   }
 struct Quaternion
 {
@@ -256,10 +258,29 @@ private:
     }
   }
 
+  void goalpose_callback(geometry_msgs::msg::PoseStamped::SharedPtr msg)
+  {
+    RCLCPP_INFO(LOGGER, "GoalPose Received: %f, %f, %f", msg->pose.position.x,msg->pose.position.y,msg->pose.position.z);
+    arm->setGoal(*msg,"tool0");
+    RCLCPP_INFO(LOGGER, "Plan to goal");
+    const auto plan_solution = arm->plan();
+    if (plan_solution)
+    {
+      visualizeTrajectory(*plan_solution.trajectory);
+
+      RCLCPP_INFO(LOGGER, "Sending the trajectory for execution");
+      moveit_msgs::msg::RobotTrajectory robot_trajectory;
+      plan_solution.trajectory->getRobotTrajectoryMsg(robot_trajectory);
+      trajectory_publisher_->publish(robot_trajectory.joint_trajectory);
+    }
+  }
+
   rclcpp::Node::SharedPtr node_;
   rclcpp::Publisher<moveit_msgs::msg::DisplayRobotState>::SharedPtr robot_state_publisher_;
   rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr trajectory_publisher_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pose_subscriber_;
   moveit::planning_interface::MoveItCppPtr moveit_cpp_;
+  std::shared_ptr<moveit::planning_interface::PlanningComponent> arm;
 };
 
 
@@ -268,18 +289,13 @@ int main(int argc, char** argv)
   RCLCPP_INFO(LOGGER, "Initialize node");
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions node_options;
-  // This enables loading undeclared parameters
-  // best practice would be to declare parameters in the corresponding classes
-  // and provide descriptions about expected use
   node_options.automatically_declare_parameters_from_overrides(true);
   rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("run_moveit_cpp", "", node_options);
 
   MoveItCppDemo demo(node);
   std::thread run_demo([&demo]() {
-    // Let RViz initialize before running demo
-    // TODO(henningkayser): use lifecycle events to launch node
-    rclcpp::sleep_for(std::chrono::seconds(5));
-    demo.run();
+    rclcpp::sleep_for(std::chrono::seconds(3));
+    demo.init();
   });
 
   rclcpp::spin(node);

@@ -105,6 +105,7 @@ void run()
     RCLCPP_ERROR_STREAM(LOGGER,"Exception while loading planner '" << planner_plugin_name << "': " << ex.what() << std::endl
                                                         << "Available plugins: " << ss.str());
   }
+  rclcpp::sleep_for(std::chrono::seconds(3));
 
 
   // Pose Goal
@@ -142,8 +143,6 @@ void run()
     moveit_msgs::msg::MotionPlanResponse response;
     res.getMessage(response);
 
-    //moveit::robot_trajectory::RobotTrajectory robot_trajectory;
-    //robot_trajectory.robot_model_ = response.
     visualizeTrajectory(*res.trajectory_);
 
 
