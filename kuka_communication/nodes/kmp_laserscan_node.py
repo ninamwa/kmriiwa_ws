@@ -55,7 +55,7 @@ class KmpLaserScanNode(Node):
 
         # Make Publishers for relevant data
         self.pub_laserscan1 = self.create_publisher(LaserScan, 'scan', qos_profile_sensor_data)
-        self.pub_laserscan4 = self.create_publisher(LaserScan, 'scan_2', qos_profile_sensor_data)
+        self.pub_laserscan2 = self.create_publisher(LaserScan, 'scan_2', qos_profile_sensor_data)
         self.send_static_transform()
 
 
@@ -70,7 +70,7 @@ class KmpLaserScanNode(Node):
             if len(self.soc.laserScanB1):
                 self.scan_callback(self.pub_laserscan1, self.soc.laserScanB1.pop(0))
             if len(self.soc.laserScanB4):
-                self.scan_callback(self.pub_laserscan4, self.soc.laserScanB4.pop(0))
+                self.scan_callback(self.pub_laserscan2, self.soc.laserScanB4.pop(0))
 
 
 
