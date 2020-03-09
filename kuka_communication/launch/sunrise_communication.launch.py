@@ -92,4 +92,13 @@ def generate_launch_description(argv=sys.argv[1:]):
             emulate_tty=True,
             arguments=['-c', connection_type_TCP, '-ro', robot],
             parameters=[param_dir]),
+
+        launch_ros.actions.Node(
+            package="kuka_communication",
+            node_executable="lbr_sensordata_node.py",
+            node_name="lbr_sensordata_node",
+            output="screen",
+            emulate_tty=True,
+            arguments=['-c', connection_type_TCP, '-ro', robot],
+            parameters=[param_dir]),
     ])

@@ -10,6 +10,7 @@ from rclpy.node import Node
 import socket
 from std_msgs.msg import String
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, TransformStamped
+from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
 from builtin_interfaces.msg import Time
@@ -18,6 +19,7 @@ from tf2_ros import StaticTransformBroadcaster
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.utilities import remove_ros_args
 import argparse
+import numpy as np
 
 from script.tcpSocket import TCPSocket
 from script.udpSocket import UDPSocket
@@ -50,13 +52,12 @@ class LbrSensordataNode(Node):
             self.soc = None
 
 
-        self.last_scan_timestamp = 0
+        self.last_data_timestamp = 0
 
 
         # Make Publishers for relevant data
-        #self.pub_lbr_sensordata = self.create_publisher(LaserScan, 'scan_1', qos_profile_sensor_data)
-        self.send_static_transform()
-
+        self.pub_lbr_sensordata = self.create_publisher(JointState, '/joint_states', qos_profile_sensor_data)
+        self.joint_names = ["joint_a1","joint_a2","joint_a3","joint_a4","joint_a5","joint_a6","joint_a7"]
 
         while not self.soc.isconnected:
             pass
@@ -66,35 +67,21 @@ class LbrSensordataNode(Node):
 
     def run(self):
         while rclpy.ok() and self.soc.isconnected:
-            if len(self.soc.laserScanB1):
+            if len(self.soc.lbr_sensordata):
                 self.data_callback(self.pub_lbr_sensordata, self.soc.lbr_sensordata.pop(0))
 
 
     def data_callback(self, publisher, values):
-        if (len(values) == 4 and values[1] != self.last_scan_timestamp):
-            kuka_timestamp = values[1]
-            self.last_scan_timestamp =kuka_timestamp
-            scan = LaserScan()
-            scan.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
-            if values[2] == '1801':
-                scan.header.frame_id = "scan_1"
-            elif values[2] == '1802':
-                scan.header.frame_id="scan_2"
-            scan.angle_increment = (0.5*math.pi)/180
-            scan.angle_min = (-135*math.pi)/180
-            scan.angle_max = (135*math.pi)/180
-            scan.range_min = 0.12 # disse må finnes ut av
-            scan.range_max = 3.5 # finn ut
-            try:
-                scan.ranges = [float(s) for s in values[3].split(',')]
-            except ValueError as e:
-                print("Error", e)
-
-            if len(scan.ranges) == 541:
-                publisher.publish(scan)
-            else:
-                print(len(scan.ranges)) ##FOR DEBUGGING
-
+        if (values.split(',')[1] != self.last_data_timestamp):
+            self.last_data_timestamp = values.split(',')[1]
+            effort = [float(s) for s in values.split('MeasuredTorque:')[1].split(',') if len(s)>0]
+            position = [float(s) for s in values.split('JointPosition:')[1].split('MeasuredTorque:')[0].split(',') if len(s)>0]
+            msg = JointState()
+            msg.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
+            msg.name = self.joint_names
+            msg.position = position
+            msg.effort = effort
+            publisher.publish(msg)
 
     def getTimestamp(self,nano):
         t = nano * 10 ** -9
@@ -103,33 +90,6 @@ class LbrSensordataNode(Node):
         timestamp.nanosec = int((t - timestamp.sec) * 10 ** 9)
         return timestamp
 
-
-    def euler_to_quaternion(self, roll, pitch, yaw):
-        qx = math.sin(roll/2) * math.cos(pitch/2) * math.cos(yaw/2) - math.cos(roll/2) * math.sin(pitch/2) * math.sin(yaw/2)
-        qy = math.cos(roll/2) * math.sin(pitch/2) * math.cos(yaw/2) + math.sin(roll/2) * math.cos(pitch/2) * math.sin(yaw/2)
-        qz = math.cos(roll/2) * math.cos(pitch/2) * math.sin(yaw/2) - math.sin(roll/2) * math.sin(pitch/2) * math.cos(yaw/2)
-        qw = math.cos(roll/2) * math.cos(pitch/2) * math.cos(yaw/2) + math.sin(roll/2) * math.sin(pitch/2) * math.sin(yaw/2)
-
-        return [qx, qy, qz, qw]
-
-    def send_static_transform(self):
-        broadcaster1 = StaticTransformBroadcaster(self)
-        broadcaster2 = StaticTransformBroadcaster(self)
-        static_transformStamped = TransformStamped()
-        static_transformStamped.header.frame_id = "laser_B4_link"
-        static_transformStamped.child_frame_id = "scan_2"
-        static_transformStamped.transform.translation.x = 0.0
-        static_transformStamped.transform.translation.y = 0.0
-        static_transformStamped.transform.translation.z = 0.0
-        quat = self.euler_to_quaternion(0, 0, 0)
-        static_transformStamped.transform.rotation.x = quat[0]
-        static_transformStamped.transform.rotation.y = quat[1]
-        static_transformStamped.transform.rotation.z = quat[2]
-        static_transformStamped.transform.rotation.w = quat[3]
-        broadcaster1.sendTransform(static_transformStamped)
-        static_transformStamped.header.frame_id = "laser_B1_link"
-        static_transformStamped.child_frame_id = "scan_1"
-        broadcaster2.sendTransform(static_transformStamped)
 
 
 def main(argv=sys.argv[1:]):
