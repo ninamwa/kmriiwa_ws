@@ -8,6 +8,7 @@ from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, Transform
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.utilities import remove_ros_args
 import argparse
+from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 from script.tcpSocket import TCPSocket
 from script.udpSocket import UDPSocket
@@ -43,6 +44,7 @@ class LbrCommandsNode(Node):
         # Make a listener for relevant topics
         sub_manipulator_vel = self.create_subscription(String, 'manipulator_vel', self.manipulatorVel_callback, qos_profile_sensor_data)
         sub_shutdown = self.create_subscription(String, 'shutdown', self.shutdown_callback, qos_profile_sensor_data)
+        sub_pathplanning = self.create_subscription(JointTrajectory, '/fake_joint_trajectory_controller/joint_trajectory', self.path_callback, qos_profile_sensor_data)
 
         while not self.soc.isconnected:
             pass
@@ -58,6 +60,22 @@ class LbrCommandsNode(Node):
     def manipulatorVel_callback(self, data):
         msg = 'setLBRmotion ' + data.data
         self.soc.send(msg)
+
+    def path_callback(self, data):
+        i=1
+        for point in data.points:
+            positions = " ".join([str(s) for s in point.positions])
+            velocities = " ".join([str(s) for s in point.velocities])
+            accelerations = " ".join([str(s) for s in point.accelerations])
+            if i == 1:
+                type = "StartPoint"
+            elif i ==len(data.points):
+                type = "EndPoint"
+            else:
+                type = "WayPoint"
+            msg = 'pathPointLBR ' + ">" + type + ">" + positions + ">" + velocities + ">" + accelerations
+            self.soc.send(msg)
+            i+=1
 
 
 def main(argv=sys.argv[1:]):
