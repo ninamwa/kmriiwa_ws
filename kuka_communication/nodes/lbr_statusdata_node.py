@@ -26,8 +26,8 @@ class LbrStatusNode(Node):
         self.declare_parameter('port')
         port = int(self.get_parameter('port').value)
         if robot == 'KMR1':
-            self.declare_parameter('/KMR1/ip')
-            ip = str(self.get_parameter('/KMR1/ip').value)
+            self.declare_parameter('KMR1/ip')
+            ip = str(self.get_parameter('KMR1/ip').value)
         elif robot == 'KMR2':
             self.declare_parameter('KMR2/ip')
             ip = str(self.get_parameter('KMR2/ip').value)

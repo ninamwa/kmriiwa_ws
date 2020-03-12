@@ -36,8 +36,8 @@ class LbrSensordataNode(Node):
         self.declare_parameter('port')
         port = int(self.get_parameter('port').value)
         if robot == 'KMR1':
-            self.declare_parameter('/KMR1/ip')
-            ip = str(self.get_parameter('/KMR1/ip').value)
+            self.declare_parameter('KMR1/ip')
+            ip = str(self.get_parameter('KMR1/ip').value)
         elif robot == 'KMR2':
             self.declare_parameter('KMR2/ip')
             ip = str(self.get_parameter('KMR2/ip').value)
@@ -72,10 +72,11 @@ class LbrSensordataNode(Node):
 
 
     def data_callback(self, publisher, values):
-        if (values.split(',')[1] != self.last_data_timestamp):
-            self.last_data_timestamp = values.split(',')[1]
-            effort = [float(s) for s in values.split('MeasuredTorque:')[1].split(',') if len(s)>0]
-            position = [float(s) for s in values.split('JointPosition:')[1].split('MeasuredTorque:')[0].split(',') if len(s)>0]
+        data=values[1]
+        if (data.split(',')[1] != self.last_data_timestamp):
+            self.last_data_timestamp = data.split(',')[1]
+            effort = [float(s) for s in data.split('MeasuredTorque:')[1].split(',') if len(s)>0]
+            position = [float(s) for s in data.split('JointPosition:')[1].split('MeasuredTorque:')[0].split(',') if len(s)>0]
             msg = JointState()
             msg.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
             msg.name = self.joint_names

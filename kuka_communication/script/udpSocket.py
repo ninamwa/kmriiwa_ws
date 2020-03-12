@@ -109,7 +109,7 @@ class UDPSocket:
                 if len(cmd_splt) and cmd_splt[0] == 'lbr_statusdata':
                     self.lbr_statusdata = cmd_splt
                 if len(cmd_splt) and cmd_splt[0] == 'lbr_sensordata':
-                    self.lbr_sensordata = self.lbr_sensordata.append(cmd_splt)
+                    self.lbr_sensordata.append(cmd_splt)
 
             except:
                 t=0

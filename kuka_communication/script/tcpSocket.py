@@ -38,6 +38,7 @@ class TCPSocket:
         self.laserScanB4 = []
         self.kmp_statusdata = None
         self.lbr_statusdata = None
+        self.lbr_sensordata = []
 
         threading.Thread(target=self.connect_to_socket).start()
 
@@ -91,7 +92,7 @@ class TCPSocket:
                     if len(cmd_splt) and cmd_splt[0] == 'lbr_statusdata':
                         self.lbr_statusdata = cmd_splt
                     if len(cmd_splt) and cmd_splt[0] == 'lbr_sensordata':
-                        self.lbr_sensordata = self.lbr_sensordata.append(cmd_splt)
+                        self.lbr_sensordata.append(cmd_splt)
 
             except:
                 t = 0
