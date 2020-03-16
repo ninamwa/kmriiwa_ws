@@ -13,6 +13,10 @@
   <test_depend>ament_lint_common</test_depend>
   <depend>rclcpp</depend>
   <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>actionlib_msgs</depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
 
   <export>
     <build_type>ament_cmake</build_type>

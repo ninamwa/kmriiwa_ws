@@ -23,9 +23,24 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
 # Install the python module for this package
 ament_python_install_package(nodes/)
+
+
+set(action_files
+  "action/OpenGripper.action"
+  "action/CloseGripper.action"
+  "action/ObjectSearch.action"
+)
+
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  ${action_files}
+  DEPENDENCIES std_msgs geometry_msgs
+  ADD_LINTER_TESTS
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -41,13 +56,15 @@ endif()
 
 # Install python scripts
 install(
-  DIRECTORY launch nodes
+  DIRECTORY launch nodes action
   DESTINATION share/${PROJECT_NAME}
 )
 
 install(
   PROGRAMS
     nodes/manipulator_node.py
+    nodes/client.py
+    nodes/server.py
     nodes/gripper/gripper_node.py
     DESTINATION lib/${PROJECT_NAME}
 )

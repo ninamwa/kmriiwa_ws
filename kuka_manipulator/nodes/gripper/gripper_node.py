@@ -4,21 +4,15 @@ import _thread as thread
 import time
 import os
 import sys
-import serial
 import binascii
-import math
 import rclpy
 from rclpy.node import Node
-import socket
 from std_msgs.msg import String
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, TransformStamped
-from nav_msgs.msg import Odometry
-from sensor_msgs.msg import LaserScan
-from builtin_interfaces.msg import Time
-from tf2_ros.transform_broadcaster import TransformBroadcaster
-from tf2_ros import StaticTransformBroadcaster
 from rclpy.qos import qos_profile_sensor_data
-
+from rclpy.action import ActionServer, GoalResponse
+from kuka_manipulator.action import OpenGripper
+from kuka_manipulator.action import CloseGripper
 
 def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 
@@ -29,39 +23,46 @@ class GripperNode(Node):
         super().__init__('gripper_node')
         self.name='gripper_node'
         # TODO: change port to NUC
-        self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,
-                            stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
+        #self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
 
         # Make Publishers for relevant data
         #self.pub_laserscan1 = self.create_publisher(LaserScan, 'scan', qos_profile_sensor_data)
-        #self.send_static_transform()
 
+        self.open_action_server = ActionServer(self,OpenGripper,'open_gripper',self.execute_callback)
+        self.close_action_server = ActionServer(self, CloseGripper, 'close_gripper', self.close_gripper_callback)
 
-        while not self.soc.isconnected:
+        self.executing = False
+
+    def execute_callback(self, goal_handle):
+        self.get_logger().info('Executing goal...')
+
+        while (self.executing):
             pass
-        self.get_logger().info('Node is ready')
 
-        thread.start_new_thread(self.run, ())
+        goal_handle.succeed()
+        result = OpenGripper.Result()
+        result.success = True
 
-    def run(self):
-        while rclpy.ok() and self.soc.isconnected:
-            if True:
-                self.scan_callback(self.pub_laserscan1, self.soc.laserScanB1.pop(0))
+        #result.success = self.getOpenResponse()
+        #if self.self.getOpenResponse() == True:
+        #    goal_handle.succeed()
+        #else:
+        #    goal_handle.canceled()
+        print("OK")
+        return result
 
+    def close_gripper_callback(self, goal_handle):
+        self.get_logger().info('Executing goal...')
+        while (self.executing):
+            pass
+        result = CloseGripper.Result()
+        result.success = self.getClosedResponse()
+        if self.getClosedResponse() == True:
+            goal_handle.succeed()
+        else:
+            goal_handle.canceled()
+        return result
 
-    def scan_callback(self, publisher, values):
-        if (len(values) == 4 and values[1] != self.last_scan_timestamp):
-            kuka_timestamp = values[1]
-            self.last_scan_timestamp =kuka_timestamp
-            publisher.publish()
-
-
-    def getTimestamp(self,nano):
-        t = nano * 10 ** -9
-        timestamp = Time()
-        timestamp.sec = math.floor(t)
-        timestamp.nanosec = int((t - timestamp.sec) * 10 ** 9)
-        return timestamp
 
     def activate(self):
         #Activation Request
@@ -86,7 +87,7 @@ class GripperNode(Node):
         #closing Not complete: 09 03 06 39 00 00 FF 0E 0A F7 8B
         #closing Complete 09 03 06 B9 00 00 FF BD 00 1D 7C
     def getOpenResponse(self):
-
+        t=0
         #Request 09 03 07 D0 00 03 04 0 E
         # opening incomplete 09 03 06 39 00 00 00 BB 10 30 E0
         # opening complete : 09 03 06 F9 00 00 00 0D 00 56 4C
