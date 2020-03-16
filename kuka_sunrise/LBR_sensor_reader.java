@@ -115,8 +115,8 @@ public class LBR_sensor_reader extends Thread{
 
 	private String generateSensorString() {
 		return 	">lbr_sensordata ,"  + System.nanoTime() +  
-				",JointPosition:" + JointPosition + 
-				",MeasuredTorque:" + MeasuredTorque ;
+				",JointPosition:" + JointPosition[0]+"," + JointPosition[1]+"," + JointPosition[2]+"," + JointPosition[3]+"," + JointPosition[4]+"," + JointPosition[5]+"," + JointPosition[6]+
+				",MeasuredTorque:" + MeasuredTorque[0] +","+ MeasuredTorque[1] +","+MeasuredTorque[2] +","+MeasuredTorque[3] +","+MeasuredTorque[4] +","+MeasuredTorque[5] +","+MeasuredTorque[6] ;
 	}
 	
 	public void sendStatus() {
