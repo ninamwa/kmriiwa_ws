@@ -16,13 +16,9 @@ import com.kuka.roboticsAPI.motionModel.IMotionContainer;
 import static com.kuka.roboticsAPI.motionModel.BasicMotions.ptp;
 
 
-public class LBR_commander extends Thread{
+public class LBR_commander extends Node{
 	
 	// Runtime Variables
-	public volatile boolean shutdown = false;
-	public volatile boolean closed = false;
-	public volatile boolean EmergencyStop = false;
-	boolean isKMPConnected;
 
 	// Robot Specific
 	LBR lbr;
@@ -33,97 +29,82 @@ public class LBR_commander extends Thread{
 	private final double defaultVelocity = 0.2;
 	AbstractFrame drivePos;
 	ICommandContainer LBR_currentMotion;
-	public volatile boolean LBR_is_Moving = false;
-
-	// Socket
-	ISocket socket;
-	String ConnectionType;
-	String CommandStr;
-	int port;
 
 
-	public LBR_commander(int port, LBR robot, String ConnectionType, AbstractFrame drivepos) {
-		this.port = port;
-		this.lbr = robot;
-		this.ConnectionType = ConnectionType;
-		this.drivePos = drivepos;
-		lbr.setHomePosition(drivePos);
+	public LBR_commander(int port,LBR robot, String ConnectionType, AbstractFrame drivepos) {
+		super(port, ConnectionType);
 		
-		createSocket();
+		this.lbr = robot;
+//		this.drivePos = drivepos;
+//		lbr.setHomePosition(drivePos);
 		
 		if (!(isSocketConnected())) {
 			System.out.println("Starting thread to connect LBR command node....");
 			Thread monitorLBRCommandConnections = new MonitorLBRCommandConnectionsThread();
 			monitorLBRCommandConnections.start();
+			}else {
+				setisLBRConnected(true);
 			}
-	}
-	
 
-	public void createSocket(){
-		if (this.ConnectionType == "TCP") {
-			 socket = new TCPSocket(this.port);
-		}
-		else {
-			socket = new UDPSocket(this.port);
-		}
 	}
 	
-	public boolean isSocketConnected() {
-		return socket.isConnected();
-	}
-	
+	@Override
 	public void run() {
 		Thread emergencystopthread = new MonitorEmergencyStopThread();
 		emergencystopthread.start();
 		
 		CommandedjointPos = lbr.getCurrentJointPosition();
 		
-		while(isSocketConnected() && (!(closed)))
+		while(isNodeRunning())
 		{   
 			String Commandstr = socket.receive_message(); 
 	    	String []splt = Commandstr.split(" ");
 	    	
 	    	if ((splt[0]).equals("shutdown")){
 	    		System.out.println("LBR RECEIVED SHUTDOWN");
-				this.shutdown = true;
-				break;
+	    		setShutdown(true);
+	    		break;
 				}
 	    	
 			if ((splt[0]).equals("setLBRmotion")&& (!(getEmergencyStop()))){
 				JointLBRMotion(Commandstr);
 				}
+			if ((splt[0]).equals("path")&& (!(getEmergencyStop()))){
+				setisPathFinished(false);
+				// TODO: I path - is finished - sett til true!!
+				}
 		}
     }
 	
 	private void JointLBRMotion(String commandstr) {
-		if(isSocketConnected() && !(closed) && !(getEmergencyStop())){
+		if(isNodeRunning() && !(getEmergencyStop())){
 			String []lineSplt = commandstr.split(" ");
 			int jointIndex = Character.getNumericValue(lineSplt[1].charAt(1)) - 1 ;
 			double direction = Double.parseDouble(lineSplt[2]);
 			double jointAngle;
 				if(jointIndex==-1){ // A10: Stop all
-					if(LBR_is_Moving){
+					if(getisLBRMoving()){
 						currentmotion.cancel();
 					}
-					LBR_is_Moving = false;
+					setisLBRMoving(false);
 					CommandedjointPos.set(lbr.getCurrentJointPosition());
 				}else if(jointIndex == 8){
 				 // A9: Move to driveposition
-					if(LBR_is_Moving){
+					if(getisLBRMoving()){
 						currentmotion.cancel();
 					}
 				    lbr.move(ptp(drivePos).setJointVelocityRel(defaultVelocity));
-				    LBR_is_Moving = false;
+					setisLBRMoving(false);
 				    CommandedjointPos.set(lbr.getCurrentJointPosition());
 				}else{
 					jointAngle = setJointAngle(jointIndex, direction);
 					if(!(CommandedjointPos.get(jointIndex)==jointAngle)){
 						CommandedjointPos.set(jointIndex, jointAngle);
-						if(LBR_is_Moving){
+						if(getisLBRMoving()){
 							currentmotion.cancel();
 						}
 						currentmotion = lbr.moveAsync(ptp(CommandedjointPos).setJointVelocityRel(defaultVelocity));
-						LBR_is_Moving = true;
+						setisLBRMoving(true);
 					}
 				}	
 		}
@@ -140,35 +121,28 @@ public class LBR_commander extends Thread{
 	
 	public class MonitorEmergencyStopThread extends Thread {
 		public void run(){
-			while((isSocketConnected()) && (!(closed))) {
+			while(isNodeRunning()) {
 				if (getEmergencyStop()){
-						if (LBR_is_Moving){
+						if (getisLBRMoving()){
 							currentmotion.cancel();
 							CommandedjointPos.set(lbr.getCurrentJointPosition());
 						}
-						LBR_is_Moving = false;
+						setisLBRMoving(true);
 						}
 				}
 			}
 		}
 	
-	public void setEmergencyStop(boolean es){
-		this.EmergencyStop = es;
-	}
-	
-	public boolean getEmergencyStop(){
-		return EmergencyStop;
-	}
-	
 	public class MonitorLBRCommandConnectionsThread extends Thread {
 		int timeout = 3000;
 		public void run(){
 			while(!(isSocketConnected()) && (!(closed))) {
-				if(isKMPConnected) {
+				if(getisKMPConnected()) {
 					timeout = 5000;
 				}
 				createSocket();
 				if (isSocketConnected()){
+					setisLBRConnected(true);
 					break;
 				}
 				try {
@@ -183,28 +157,15 @@ public class LBR_commander extends Thread{
 				}	
 		}
 	}
-	public void runmainthread(){
-		this.run();
-	}
 	
-	public boolean isLBRMoving() {
-		return LBR_is_Moving;
-	}
 	
-	public boolean getShutdown() {
-		return this.shutdown;
-	}
-	
-	public void setKMPConnected(boolean KMPConnected) {
-		this.isKMPConnected = KMPConnected;
-	}
-	
+	@Override
 	public void close(){
-		shutdown = true;
+		setShutdown(true);
 		closed = true;
 		CommandedjointPos.set(lbr.getCurrentJointPosition());
 
-		if(LBR_is_Moving){
+		if(getisLBRMoving()){
 			try{
 			currentmotion.cancel();
 			}catch(Exception e){
