@@ -2,7 +2,6 @@
 
 import _thread as thread
 import time
-import os
 import sys
 import serial
 import binascii
@@ -18,24 +17,12 @@ from rclpy.action import ActionServer, GoalResponse
 from kuka_manipulator.action import OpenGripper
 from kuka_manipulator.action import CloseGripper
 
+from script.gripper_msgs import GripperMsg
+from script.errorcodes import ErrorCodes
+
+
 from enum import Enum
 def cl_red(msge): return '\033[31m' + msge + '\033[0m'
-
-
-class GripperMsg(Enum):
-    Activation = b"\x09\x10\x03\xE8\x00\x03\x06\x00\x00\x00\x00\x00\x00\x73\x30"
-    ActivationRequest = b"\x09\x03\x07\xD0\x00\x01\x85\xCF"
-    ActivationComplete = "09030200005985"
-
-    StatusResponse= b"\x09\x03\x07\xD0\x00\x03\x04\x0E"
-    CloseRequest = b"\x09\x10\x03\xE8\x00\x03\x06\x09\x00\x00\xFF\x7F\x7F\x22\x49"
-    OpenRequest = b"\x09\x10\x03\xE8\x00\x03\x06\x09\x00\x00\x00\xFF\xFF\x72\x19"
-
-    NOTMOVING = -1
-    MOVING = 0
-    OBJECT_OPENING = 1
-    OBJECT_CLOSING = 2
-    REQUESTEDPOSITION = 3
 
 
 class GripperNode(Node):
