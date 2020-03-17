@@ -119,8 +119,7 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 		long startTime = System.currentTimeMillis();
 		int shutDownAfterMs = 7000; 
 		while(!AppRunning) {
-			kmp_commander.setLBRConnected(lbr_commander.isSocketConnected());
-			lbr_commander.setKMPConnected(kmp_commander.isSocketConnected());
+			
 			if(kmp_commander.isSocketConnected() || lbr_commander.isSocketConnected()){
 					AppRunning = true;
 					System.out.println("Application ready to run!");	
@@ -180,15 +179,14 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 			lbr_status_reader.start();		
 		}
 
-		if(lbr_sensor_reader.isRequested()) {
+		if(lbr_sensor_reader.isSocketConnected()) {
 			lbr_sensor_reader.start();
 		}
 		
-		if(kmp_sensor_reader.isRequested()) {
+		if(kmp_sensor_reader.isSocketConnected()) {
 			kmp_sensor_reader.start();
 		}
-		Thread updatevar = new UpdateGlobalVariablesThread();
-		updatevar.start();
+
 		
 	
 		while(AppRunning)
@@ -211,19 +209,10 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 		}
 		resumeFunction.disableApplicationResuming(getClass().getCanonicalName());		
 	}
-	
-	public class UpdateGlobalVariablesThread  extends Thread {
-		public void run(){
-			while(AppRunning){
-				lbr_status_reader.setLBRisMoving(lbr_commander.isLBRMoving());
-				kmp_status_reader.setKMPisMoving(kmp_commander.isKMPmoving());
-			}
-		}
-	}
+
 	
 	public static void main(String[] args){
 		KMRiiwaSunriseApplication app = new KMRiiwaSunriseApplication();
-
 		app.runApplication();
 	}
 	

@@ -10,10 +10,9 @@ import API_ROS2_Sunrise.UDPSocket;
 import com.kuka.roboticsAPI.deviceModel.LBR;
 
 
-public class LBR_sensor_reader extends Thread{
+public class LBR_sensor_reader extends Node{
 	
 	// Runtime variables
-	public volatile boolean closed = false;
 	Boolean LBR_sensor_requested;
 
 	// Robot
@@ -29,12 +28,10 @@ public class LBR_sensor_reader extends Thread{
 	String ConnectionType;
 	
 	
-	public LBR_sensor_reader(int UDPport, LBR robot, String ConnectionType) {
-		this.port = UDPport;
+	public LBR_sensor_reader(int port, LBR robot, String ConnectionType) {
+		super(port, ConnectionType);
 		this.lbr = robot;
 		LBR_sensor_requested = false;
-		this.ConnectionType = ConnectionType;
-		createSocket();
 		
 		if(!(isSocketConnected())){
 			Thread monitorLBRsensorConnections = new MonitorSensorConnectionThread();
@@ -45,15 +42,6 @@ public class LBR_sensor_reader extends Thread{
 
 	}
 	
-	public void createSocket(){
-		if (this.ConnectionType == "TCP") {
-			 socket = new TCPSocket(this.port);
-		}
-		
-		else {
-			socket = new UDPSocket(this.port);
-		}
-	}
 		
 	public class MonitorSensorConnectionThread extends Thread {
 		int timeout = 3000;
@@ -77,13 +65,10 @@ public class LBR_sensor_reader extends Thread{
 				}	
 		}
 	}
-	
-	public void runmainthread(){
-		this.run();
-	}
-	
+
+	@Override
 	public void run() {
-		while(isSocketConnected() && (!(closed)))
+		while(isNodeRunning())
 		{	
 			//FIND OUT HOW MUCH TO SLEEP. SAMME RATE SOM ODOMETRY?
 			updateMeasuredTorque();
@@ -121,11 +106,11 @@ public class LBR_sensor_reader extends Thread{
 	
 	public void sendStatus() {
 		String sensorString = generateSensorString();
-		if(isSocketConnected() && (!(closed))){
+		if(isNodeRunning()){
 			try{
 				this.socket.send_message(sensorString);
 				if(closed){
-					System.out.println("LBR sensor sender selv om han ikke får lov");
+					System.out.println("LBR sensor sender selv om han ikke fï¿½r lov");
 				}
 			}catch(Exception e){
 				System.out.println("Could not send Operation mode to ROS: " + e);
@@ -133,20 +118,12 @@ public class LBR_sensor_reader extends Thread{
 		}
 	}
 	
+	@Override
 	public void close() {
 		closed = true;
 		socket.close();
 		System.out.println("LBR sensor closed!");
 
 	}
-	
-	public boolean isSocketConnected() {
-		return socket.isConnected();
-	}
-	
-	public boolean isRequested() {
-		return (LBR_sensor_requested); 
-	}
-
 	
 }

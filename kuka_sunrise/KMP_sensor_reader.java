@@ -9,19 +9,12 @@ import API_ROS2_Sunrise.DataController;
 import API_ROS2_Sunrise.ISocket;
 import API_ROS2_Sunrise.TCPSocket;
 import API_ROS2_Sunrise.UDPSocket;
-
 import com.kuka.nav.fdi.FDIConnection;
 
-
-
-
-public class KMP_sensor_reader {
+public class KMP_sensor_reader extends Node{
 	
 	// Runtime variables
-	volatile Boolean KMP_laser_requested;
-	volatile Boolean KMP_odometry_requested;
-	public volatile boolean closed = false;
-	
+
     // Data retrieval socket via FDI 
     public FDIConnection fdi;
 	public DataController listener;
@@ -32,41 +25,25 @@ public class KMP_sensor_reader {
 	private static int laser_B1 = 1801;
 	private static int laser_B4 = 1802;
 	
-	// Socket
-	public ISocket laser_socket;
-	public ISocket odometry_socket;
-	int KMP_laser_port = 30005;
-	int KMP_odometry_port = 30006;
-	String LaserConnectionType;
-	String OdometryConnectionType;
-	
+
 	
 	public KMP_sensor_reader(int laserport, int odomport, String LaserConnectionType, String OdometryConnectionType) {
-		this.KMP_laser_port = laserport;
-		this.KMP_odometry_port = odomport;
-		this.LaserConnectionType = LaserConnectionType;
-		this.OdometryConnectionType = OdometryConnectionType;
-		createLaserSocket();
-		createOdometrySocket();
+		super(laserport, LaserConnectionType, odomport, OdometryConnectionType);
 
-		KMP_laser_requested = true;
-		KMP_odometry_requested = true;
 		
 		if (!(isLaserSocketConnected())) {
-			KMP_laser_requested=false;
 			System.out.println("Starting thread to connect laser node....");
 			Thread monitorLaserConnections = new MonitorLaserConnectionThread();
 			monitorLaserConnections.start();
 			}
 				
 		if (!(isOdometrySocketConnected())) {
-			KMP_odometry_requested=false;
 			System.out.println("Starting thread to connect odometry node....");
 			Thread monitorOdometryConnections = new MonitorOdometryConnectionThread();
 			monitorOdometryConnections.start();
 			}
 		
-		if (KMP_laser_requested || KMP_odometry_requested) { 
+		if (isSocketConnected()){ 
 			this.fdiConnection();
 		}
 	}
@@ -80,29 +57,13 @@ public class KMP_sensor_reader {
 		this.fdi.connect();
 	}
 	
-	public void createLaserSocket(){
-		if(LaserConnectionType == "TCP") {
-			this.laser_socket = new TCPSocket(KMP_laser_port);
 
-		}else {
-			this.laser_socket = new UDPSocket(KMP_laser_port);
-		}
-	}
-	
-	public void createOdometrySocket(){
-		if(OdometryConnectionType == "TCP") {
-			this.odometry_socket = new TCPSocket(KMP_odometry_port);
-
-		}else {
-			this.odometry_socket = new UDPSocket(KMP_odometry_port);
-		}
-	}
 	
 	public class MonitorLaserConnectionThread extends Thread {
 		public void run(){
 			while(!(isLaserSocketConnected()) && (!(closed))) {
 
-				createLaserSocket();
+				createSocket("Laser");
 				if(isLaserSocketConnected()){
 					break;
 				}	
@@ -113,7 +74,6 @@ public class KMP_sensor_reader {
 				}
 			}
 			if(!closed){
-				KMP_laser_requested = true;
 				if (fdi==null) {
 					fdiConnection();
 				}
@@ -129,7 +89,7 @@ public class KMP_sensor_reader {
 		public void run(){
 			while(!(isOdometrySocketConnected()) && (!(closed))) {
 				
-				createOdometrySocket();
+				createSocket("Odom");
 				if (isOdometrySocketConnected()){
 					break;
 				}
@@ -141,7 +101,6 @@ public class KMP_sensor_reader {
 			
 		}	
 			if(!closed){
-				KMP_odometry_requested = true;
 				if (fdi==null) {
 					fdiConnection();
 				}
@@ -153,26 +112,25 @@ public class KMP_sensor_reader {
 	}
 	
 	public void subscribe_kmp_odometry_data() {
-		if (KMP_odometry_requested){
     		fdi.getNewOdometry();
-		}
 	}
 	public void subscribe_kmp_laser_data(){
-    	if (KMP_laser_requested){
     		fdi.getNewLaserScan(laser_B1);
     		fdi.getNewLaserScan(laser_B4);
-    	}
+
 	}
 	
-	public void start() {
-		if(KMP_laser_requested) {
+	@Override
+	public void run() {
+		if(isLaserSocketConnected()) {
 			subscribe_kmp_laser_data();
 		}
-		if(KMP_odometry_requested) {
+		if(isOdometrySocketConnected()) {
 			subscribe_kmp_odometry_data();
 		}
 	}
 	
+	@Override
 	public void close() {
 		closed = true;
 		try{
@@ -192,26 +150,32 @@ public class KMP_sensor_reader {
 			System.out.println("Can not close odometry socket connection! : " + c);
 		}
 		System.out.println("KMP sensor closed!");
-
-		
 	}
 	
 	// Dette gir feilmelding hvis det ikke eksisterer et objekt
 	public boolean isLaserSocketConnected() {
-		return this.laser_socket.isConnected();
+		boolean res = false;
+		try {
+			res = laser_socket.isConnected();
+		}catch(Exception e) {}
+		return res;
 	}
 	
-	public boolean isOdometrySocketConnected() {
-		return this.odometry_socket.isConnected();
+	public boolean isOdometrySocketConnected() {		
+		boolean res = false;
+		try {
+			res = odometry_socket.isConnected();
+		}catch(Exception e) {}
+		return res;
 	}
 	
 	public boolean isFDIConnected() {
 		return this.listener.fdi_isConnected;
 	}
 	
-	
-	public boolean isRequested() {
-		return (this.KMP_laser_requested || this.KMP_odometry_requested); 
+	@Override
+	public boolean isSocketConnected()  {
+		return (isOdometrySocketConnected() || isLaserSocketConnected()); 
 	}
 	
 }
