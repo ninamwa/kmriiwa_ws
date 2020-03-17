@@ -3,6 +3,8 @@ import yaml
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def load_file(package_name, file_path):
     package_path = get_package_share_directory(package_name)
@@ -52,6 +54,8 @@ def generate_launch_description():
 
     planner_plugin={'planner_plugin' : 'ompl_interface/OMPLPlanner'}
 
+    state_publisher_launch_file_dir = os.path.join(get_package_share_directory('kuka_bringup'), 'launch')
+
     # MoveItCpp demo executable
     run_moveit_node = Node(node_name='run_moveit_cpp',
                                package='kuka_moveit2',
@@ -64,19 +68,7 @@ def generate_launch_description():
                                            kinematics_yaml,
                                            ompl_planning_pipeline_config,
                                            moveit_controllers])
-    move_to_pose = Node(node_name='move_to_pose',
-                           package='kuka_moveit2',
-                           node_executable='move_to_pose',
-                           output='screen',
-                           emulate_tty=True,
-                           parameters=[move2pose_yaml_file_name,
-                                    robot_description,
-                                    robot_description_semantic,
-                                    kinematics_yaml,
-                                    ompl_planning_pipeline_config,
-                                    moveit_controllers,
-                                       planner_plugin])
-
+                                           
     # RViz
     rviz_config_file = get_package_share_directory('kuka_moveit2') + "/rviz/moveit.rviz"
     rviz_node = Node(package='rviz2',
@@ -91,7 +83,7 @@ def generate_launch_description():
                      node_executable='static_transform_publisher',
                      node_name='static_transform_publisher',
                      output='screen',
-                     arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'world', 'base_iiwa'])
+                     arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'world', 'base_footprint'])
 
     # Fake joint driver
     fake_joint_driver_node = Node(package='fake_joint_driver',
@@ -102,4 +94,8 @@ def generate_launch_description():
                                   output='screen',
                                   )
 
-    return LaunchDescription([ static_tf, rviz_node, fake_joint_driver_node,run_moveit_node ])
+    return LaunchDescription([ static_tf, rviz_node,run_moveit_node,
+     IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([state_publisher_launch_file_dir, '/state_publisher.launch.py']),
+        ),
+        ])

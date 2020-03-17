@@ -17,7 +17,7 @@ def generate_launch_description():
             'rviz',
             'tf3.rviz')
 
-    urdf_file_name = 'kuka_correct.urdf'
+    urdf_file_name = 'kuka_withD435.urdf'
     urdf = os.path.join(
         get_package_share_directory('kuka_bringup'),
         'urdf',

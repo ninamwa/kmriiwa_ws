@@ -230,7 +230,7 @@ private:
   }
 
   void frame_callback(std_msgs::msg::String::SharedPtr msg){
-    RCLCPP_INFO(LOGGER, "Frame Received: %s", *msg);
+    RCLCPP_INFO(LOGGER, "Frame Received: %s", msg->data);
     arm->setGoal(msg->data);
     move();
   }
