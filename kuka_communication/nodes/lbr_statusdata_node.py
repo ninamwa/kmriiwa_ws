@@ -10,6 +10,7 @@ from builtin_interfaces.msg import Time
 from rclpy.qos import qos_profile_sensor_data
 from script.tcpSocket import TCPSocket
 from script.udpSocket import UDPSocket
+from std_msgs.msg import Bool
 
 from rclpy.utilities import remove_ros_args
 import argparse
@@ -23,6 +24,7 @@ class LbrStatusNode(Node):
         super().__init__('lbr_statusdata_node')
         self.name='lbr_statusdata_node'
         self.last_status_timestamp = 0
+        self.path_finished = False
         self.declare_parameter('port')
         port = int(self.get_parameter('port').value)
         if robot == 'KMR1':
@@ -45,7 +47,7 @@ class LbrStatusNode(Node):
 
         # Make Publisher for statusdata
         self.pub_lbr_statusdata = self.create_publisher(LbrStatusdata, 'lbr_statusdata', qos_profile_sensor_data)
-
+        self.pub_path_status = self.create_publisher(Bool, 'path_finished', qos_profile_sensor_data)
 
         while not self.soc.isconnected:
             pass
@@ -55,11 +57,11 @@ class LbrStatusNode(Node):
 
     def run(self):
         while rclpy.ok() and self.soc.isconnected:
-            self.status_callback(self.pub_lbr_statusdata, self.soc.lbr_statusdata)
+            self.status_callback(self.pub_lbr_statusdata,self.pub_path_status, self.soc.lbr_statusdata)
 
 
 
-    def status_callback(self,publisher,data):
+    def status_callback(self,status_publisher, path_publisher, data):
         if data != None:
             msg = LbrStatusdata()
             msg.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
@@ -88,7 +90,11 @@ class LbrStatusNode(Node):
                             msg.lbr_safetystop = True
                         else:
                             msg.lbr_safetystop = False
-                publisher.publish(msg)
+                    elif (split[0] == "PathIsFinished"):
+                        if (split[1] != self.path_finished):
+                            self.path_finished = split[1]
+                            path_publisher(self.path_finished)
+                status_publisher.publish(msg)
 
     def getTimestamp(self,nano):
         t = nano * 10 ** -9

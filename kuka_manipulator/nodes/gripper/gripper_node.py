@@ -22,7 +22,7 @@ from enum import Enum
 def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 
 
-class Msg(Enum):
+class GripperMsg(Enum):
     Activation = b"\x09\x10\x03\xE8\x00\x03\x06\x00\x00\x00\x00\x00\x00\x73\x30"
     ActivationRequest = b"\x09\x03\x07\xD0\x00\x01\x85\xCF"
     ActivationComplete = "09030200005985"
@@ -43,123 +43,115 @@ class GripperNode(Node):
         super().__init__('gripper_node')
         self.name='gripper_node'
         # TODO: change port to NUC
-        #self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
-
-        # Make Publishers for relevant data
-        #self.pub_laserscan1 = self.create_publisher(LaserScan, 'scan', qos_profile_sensor_data)
-
-        self.open_action_server = ActionServer(self,OpenGripper,'open_gripper',self.execute_callback)
+        self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
+        self.activate()
+        print("OK")
+        self.open_action_server = ActionServer(self,OpenGripper,'open_gripper',self.open_gripper_callback)
         self.close_action_server = ActionServer(self, CloseGripper, 'close_gripper', self.close_gripper_callback)
+    
 
-        self.executing = False
-
-    def execute_callback(self, goal_handle):
+    def open_gripper_callback(self, goal_handle):
         self.get_logger().info('Executing goal...')
-
-        while (self.executing):
+        self.open()
+        while (self.isMoving()):
             pass
-
-        goal_handle.succeed()
-        result = OpenGripper.Result()
-        result.success = True
-
-        #result.success = self.getOpenResponse()
-        #if self.self.getOpenResponse() == True:
-        #    goal_handle.succeed()
-        #else:
-        #    goal_handle.canceled()
+        result = OpenGripper.Result() 
+        result.success = self.getOpenResponse()
+        if result.success == True:
+           goal_handle.succeed()
+        else:
+           goal_handle.abort()
         print("OK")
         return result
 
     def close_gripper_callback(self, goal_handle):
         self.get_logger().info('Executing goal...')
-        while (self.executing):
+        self.close()
+        while (self.isMoving()):
             pass
+        
         result = CloseGripper.Result()
         result.success = self.getClosedResponse()
-        if self.getClosedResponse() == True:
-            goal_handle.succeed()
+        if result.success == True:
+           goal_handle.succeed()
         else:
-            goal_handle.canceled()
+           goal_handle.abort()
+        print("OK")
         return result
 
 
     def activate(self):
         # Activation Request
-        self.ser.write(Msg.Activation.value)
+        self.ser.write(GripperMsg.Activation.value)
         data_raw = self.ser.readline()
-        Activated = False
-        while (not Activated):
-            self.ser.write(Msg.ActivationRequest.value)
+        activated = False
+        while (not activated):
+            self.ser.write(GripperMsg.ActivationRequest.value)
             data_raw = self.ser.readline()
             data_string = binascii.hexlify(data_raw).decode()
-            if (data_string == Msg.ActivationComplete.value):
-                Activated = True
+            if (data_string == GripperMsg.ActivationComplete.value):
+                activated = True
                 self.close()
                 self.open()
 
     def close(self):
         # Close the gripper
-        self.ser.write(Msg.CloseRequest.value)
+        self.ser.write(GripperMsg.CloseRequest.value)
         self.ser.readline()
 
     def open(self):
         # Open the gripper full speed and force
-        self.ser.write(Msg.OpenRequest.value)
+        self.ser.write(GripperMsg.OpenRequest.value)
         self.ser.readline()
+
+    def isMoving(self):
+        result=False
+        self.ser.write(GripperMsg.StatusResponse.value)
+        data_raw = self.ser.readline()
+        gObj = self.messageTogObj(str(data_raw))
+        # Not Moving
+        if(gObj==GripperMsg.NOTMOVING.value):
+            result=False
+            print("Not moving")
+        # Moving
+        if(gObj==GripperMsg.MOVING.value):
+            result=True
+            print("Moving")
+        return result
 
     def getClosedResponse(self):
         result = False
-        while (not result):
-            self.ser.write(Msg.StatusResponse.value)
-            data_raw = self.ser.readline()
-            print(data_raw)
-            gObj = self.messageTogObj(str(data_raw))
-            # Not Moving
-            if(gObj==Msg.NOTMOVING.value):
-                result=False
-                print("Not moving")
-            # Moving
-            if(gObj==Msg.MOVING.value):
-                result=False
-                print("Closing")
-            # Closed, no object:
-            if(gObj==Msg.REQUESTEDPOSITION.value):
-                result=False
-                print("No object found while closing")
+        self.ser.write(GripperMsg.StatusResponse.value)
+        data_raw = self.ser.readline()
+        gObj = self.messageTogObj(str(data_raw))
+        # Closed, no object:
+        if(gObj==GripperMsg.REQUESTEDPOSITION.value):
+            result=False
+            print("No object found while closing")
             # Closed, object:
-            if(gObj==Msg.OBJECT_CLOSING.value):
-                result=True
-                print("Object found while closing")
+        if(gObj==GripperMsg.OBJECT_CLOSING.value):
+            result=True
+            print("Object found while closing")
         return result
 
     def getOpenResponse(self):
         result=False
-        while(not result):
-            self.ser.write(Msg.StatusResponse.value)
-            gObj = self.messageTogObj(str(self.ser.readline()))
-            if(gObj==Msg.NOTMOVING.value):
-                result=False
-                print("Not moving")
-            #Moving
-            if (gObj == Msg.MOVING.value):
-                result = False
-                print("Opening")
-            # Collision
-            if (gObj == Msg.OBJECT_OPENING.value):
-                result = False
-                print("Collision")
+        self.ser.write(GripperMsg.StatusResponse.value)
+        gObj = self.messageTogObj(str(self.ser.readline()))
+        # Collision
+        if (gObj == GripperMsg.OBJECT_OPENING.value):
+            result = False
+            print("Collision")
             # Open
-            if (gObj == Msg.REQUESTEDPOSITION.value):
-                result = True
-                print("Open: Requested Position")
+        if (gObj == GripperMsg.REQUESTEDPOSITION.value):
+            result = True
+            print("Open: Requested Position")
         return result
 
 
     def messageTogObj(self, data_string):
         # moving only meaningful if gGTO = 1
         hexa = data_string.split("\\")[4].split("x")[1]
-        print(hexa)
         binary = bin(int(hexa, 16))[2:].zfill(8)
         gGTO = binary[4]
         gObj = 2*int(binary[0]) + 1*int(binary[1])
@@ -172,9 +164,6 @@ def main(args=None):
     gripper_node = GripperNode()
 
     rclpy.spin(gripper_node)
-
-    #while rclpy.ok():
-    #    rclpy.spin_once(odometry_node)
     try:
         gripper_node.destroy_node()
         rclpy.shutdown()

@@ -50,6 +50,7 @@
 #include <moveit/kinematic_constraints/utils.h>
 #include <moveit_msgs/msg/constraints.hpp>
 #include <moveit_msgs/msg/motion_plan_response.hpp>
+#include <std_msgs/msg/string.hpp>
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_cpp_demo");
 
@@ -63,6 +64,7 @@ public:
           "/fake_joint_trajectory_controller/joint_trajectory", 1))
     , goal_pose_subscriber_(node_->create_subscription<geometry_msgs::msg::PoseStamped>(
       "/moveit/goalpose", 10 ,std::bind(&MoveItCppDemo::goalpose_callback, this, std::placeholders::_1)))
+    , frame_subscriber_(node_->create_subscription<std_msgs::msg::String>("/moveit/frame",10,std::bind(&MoveItCppDemo::frame_callback, this, std::placeholders::_1)))
   {
   }
 
@@ -80,17 +82,9 @@ public:
 
     // Create collision object, planning shouldn't be too easy
     moveit_msgs::msg::CollisionObject collision_object;
-    collision_object.header.frame_id = "base_iiwa";
+    collision_object.header.frame_id = "base_footprint";
     collision_object.id = "box";
 
-
-    shape_msgs::msg::SolidPrimitive mobile_base;
-    mobile_base.type = mobile_base.BOX;
-    mobile_base.dimensions = { 1.08, 0.63, 0.085 };
-    geometry_msgs::msg::Pose mobile_base_pose;
-    mobile_base_pose.position.x = 0.0;
-    mobile_base_pose.position.y = 0.15;
-    mobile_base_pose.position.z = -0.04225;
 
     shape_msgs::msg::SolidPrimitive box;
     box.type = box.BOX;
@@ -99,7 +93,7 @@ public:
     geometry_msgs::msg::Pose box_pose;
     box_pose.position.x = -0.05;
     box_pose.position.y = 0.0;
-    box_pose.position.z = 0.6;
+    box_pose.position.z = 1.0;
 
     shape_msgs::msg::SolidPrimitive box2;
     box2.type = box2.BOX;
@@ -108,7 +102,7 @@ public:
     geometry_msgs::msg::Pose box2_pose;
     box2_pose.position.x = 0.0;
     box2_pose.position.y = 0.15;
-    box2_pose.position.z = 0.55;
+    box2_pose.position.z = 1.0;
 
     shape_msgs::msg::SolidPrimitive box3;
     box3.type = box3.BOX;
@@ -117,10 +111,9 @@ public:
     geometry_msgs::msg::Pose box3_pose;
     box3_pose.position.x = 0.0;
     box3_pose.position.y = 0.40;
-    box3_pose.position.z = 0.6;
+    box3_pose.position.z = 1.0;
 
-    //collision_object.primitives.push_back(mobile_base);
-    //collision_object.primitive_poses.push_back(mobile_base);
+
     collision_object.primitives.push_back(box);
     collision_object.primitive_poses.push_back(box_pose);
     collision_object.primitives.push_back(box2);
@@ -175,7 +168,7 @@ public:
 
 
     // Set joint state goal
-    //RCLCPP_INFO(LOGGER, "Set goal");
+    RCLCPP_INFO(LOGGER, "Set goal");
     //arm.setGoal("pose1");
 
     geometry_msgs::msg::PoseStamped pose_msg;
@@ -194,28 +187,6 @@ public:
     pose.pose.position.y = 0.4;
     pose.pose.position.z = 0.9;
     pose.pose.orientation.w = 1.0;
-
-    // Quaternion quat = ToQuaternion(0,0,0);
-    // printf("%f,%f,%f,%f", quat.w,quat.x,quat.y,quat.z);
-    // pose_msg.pose.orientation.w= quat.w;
-    // pose_msg.pose.orientation.x = quat.x;
-    // pose_msg.pose.orientation.y= quat.y;
-    // pose_msg.pose.orientation.z = quat.z; 
-
-    //arm.setGoal(pose_msg,"tool0");
-
-    // Run actual plan
-    // RCLCPP_INFO(LOGGER, "Plan to goal");
-    // const auto plan_solution = arm.plan();
-    // if (plan_solution)
-    // {
-    //   visualizeTrajectory(*plan_solution.trajectory);
-
-    //   RCLCPP_INFO(LOGGER, "Sending the trajectory for execution");
-    //   moveit_msgs::msg::RobotTrajectory robot_trajectory;
-    //   plan_solution.trajectory->getRobotTrajectoryMsg(robot_trajectory);
-    //   trajectory_publisher_->publish(robot_trajectory.joint_trajectory);
-    // }
   }
 struct Quaternion
 {
@@ -258,12 +229,40 @@ private:
     }
   }
 
+  void frame_callback(std_msgs::msg::String::SharedPtr msg){
+    RCLCPP_INFO(LOGGER, "Frame Received: %s", *msg);
+    arm->setGoal(msg->data);
+    move();
+  }
+
   void goalpose_callback(geometry_msgs::msg::PoseStamped::SharedPtr msg)
   {
+/*     ::planning_interface::MotionPlanRequest req;
+    moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
+    start_state->update();
+    moveit::core::robotStateToRobotStateMsg(*start_state, req.start_state);
+    {
+      planning_scene_monitor::LockedPlanningSceneRW scene(moveit_cpp_->getPlanningSceneMonitor());
+      scene->setCurrentState(*start_state);
+    } */
     RCLCPP_INFO(LOGGER, "GoalPose Received: %f, %f, %f", msg->pose.position.x,msg->pose.position.y,msg->pose.position.z);
     arm->setGoal(*msg,"tool0");
+    move();
+    
+  }
+
+  void move(){
     RCLCPP_INFO(LOGGER, "Plan to goal");
-    const auto plan_solution = arm->plan();
+
+    default_parameters.planning_attempts = 1;
+    default_parameters.planning_time = 5.0;
+    default_parameters.max_velocity_scaling_factor = 0.4;
+    default_parameters.max_acceleration_scaling_factor = 0.4;
+
+    planning_pipeline_names = moveit_cpp_->getPlanningPipelineNames("manipulator");
+    if (!planning_pipeline_names.empty())
+      default_parameters.planning_pipeline = *planning_pipeline_names.begin();
+    const auto plan_solution = arm->plan(default_parameters);
     if (plan_solution)
     {
       visualizeTrajectory(*plan_solution.trajectory);
@@ -279,8 +278,11 @@ private:
   rclcpp::Publisher<moveit_msgs::msg::DisplayRobotState>::SharedPtr robot_state_publisher_;
   rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr trajectory_publisher_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pose_subscriber_;
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr frame_subscriber_;
   moveit::planning_interface::MoveItCppPtr moveit_cpp_;
   std::shared_ptr<moveit::planning_interface::PlanningComponent> arm;
+  std::set<std::string> planning_pipeline_names;
+  moveit::planning_interface::PlanningComponent::PlanRequestParameters default_parameters;
 };
 
 
