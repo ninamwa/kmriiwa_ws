@@ -65,12 +65,10 @@ install(
 # Install python scripts
 install(
   PROGRAMS
-    nodes/manipulator_node.py
-    nodes/client.py
-    nodes/server.py
-    nodes/gripper/gripper_node.py
     script/errorcodes.py
     script/gripper_msgs.py
+    nodes/manipulator_node.py
+    nodes/gripper/gripper_node.py
     DESTINATION lib/${PROJECT_NAME}
 )
 
