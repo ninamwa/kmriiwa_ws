@@ -35,6 +35,39 @@
         <joint name="joint_a6" value="0" />
         <joint name="joint_a7" value="0" />
     </group_state>
+
+    <group_state name="frame1" group="manipulator">
+        <joint name="joint_a1" value="0" />
+        <joint name="joint_a2" value="-0.785" />
+        <joint name="joint_a3" value="0.5" />
+        <joint name="joint_a4" value="0.0" />
+        <joint name="joint_a5" value="0" />
+        <joint name="joint_a6" value="0" />
+        <joint name="joint_a7" value="0" />
+    </group_state>
+
+    <group_state name="frame2" group="manipulator">
+        <joint name="joint_a1" value="0" />
+        <joint name="joint_a2" value="-0.785" />
+        <joint name="joint_a3" value="0.5" />
+        <joint name="joint_a4" value="0.0" />
+        <joint name="joint_a5" value="0" />
+        <joint name="joint_a6" value="0" />
+        <joint name="joint_a7" value="0" />
+    </group_state>
+
+    <group_state name="frame3" group="manipulator">
+        <joint name="joint_a1" value="0" />
+        <joint name="joint_a2" value="-0.785" />
+        <joint name="joint_a3" value="0.5" />
+        <joint name="joint_a4" value="0.0" />
+        <joint name="joint_a5" value="0" />
+        <joint name="joint_a6" value="0" />
+        <joint name="joint_a7" value="0" />
+    </group_state>
+
+
+
      <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="endeffector" parent_link="tool0" group="endeffector"/>
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
@@ -63,4 +96,21 @@
     <disable_collisions link1="link_5" link2="link_6" reason="Adjacent" />
     <disable_collisions link1="link_5" link2="link_7" reason="Never" />
     <disable_collisions link1="link_6" link2="link_7" reason="Adjacent" />
+
+
+    <disable_collisions link1="link_7" link2="gripper_base_link" reason="Never" />
+    <disable_collisions link1="left_outer_knuckle" link2="left_outer_finger" reason="Never" />
+    <disable_collisions link1="right_outer_knuckle" link2="right_outer_finger" reason="Never" />
+    <disable_collisions link1="gripper_base_link" link2="right_outer_knuckle" reason="Never" />
+    <disable_collisions link1="gripper_base_link" link2="left_outer_knuckle" reason="Never" />
+    <disable_collisions link1="left_inner_finger" link2="left_inner_finger_pad" reason="Never" />
+    <disable_collisions link1="right_inner_finger" link2="right_inner_finger_pad" reason="Never" />
+    <disable_collisions link1="left_inner_finger" link2="left_outer_finger" reason="Never" />
+    <disable_collisions link1="right_inner_finger" link2="right_outer_finger" reason="Never" />
+    <disable_collisions link1="left_inner_finger" link2="left_inner_knuckle" reason="Never" />
+    <disable_collisions link1="right_inner_finger" link2="right_inner_knuckle" reason="Never" />
+    <disable_collisions link1="gripper_base_link" link2="right_inner_knuckle" reason="Never" />
+    <disable_collisions link1="gripper_base_link" link2="left_inner_knuckle" reason="Never" />
+
+
 </robot>
