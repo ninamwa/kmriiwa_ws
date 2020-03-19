@@ -69,17 +69,18 @@ class GripperNode(Node):
 
     def activate(self):
         # Activation Request
-        self.ser.write(GripperMsg.Activation.value)
+        self.ser.write(GripperMsg.ActivationRequest.value)
         data_raw = self.ser.readline()
         activated = False
         while (not activated):
-            self.ser.write(GripperMsg.ActivationRequest.value)
-            data_raw = self.ser.readline()
-            data_string = binascii.hexlify(data_raw).decode()
-            if (data_string == GripperMsg.ActivationComplete.value):
+            self.ser.write(GripperMsg.ActivationStatusRequest.value)
+            gSTA  = self.response_to_value(str(self.ser.readline()),2,3)
+            if (gSTA == GripperMsg.ACTIVATIONCOMPLETE.value):
                 activated = True
                 self.close()
                 self.open()
+            if (gSTA == GripperMsg.ACTIVATIONINPROGRESS.value):
+                print("Gripper activation in progress...")
 
     def close(self):
         # Close the gripper
@@ -93,58 +94,59 @@ class GripperNode(Node):
 
     def isMoving(self):
         result=False
-        self.ser.write(GripperMsg.StatusResponse.value)
-        data_raw = self.ser.readline()
-        gObj = self.messageTogObj(str(data_raw))
+        self.ser.write(GripperMsg.MotionStatusRequest.value)
+        gOBJ = self.response_to_value(str(self.ser.readline()),0,1)
         # Not Moving
-        if(gObj==GripperMsg.NOTMOVING.value):
+        if(gOBJ==GripperMsg.NOTMOVING.value):
             result=False
             print("Not moving")
         # Moving
-        if(gObj==GripperMsg.MOVING.value):
+        if(gOBJ==GripperMsg.MOVING.value):
             result=True
             print("Moving")
         return result
 
     def getClosedResponse(self):
         result = False
-        self.ser.write(GripperMsg.StatusResponse.value)
-        data_raw = self.ser.readline()
-        gObj = self.messageTogObj(str(data_raw))
+        self.ser.write(GripperMsg.MotionStatusRequest.value)
+        gOBJ = self.response_to_value(str(self.ser.readline()),0,1)
         # Closed, no object:
-        if(gObj==GripperMsg.REQUESTEDPOSITION.value):
+        if(gOBJ==GripperMsg.REQUESTEDPOSITION.value):
             result=False
             print(ErrorCodes.NO_OBJECT)
             # Closed, object:
-        if(gObj==GripperMsg.OBJECT_CLOSING.value):
+        if(gOBJ==GripperMsg.OBJECT_CLOSING.value):
             result=True
             print(ErrorCodes.OBJECT_FOUND)
         return result
 
     def getOpenResponse(self):
         result=False
-        self.ser.write(GripperMsg.StatusResponse.value)
-        gObj = self.messageTogObj(str(self.ser.readline()))
+        self.ser.write(GripperMsg.MotionRequest.value)
+        gOBJ = self.response_to_value(str(self.ser.readline()),0,1)
         # Collision
-        if (gObj == GripperMsg.OBJECT_OPENING.value):
+        if (gOBJ == GripperMsg.OBJECT_OPENING.value):
             result = False
             print(ErrorCodes.COLLISION)
             # Open
-        if (gObj == GripperMsg.REQUESTEDPOSITION.value):
+        if (gOBJ == GripperMsg.REQUESTEDPOSITION.value):
             result = True
             print(ErrorCodes.OPEN)
         return result
 
 
-    def messageTogObj(self, data_string):
+    def response_to_value(self,data_string,bit1,bit2):
         # moving only meaningful if gGTO = 1
         hexa = data_string.split("\\")[4].split("x")[1]
         binary = bin(int(hexa, 16))[2:].zfill(8)
-        gGTO = binary[4]
-        gObj = 2*int(binary[0]) + 1*int(binary[1])
-        if (gObj==0 and gGTO!=1):
-            gObj=-1
-        return gObj
+        value = 2*int(binary[bit1]) + 1*int(binary[bit2])
+        # for gOBJ:
+        if(bit1==0 and bit2==1):
+            gGTO = binary[4]
+            if (value==0 and gGTO!=1):
+                value=-1
+        return value
+
 
 def main(args=None):
     rclpy.init(args=args)
