@@ -51,6 +51,8 @@
 #include <moveit_msgs/msg/constraints.hpp>
 #include <moveit_msgs/msg/motion_plan_response.hpp>
 #include <std_msgs/msg/string.hpp>
+#include <kuka_manipulator/action/drive_to_frame.hpp>
+#include "rclcpp_action/rclcpp_action.hpp"
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_cpp_demo");
 
@@ -65,6 +67,15 @@ public:
     , goal_pose_subscriber_(node_->create_subscription<geometry_msgs::msg::PoseStamped>(
       "/moveit/goalpose", 10 ,std::bind(&MoveItCppDemo::goalpose_callback, this, std::placeholders::_1)))
     , frame_subscriber_(node_->create_subscription<std_msgs::msg::String>("/moveit/frame",10,std::bind(&MoveItCppDemo::frame_callback, this, std::placeholders::_1)))
+    , action_server_(rclcpp_action::create_server<kuka_manipulator::action::DriveToFrame>(
+      node_->get_node_base_interface(),
+      node_->get_node_clock_interface(),
+      node_->get_node_logging_interface(),
+      node_->get_node_waitables_interface(),
+      "/moveit/frame",
+      std::bind(&MoveItCppDemo::handle_goal, this,  std::placeholders::_1,  std::placeholders::_2),
+      std::bind(&MoveItCppDemo::handle_cancel, this,  std::placeholders::_1),
+      std::bind(&MoveItCppDemo::handle_accepted, this,  std::placeholders::_1)))
   {
   }
 
@@ -127,7 +138,6 @@ public:
       planning_scene_monitor::LockedPlanningSceneRW scene(moveit_cpp_->getPlanningSceneMonitor());
       //scene->processCollisionObjectMsg(collision_object);
     }  // Unlock PlanningScene
-
     robot_model_loader::RobotModelLoader robot_model_loader(node_,"robot_description",true);
     robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
     RCLCPP_INFO(LOGGER,"Model frame: %s", kinematic_model->getModelFrame().c_str());
@@ -142,12 +152,11 @@ public:
     {
       RCLCPP_INFO(LOGGER,"Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
     }
-
-
-    kinematic_state->setToRandomPositions(joint_model_group);
+  
+    /* kinematic_state->setToRandomPositions(joint_model_group);
     const Eigen::Isometry3d& end_effector_state = kinematic_state->getGlobalLinkTransform("tool0");
 
-    //* Print end-effector pose. Remember that this is in the model frame *//*
+     Print end-effector pose. Remember that this is in the model frame
     RCLCPP_INFO(LOGGER,"Translation: %f, %f, %f " ,end_effector_state.translation()[0],end_effector_state.translation()[1],end_effector_state.translation()[2]);
     //RCLCPP_INFO(LOGGER,"Rotation: \n" << end_effector_state.rotation() << "\n");
     double timeout = 0.1;
@@ -164,7 +173,7 @@ public:
     {
       RCLCPP_INFO(LOGGER,"Did not find IK solution");
     }
-
+ */
 
 
     // Set joint state goal
@@ -173,9 +182,9 @@ public:
 
     geometry_msgs::msg::PoseStamped pose_msg;
     pose_msg.header.frame_id = "base_iiwa";
-    pose_msg.pose.position.x = 0.3;
-    pose_msg.pose.position.y = 0.4;
-    pose_msg.pose.position.z = 0.0;
+    pose_msg.pose.position.x = -0.1;
+    pose_msg.pose.position.y = -0.5;
+    pose_msg.pose.position.z = 0.5;
     pose_msg.pose.orientation.w = 0.0;
     pose_msg.pose.orientation.x = 1.0;
     pose_msg.pose.orientation.y= 0.0;
@@ -187,30 +196,33 @@ public:
     pose.pose.position.y = 0.4;
     pose.pose.position.z = 0.9;
     pose.pose.orientation.w = 1.0;
-  }
-struct Quaternion
-{
-    double w, x, y, z;
-};
 
-    Quaternion ToQuaternion(double yaw, double pitch, double roll) // yaw (Z), pitch (Y), roll (X)
+    //arm->setGoal(pose_msg,"gripper_base_link");
+    arm->setGoal("home");
+    MoveItCppDemo::move();
+    rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
+    
+    moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
+    start_state->copyJointGroupPositions(joint_model_group, joint_values);
+    for (std::size_t i = 0; i < joint_names.size(); ++i)
     {
-        // Abbreviations for the various angular functions
-        double cy = cos(yaw * 0.5);
-        double sy = sin(yaw * 0.5);
-        double cp = cos(pitch * 0.5);
-        double sp = sin(pitch * 0.5);
-        double cr = cos(roll * 0.5);
-        double sr = sin(roll * 0.5);
+      RCLCPP_INFO(LOGGER,"Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+    }
 
-        Quaternion q;
-        q.w = cy * cp * cr + sy * sp * sr;
-        q.x = cy * cp * sr - sy * sp * cr;
-        q.y = sy * cp * sr + cy * sp * cr;
-        q.z = sy * cp * cr - cy * sp * sr;
+    arm->setGoal("search_1");
+    MoveItCppDemo::move();
+    rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
 
-        return q;
-    };
+    arm->setGoal("search_2");
+    MoveItCppDemo::move();
+
+    rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
+
+    arm->setGoal("search_3");
+    MoveItCppDemo::move();
+    
+  }
+
 private:
   void visualizeTrajectory(const robot_trajectory::RobotTrajectory& trajectory)
   {
@@ -274,6 +286,78 @@ private:
     }
   }
 
+  rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID & uuid,std::shared_ptr<const kuka_manipulator::action::DriveToFrame::Goal> goal)
+  {
+    RCLCPP_INFO(LOGGER, "Received request to move to: %s", goal->frame);
+    (void)uuid;
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  }
+
+  rclcpp_action::CancelResponse handle_cancel(
+    const std::shared_ptr<rclcpp_action::ServerGoalHandle<kuka_manipulator::action::DriveToFrame>> goal_handle)
+  {
+    RCLCPP_INFO(LOGGER, "Received request to cancel goal");
+    (void)goal_handle;
+    return rclcpp_action::CancelResponse::ACCEPT;
+  }
+  void handle_accepted(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kuka_manipulator::action::DriveToFrame>> goal_handle)
+  {
+    std::thread{std::bind(&MoveItCppDemo::execute, this, std::placeholders::_1), goal_handle}.detach();
+  }
+
+   void execute(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kuka_manipulator::action::DriveToFrame>> goal_handle)
+  {
+    RCLCPP_INFO(LOGGER, "Executing goal");
+    rclcpp::Rate loop_rate(1);
+    const auto goal = goal_handle->get_goal();
+    
+    auto result = std::make_shared<kuka_manipulator::action::DriveToFrame::Result>();
+
+    arm->setGoal(goal->frame);
+    RCLCPP_INFO(LOGGER, "Plan to goal");
+    default_parameters.planning_attempts = 1;
+    default_parameters.planning_time = 5.0;
+    default_parameters.max_velocity_scaling_factor = 0.4;
+    default_parameters.max_acceleration_scaling_factor = 0.4;
+    planning_pipeline_names = moveit_cpp_->getPlanningPipelineNames("manipulator");
+    if (!planning_pipeline_names.empty())
+      default_parameters.planning_pipeline = *planning_pipeline_names.begin();
+    const auto plan_solution = arm->plan(default_parameters);
+
+    // Check if there is a cancel request
+    if (goal_handle->is_canceling()) {
+      goal_handle->canceled(result);
+      RCLCPP_INFO(LOGGER, "Goal Canceled");
+      return;
+    }
+
+    if (plan_solution)
+    {
+      // Check if goal is done
+      if (rclcpp::ok()) {
+        result->success = true;
+        result->frame = goal->frame;
+        goal_handle->succeed(result);
+        RCLCPP_INFO(LOGGER, "Goal Succeeded");
+      }
+
+      visualizeTrajectory(*plan_solution.trajectory);
+
+      RCLCPP_INFO(LOGGER, "Sending the trajectory for execution");
+      moveit_msgs::msg::RobotTrajectory robot_trajectory;
+      plan_solution.trajectory->getRobotTrajectoryMsg(robot_trajectory);
+      trajectory_publisher_->publish(robot_trajectory.joint_trajectory);
+    }
+    else{
+        result->success = false;
+        result->frame = goal->frame;
+        goal_handle->abort(result);
+        RCLCPP_INFO(LOGGER, "Goal Failed - Planning Failed");
+
+    }
+  
+  }
+
   rclcpp::Node::SharedPtr node_;
   rclcpp::Publisher<moveit_msgs::msg::DisplayRobotState>::SharedPtr robot_state_publisher_;
   rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr trajectory_publisher_;
@@ -283,6 +367,7 @@ private:
   std::shared_ptr<moveit::planning_interface::PlanningComponent> arm;
   std::set<std::string> planning_pipeline_names;
   moveit::planning_interface::PlanningComponent::PlanRequestParameters default_parameters;
+  rclcpp_action::Server<kuka_manipulator::action::DriveToFrame>::SharedPtr action_server_;
 };
 
 

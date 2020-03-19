@@ -27,6 +27,8 @@
 
   <build_depend>tf2</build_depend>
   <exec_depend>tf2</exec_depend>
+  <depend>kuka_manipulator</depend>
+  <depend>rclcpp_action</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

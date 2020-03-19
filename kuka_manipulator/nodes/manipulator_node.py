@@ -7,12 +7,12 @@ import sys
 import math
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 from geometry_msgs.msg import Pose, PoseStamped
 from builtin_interfaces.msg import Time
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.action import ActionClient
-from kuka_manipulator.action import OpenGripper, CloseGripper, ObjectSearch
+from kuka_manipulator.action import OpenGripper, CloseGripper, ObjectSearch, DriveToFrame
 from kuka_communication.msg import LbrStatusdata
 from functools import partial
 
@@ -28,32 +28,48 @@ class ManipulatorNode(Node):
 
       
         self.pub_moveit_pose = self.create_publisher(PoseStamped, '/moveit/goalpose', qos_profile_sensor_data)
-        self.pub_moveit_frame = self.create_publisher(String, '/moveit/frame', qos_profile_sensor_data)
 
-        sub_path_finished = self.create_subscription(LbrStatusdata,'/path_finished',self.path_finished_callback, qos_profile_sensor_data)
+        sub_path_finished = self.create_subscription(Bool,'/path_finished',self.path_finished_callback, qos_profile_sensor_data)
+        sub_navgoal_reached= self.create_subscription(Bool,'/navgoal_reached',self.navgoal_callback, qos_profile_sensor_data)
         self.opengripper_action_client = ActionClient(self, OpenGripper, 'open_gripper')
         self.closegripper_action_client = ActionClient(self, CloseGripper, 'close_gripper')
         self.camera_search_action_client = ActionClient(self, ObjectSearch, 'camera_object_search')
+        self.drivetoframe_action_client = ActionClient(self, DriveToFrame, '/moveit/frame')
 
         self.gripperStatus = "OPEN"
         self.hasObject = False
         self.pathFinished = False
 
-        self.frame1 = None
-        self.frame2 = None
-        self.frame3 =  None
-     
-        thread.start_new_thread( self.send_close_gripper_goal, ())
-        time.sleep(10)
-        thread.start_new_thread( self.send_open_gripper_goal, ())
+        self.frame1_busy = False
+        self.frame2_busy = False
+        self.frame3_busy =  False
+
+        self.search_counter = 0
+        self.send_new_navgoal = False
     
 
+    #TODO: Hvordan skal det gjøres når noe skal plukkes AV roboten??? 
+    #TODO: Håntere hva vi gjør i retry() - bevege robot litt bakover og prøve igjen, how? 
+    #TODO: Feilhåndtering dersom kamera ikke oppdager noe objekt
+    #TODO: Lage en standard path som armen beveger seg i mens den ser etter object
+    #TODO: Lage metode for å sende nytt NAV GOAL. 
+
+    def navgoal_callback(self,data):
+        if data.data == True:
+            self.search_counter = 0
+            self.send_drivetoframe_goal("search_1")
+
     def path_finished_callback(self,data):
-        self.pathFinished = data
-        if self.pathFinished and self.hasObject: 
-            self.send_open_gripper_goal()
-        elif self.pathFinished and not self.hasObject:
-            self.send_close_gripper_goal()
+        self.pathFinished = data.data
+
+        if self.send_new_navgoal:
+            #SEND NY NAV_GOAL
+            self.send_new_navgoal = False
+        else:
+            if self.pathFinished and self.hasObject: 
+                self.send_open_gripper_goal()
+            elif self.pathFinished and not self.hasObject:
+                self.send_close_gripper_goal()
            
     def send_open_gripper_goal(self):
         print("Open gripper goal")
@@ -84,19 +100,42 @@ class ManipulatorNode(Node):
         self.get_logger().info('Result: {0}'.format(result.success))
         if type == "open" and result.success:
             self.gripperStatus = "OPEN"
+            self.hasObject = False
+            self.send_drivetoframe_goal("drive_frame")
         elif type == "close" and result.success:
             self.gripperStatus = "CLOSED"
             self.hasObject = True
-            self.driveToFrame()
+            self.send_drivetoframe_goal(None)
         elif type == "close" and not result.success:
             self.gripperStatus = "CLOSED"
             self.hasObject = False
             self.retry()
         elif type == "objectsearch" and result.success:
             self.pub_moveit_pose.publish(result.pose)
+            self.search_counter = 0
         elif type == "objectsearch" and not result.success:
-            t=0
-            #Håntere hva vi gjør hvis kamera ikke finner object
+            if self.search_counter < 3:
+                goal = "search_" + str(self.search_counter+1)
+                self.send_drivetoframe_goal(goal)
+            else:
+                self.send_drivetoframe_goal("drive_frame")
+        elif type == "drivetoframe" and result.success:
+            if result.frame == "frame1":
+                self.frame1_busy=True
+            elif result.frame == "frame2":
+                self.frame2_busy=True
+            elif result.frame == "frame3":
+                self.frame3_busy=True
+            elif result.frame == "drive_frame":
+                self.send_new_navgoal = True
+        elif type=="drivetoframe" and not result.success:
+            #Was not possible to create plan - put object down and continue. 
+            self.send_open_gripper_goal()
+            print(cl_red('Error: ') + "Was to able to plan to desired frame")
+        elif type=="drivetoframe_search" and result.success:
+            self.search_counter += 1
+            self.send_objectsearch_goal()
+
         
     
 
@@ -111,20 +150,29 @@ class ManipulatorNode(Node):
             #Be Moveit gå litt bakover
             self.send_objectsearch_goal()
 
-    def driveToFrame(self):
-        if self.frame1 == None:
-            frame = "frame1"
-        elif self.frame2 == None:
-            frame = "frame2"
-        elif self.frame3 == None:
-            frame = "frame3"
+    def send_drivetoframe_goal(self,goal):
+        print("DriveToFrame goal")
+        type = "drivetoframe"
+        goal_msg = DriveToFrame.Goal()
+        if goal == "drive_frame":
+            goal_msg.frame = goal
+        elif goal.split("_")[0] == "search":
+            goal_msg.frame = goal
+            type = type + "_search"
         else:
-            frame=None
-            #Håndtere hvis ingen er tomme
-        self.pub_moveit_pose.publish(frame)
-        ##Når settes disse til å ikke være NONE ?? 
-        
-
+            if self.frame1_busy == False:
+                goal_msg.frame = "frame1"
+            elif self.frame2_busy == False:
+                goal_msg.frame = "frame2"
+            elif self.frame3_busy == False:
+                goal_msg.frame = "frame3"
+            else:
+                #If no frame is empty, the gripper should open and leave the object in the same place
+                self.send_open_gripper_goal()
+                return
+        self.drivetoframe_action_client.wait_for_server()
+        self._send_goal_future = self.drivetoframe_action_client.send_goal_async(goal_msg)
+        self._send_goal_future.add_done_callback(partial(self.goal_response_callback, type="drivetoframe"))
 
     def getTimestamp(self,nano):
         t = nano * 10 ** -9

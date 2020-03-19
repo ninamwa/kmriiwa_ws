@@ -114,11 +114,11 @@ class GripperNode(Node):
         # Closed, no object:
         if(gObj==GripperMsg.REQUESTEDPOSITION.value):
             result=False
-            print("No object found while closing")
+            print(ErrorCodes.NO_OBJECT)
             # Closed, object:
         if(gObj==GripperMsg.OBJECT_CLOSING.value):
             result=True
-            print("Object found while closing")
+            print(ErrorCodes.OBJECT_FOUND)
         return result
 
     def getOpenResponse(self):
@@ -128,11 +128,11 @@ class GripperNode(Node):
         # Collision
         if (gObj == GripperMsg.OBJECT_OPENING.value):
             result = False
-            print("Collision")
+            print(ErrorCodes.COLLISION)
             # Open
         if (gObj == GripperMsg.REQUESTEDPOSITION.value):
             result = True
-            print("Open: Requested Position")
+            print(ErrorCodes.OPEN)
         return result
 
 
