@@ -1,4 +1,4 @@
-# kuka_ws
+# kmriiwa_ws
 
 Repository for specialization project in Robotics & Automation, at NTNU Fall 2019, by Charlotte Heggem and Nina Marie Wahl. 
 
