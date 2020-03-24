@@ -120,6 +120,7 @@
   </collision>
 </link>
 
+
   <joint name="laser_B1_joint" type="fixed">
           <parent link="base_link" />
           <child link="laser_B1_link" />
@@ -743,5 +744,101 @@
       <axis xyz="1 0 0" />
       <limit lower="0" upper="0.8" velocity="2.0" effort="1000" />
     </joint>
+
+    <link name="gripper_middle_point">
+
+
+    <material name="aluminum">
+      <color rgba="0.5 0.5 0.5 1"/>
+    </material>
+    <!-- camera body, with origin at bottom screw mount -->
+    <joint name="camera_joint2" type="fixed">
+      <origin xyz="0.483 0.0 0.2625" rpy="0 0 0"/>
+      <parent link="base_link_top"/>
+      <child link="camera_link" />
+    </joint>
+
+    <link name="camera_link">
+      <visual>
+      <origin xyz="0.0149 0.0 0.0125" rpy="1.570796 0 1.570796"/>
+        <geometry>
+	        <mesh filename="package://kuka_bringup/meshes/sensors/visual/d435.dae" />
+        </geometry>
+        <material name="aluminum"/>
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0125" rpy="0 0 0"/>
+        <geometry>
+        <box size="0.02505 0.090 0.025"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <!-- The following are not reliable values, and should not be used for modeling -->
+        <mass value="0.564" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.003881243" ixy="0.0" ixz="0.0" iyy="0.000498940" iyz="0.0" izz="0.003879257" />
+      </inertial>
+    </link>
+   
+    <!-- camera depth joints and links -->
+    <joint name="camera_depth_joint" type="fixed">
+      <origin xyz="0.0149 -0.0075 0.0125" rpy="0 0 0"/>
+      <parent link="camera_link"/>
+      <child link="camera_depth_frame" />
+    </joint>
+    <link name="camera_depth_frame"/>
+
+    <joint name="camera_depth_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
+      <parent link= "camera_depth_frame" />
+      <child link="camera_depth_optical_frame" />
+    </joint>
+    <link name="camera_depth_optical_frame"/>
+      
+    <!-- camera left IR joints and links -->
+    <joint name="camera_left_ir_joint" type="fixed">
+      <origin xyz="0 -0.025 0" rpy="0 0 0" />
+      <parent link="camera_depth_frame" />
+      <child link="camera_left_ir_frame" />
+    </joint>
+    <link name="camera_left_ir_frame"/>
+
+    <joint name="camera_left_ir_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
+      <parent link="camera_left_ir_frame" />
+      <child link="camera_left_ir_optical_frame" />
+    </joint>
+    <link name="camera_left_ir_optical_frame"/>
+
+    <!-- camera right IR joints and links -->
+    <joint name="camera_right_ir_joint" type="fixed">
+      <origin xyz="0 0.025 0" rpy="0 0 0" />
+      <parent link="camera_depth_frame" />
+      <child link="camera_right_ir_frame" />
+    </joint>
+    <link name="camera_right_ir_frame"/>
+
+    <joint name="camera_right_ir_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
+      <parent link="camera_right_ir_frame" />
+      <child link="camera_right_ir_optical_frame" />
+    </joint>
+    <link name="camera_right_ir_optical_frame"/>
+
+    <!-- camera fisheye joints and links -->
+    <joint name="camera_fisheye_joint" type="fixed">
+      <origin xyz="0 0.040 0" rpy="0 0 0" />
+      <parent link="camera_depth_frame" />
+      <child link="camera_fisheye_frame" />
+    </joint>
+    <link name="camera_fisheye_frame"/>
+
+    <joint name="camera_fisheye_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
+      <parent link="camera_fisheye_frame" />
+      <child link="camera_fisheye_optical_frame" />
+    </joint>
+    <link name="camera_fisheye_optical_frame"/>
+
 
 </robot>
