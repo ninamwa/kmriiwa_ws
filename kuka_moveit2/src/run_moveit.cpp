@@ -124,19 +124,31 @@ public:
     box3_pose.position.y = 0.40;
     box3_pose.position.z = 1.0;
 
+    shape_msgs::msg::SolidPrimitive snus;
+    snus.type = snus.CYLINDER;
+    snus.dimensions = {0.01, 0.03};
 
-    collision_object.primitives.push_back(box);
-    collision_object.primitive_poses.push_back(box_pose);
-    collision_object.primitives.push_back(box2);
-    collision_object.primitive_poses.push_back(box2_pose);
+    geometry_msgs::msg::Pose snus_pose;
+    snus_pose.position.x = -0.2;
+    snus_pose.position.y = 0.0;
+    snus_pose.position.z = 0.6;
+
+  
+
+    // collision_object.primitives.push_back(box);
+    // collision_object.primitive_poses.push_back(box_pose);
+    // collision_object.primitives.push_back(box2);
+    // collision_object.primitive_poses.push_back(box2_pose);
     //collision_object.primitives.push_back(box3);
     //collision_object.primitive_poses.push_back(box3_pose);
+    collision_object.primitives.push_back(snus);
+    collision_object.primitive_poses.push_back(snus_pose);
     collision_object.operation = collision_object.ADD;
 
     // Add object to planning scene
     {  // Lock PlanningScene
       planning_scene_monitor::LockedPlanningSceneRW scene(moveit_cpp_->getPlanningSceneMonitor());
-      //scene->processCollisionObjectMsg(collision_object);
+      scene->processCollisionObjectMsg(collision_object);
     }  // Unlock PlanningScene
     robot_model_loader::RobotModelLoader robot_model_loader(node_,"robot_description",true);
     robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
@@ -153,27 +165,6 @@ public:
       RCLCPP_INFO(LOGGER,"Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
     }
   
-    /* kinematic_state->setToRandomPositions(joint_model_group);
-    const Eigen::Isometry3d& end_effector_state = kinematic_state->getGlobalLinkTransform("tool0");
-
-     Print end-effector pose. Remember that this is in the model frame
-    RCLCPP_INFO(LOGGER,"Translation: %f, %f, %f " ,end_effector_state.translation()[0],end_effector_state.translation()[1],end_effector_state.translation()[2]);
-    //RCLCPP_INFO(LOGGER,"Rotation: \n" << end_effector_state.rotation() << "\n");
-    double timeout = 0.1;
-    bool found_ik = kinematic_state->setFromIK(joint_model_group, end_effector_state, timeout);
-    if (found_ik)
-    {
-      kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
-      for (std::size_t i = 0; i < joint_names.size(); ++i)
-      {
-        RCLCPP_INFO(LOGGER,"Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
-      }
-    }
-    else
-    {
-      RCLCPP_INFO(LOGGER,"Did not find IK solution");
-    }
- */
 
 
     // Set joint state goal
@@ -181,14 +172,15 @@ public:
     //arm.setGoal("pose1");
 
     geometry_msgs::msg::PoseStamped pose_msg;
-    pose_msg.header.frame_id = "base_iiwa";
-    pose_msg.pose.position.x = -0.1;
-    pose_msg.pose.position.y = -0.5;
-    pose_msg.pose.position.z = 0.5;
+    pose_msg.header.frame_id = "base_footprint";
+    pose_msg.pose.position.x = -0.2;
+    pose_msg.pose.position.y = 0.0;
+    pose_msg.pose.position.z = 0.75;
     pose_msg.pose.orientation.w = 0.0;
     pose_msg.pose.orientation.x = 1.0;
     pose_msg.pose.orientation.y= 0.0;
     pose_msg.pose.orientation.z = 0.0;
+
 
     geometry_msgs::msg::PoseStamped pose;
     pose.header.frame_id = "base_iiwa";
@@ -209,17 +201,17 @@ public:
       RCLCPP_INFO(LOGGER,"Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
     }
 
-    arm->setGoal("search_1");
+    arm->setGoal(pose_msg, "gripper_base_link");
     MoveItCppDemo::move();
     rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
 
-    arm->setGoal("search_2");
-    MoveItCppDemo::move();
+    // arm->setGoal("search_2");
+    // MoveItCppDemo::move();
 
-    rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
+    // rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
 
-    arm->setGoal("search_3");
-    MoveItCppDemo::move();
+    // arm->setGoal("search_3");
+    // MoveItCppDemo::move();
     
   }
 

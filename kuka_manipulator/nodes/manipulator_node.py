@@ -50,8 +50,6 @@ class ManipulatorNode(Node):
 
     #TODO: Hvordan skal det gjøres når noe skal plukkes AV roboten??? 
     #TODO: Håntere hva vi gjør i retry() - bevege robot litt bakover og prøve igjen, how? 
-    #TODO: Feilhåndtering dersom kamera ikke oppdager noe objekt
-    #TODO: Lage en standard path som armen beveger seg i mens den ser etter object
     #TODO: Lage metode for å sende nytt NAV GOAL. 
 
     def navgoal_callback(self,data):
@@ -102,39 +100,47 @@ class ManipulatorNode(Node):
             self.gripperStatus = "OPEN"
             self.hasObject = False
             self.send_drivetoframe_goal("drive_frame")
-        elif type == "close" and result.success:
-            self.gripperStatus = "CLOSED"
-            self.hasObject = True
-            self.send_drivetoframe_goal(None)
-        elif type == "close" and not result.success:
-            self.gripperStatus = "CLOSED"
-            self.hasObject = False
-            self.retry()
-        elif type == "objectsearch" and result.success:
-            self.pub_moveit_pose.publish(result.pose)
-            self.search_counter = 0
-        elif type == "objectsearch" and not result.success:
-            if self.search_counter < 3:
+        elif type == "close":
+            if result.success:
+                self.gripperStatus = "CLOSED"
+                self.hasObject = True
+                self.send_drivetoframe_goal(None)
+            else:
+                self.gripperStatus = "CLOSED"
+                self.hasObject = False
+                self.retry()
+        elif type == "objectsearch":
+            if result.success:
+                self.pub_moveit_pose.publish(result.pose)
+                self.search_counter = 0
+            else:
+                if self.search_counter < 3:
+                    goal = "search_" + str(self.search_counter+1)
+                    self.send_drivetoframe_goal(goal)
+                else:
+                    self.send_drivetoframe_goal("drive_frame")
+        elif type == "drivetoframe"
+            if result.success:
+                if result.frame == "frame1":
+                    self.frame1_busy=True
+                elif result.frame == "frame2":
+                    self.frame2_busy=True
+                elif result.frame == "frame3":
+                    self.frame3_busy=True
+                elif result.frame == "drive_frame":
+                    self.send_new_navgoal = True
+            else:
+                #Was not possible to create plan - put object down and continue. 
+                self.send_open_gripper_goal()
+                print(cl_red('Error: ') + "Was not able to plan to desired frame")
+        elif type=="drivetoframe_search" 
+            self.search_counter += 1
+            if result.success:
+                self.send_objectsearch_goal()
+            else:
+                #Failed to move to correct search frame, move on to the next!
                 goal = "search_" + str(self.search_counter+1)
                 self.send_drivetoframe_goal(goal)
-            else:
-                self.send_drivetoframe_goal("drive_frame")
-        elif type == "drivetoframe" and result.success:
-            if result.frame == "frame1":
-                self.frame1_busy=True
-            elif result.frame == "frame2":
-                self.frame2_busy=True
-            elif result.frame == "frame3":
-                self.frame3_busy=True
-            elif result.frame == "drive_frame":
-                self.send_new_navgoal = True
-        elif type=="drivetoframe" and not result.success:
-            #Was not possible to create plan - put object down and continue. 
-            self.send_open_gripper_goal()
-            print(cl_red('Error: ') + "Was to able to plan to desired frame")
-        elif type=="drivetoframe_search" and result.success:
-            self.search_counter += 1
-            self.send_objectsearch_goal()
 
         
     
