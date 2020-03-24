@@ -35,6 +35,10 @@
 /* Author: Henning Kayser
    Desc: A simple demo node running MoveItCpp for planning and execution
 */
+/* Author: Nina Marie Wahk
+   Desc: Fuctionality added for communication with manipulator_node
+*/
+
 
 #include <thread>
 #include <rclcpp/rclcpp.hpp>
