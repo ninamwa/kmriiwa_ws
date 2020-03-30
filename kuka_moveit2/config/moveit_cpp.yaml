@@ -15,5 +15,5 @@ run_moveit_cpp:
     
     default_planner_options:
       planning_attempts: 10
-      max_velocity_scaling_factor: 1.0
-      max_acceleration_scaling_factor: 1.0
+      max_velocity_scaling_factor: 0.4
+      max_acceleration_scaling_factor: 0.4

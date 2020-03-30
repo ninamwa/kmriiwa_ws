@@ -134,7 +134,7 @@ class ManipulatorNode(Node):
                     self.send_drivetoframe_goal(goal)
                 else:
                     self.send_drivetoframe_goal("drive_frame")
-        elif type == "drivetoframe"
+        elif type == "drivetoframe":
             if result.success:
                 if result.frame == "frame1":
                     self.frame1_busy=True
@@ -148,7 +148,7 @@ class ManipulatorNode(Node):
                 #Was not possible to create plan - put object down and continue. 
                 self.send_open_gripper_goal()
                 print(cl_red('Error: ') + "Was not able to plan to desired frame")
-        elif type=="drivetoframe_search" 
+        elif type=="drivetoframe_search":
             self.search_counter += 1
             if result.success:
                 self.send_objectsearch_goal()

@@ -68,8 +68,7 @@ public:
     , robot_state_publisher_(node_->create_publisher<moveit_msgs::msg::DisplayRobotState>("display_robot_state", 1))
     , trajectory_publisher_(node_->create_publisher<trajectory_msgs::msg::JointTrajectory>(
           "/fake_joint_trajectory_controller/joint_trajectory", 1))
-    , goal_pose_subscriber_(node_->create_subscription<geometry_msgs::msg::PoseStamped>(
-      "/moveit/goalpose", 10 ,std::bind(&MoveItCppDemo::goalpose_callback, this, std::placeholders::_1)))
+    , goal_pose_subscriber_(node_->create_subscription<geometry_msgs::msg::PoseStamped>("/moveit/goalpose", 10 ,std::bind(&MoveItCppDemo::goalpose_callback, this, std::placeholders::_1)))
     , frame_subscriber_(node_->create_subscription<std_msgs::msg::String>("/moveit/frame",10,std::bind(&MoveItCppDemo::frame_callback, this, std::placeholders::_1)))
     , action_server_(rclcpp_action::create_server<kuka_manipulator::action::DriveToFrame>(
       node_->get_node_base_interface(),
