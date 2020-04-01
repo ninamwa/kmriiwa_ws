@@ -35,7 +35,8 @@ set(action_files
   "action/OpenGripper.action"
   "action/CloseGripper.action"
   "action/ObjectSearch.action"
-  "action/DriveToFrame.action"
+  "action/PlanToFrame.action"
+  "action/MoveManipulator.action"
 )
 
 

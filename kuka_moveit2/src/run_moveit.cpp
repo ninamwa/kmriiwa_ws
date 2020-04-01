@@ -55,7 +55,7 @@
 #include <moveit_msgs/msg/constraints.hpp>
 #include <moveit_msgs/msg/motion_plan_response.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <kuka_manipulator/action/drive_to_frame.hpp>
+#include <kuka_manipulator/action/plan_to_frame.hpp>
 #include "rclcpp_action/rclcpp_action.hpp"
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_cpp_demo");
@@ -71,7 +71,7 @@ public:
     , goal_pose_subscriber_(node_->create_subscription<geometry_msgs::msg::PoseStamped>(
       "/moveit/goalpose", 10 ,std::bind(&MoveItCppDemo::goalpose_callback, this, std::placeholders::_1)))
     , frame_subscriber_(node_->create_subscription<std_msgs::msg::String>("/moveit/frame",10,std::bind(&MoveItCppDemo::frame_callback, this, std::placeholders::_1)))
-    , action_server_(rclcpp_action::create_server<kuka_manipulator::action::DriveToFrame>(
+    , action_server_(rclcpp_action::create_server<kuka_manipulator::action::PlanToFrame>(
       node_->get_node_base_interface(),
       node_->get_node_clock_interface(),
       node_->get_node_logging_interface(),
@@ -282,7 +282,7 @@ private:
     }
   }
 
-  rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID & uuid,std::shared_ptr<const kuka_manipulator::action::DriveToFrame::Goal> goal)
+  rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID & uuid,std::shared_ptr<const kuka_manipulator::action::PlanToFrame::Goal> goal)
   {
     RCLCPP_INFO(LOGGER, "Received request to move to: %s", goal->frame);
     (void)uuid;
@@ -290,24 +290,24 @@ private:
   }
 
   rclcpp_action::CancelResponse handle_cancel(
-    const std::shared_ptr<rclcpp_action::ServerGoalHandle<kuka_manipulator::action::DriveToFrame>> goal_handle)
+    const std::shared_ptr<rclcpp_action::ServerGoalHandle<kuka_manipulator::action::PlanToFrame>> goal_handle)
   {
     RCLCPP_INFO(LOGGER, "Received request to cancel goal");
     (void)goal_handle;
     return rclcpp_action::CancelResponse::ACCEPT;
   }
-  void handle_accepted(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kuka_manipulator::action::DriveToFrame>> goal_handle)
+  void handle_accepted(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kuka_manipulator::action::PlanToFrame>> goal_handle)
   {
     std::thread{std::bind(&MoveItCppDemo::execute, this, std::placeholders::_1), goal_handle}.detach();
   }
 
-   void execute(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kuka_manipulator::action::DriveToFrame>> goal_handle)
+   void execute(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kuka_manipulator::action::PlanToFrame>> goal_handle)
   {
     RCLCPP_INFO(LOGGER, "Executing goal");
     rclcpp::Rate loop_rate(1);
     const auto goal = goal_handle->get_goal();
     
-    auto result = std::make_shared<kuka_manipulator::action::DriveToFrame::Result>();
+    auto result = std::make_shared<kuka_manipulator::action::PlanToFrame::Result>();
 
     arm->setGoal(goal->frame);
     RCLCPP_INFO(LOGGER, "Plan to goal");
@@ -315,9 +315,8 @@ private:
     default_parameters.planning_time = 5.0;
     default_parameters.max_velocity_scaling_factor = 0.4;
     default_parameters.max_acceleration_scaling_factor = 0.4;
-    planning_pipeline_names = moveit_cpp_->getPlanningPipelineNames("manipulator");
-    if (!planning_pipeline_names.empty())
-      default_parameters.planning_pipeline = *planning_pipeline_names.begin();
+    RCLCPP_INFO(LOGGER, "Initialize node");
+    planning_pipeline_names.begin();
     const auto plan_solution = arm->plan(default_parameters);
 
     // Check if there is a cancel request
@@ -363,7 +362,7 @@ private:
   std::shared_ptr<moveit::planning_interface::PlanningComponent> arm;
   std::set<std::string> planning_pipeline_names;
   moveit::planning_interface::PlanningComponent::PlanRequestParameters default_parameters;
-  rclcpp_action::Server<kuka_manipulator::action::DriveToFrame>::SharedPtr action_server_;
+  rclcpp_action::Server<kuka_manipulator::action::PlanToFrame>::SharedPtr action_server_;
 };
 
 

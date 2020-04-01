@@ -48,18 +48,11 @@ set(DEPENDENCIES
 add_executable(run_moveit_cpp src/run_moveit.cpp)
 ament_target_dependencies(run_moveit_cpp ${DEPENDENCIES})
 
-add_executable(move_to_pose src/move_to_pose.cpp)
-ament_target_dependencies(move_to_pose ${DEPENDENCIES})
 
 install(TARGETS run_moveit_cpp
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME}
 )
-install(TARGETS move_to_pose
-  EXPORT export_${PROJECT_NAME}
-  DESTINATION lib/${PROJECT_NAME}
-)
-
 install(
   DIRECTORY launch config rviz
   DESTINATION share/${PROJECT_NAME}
