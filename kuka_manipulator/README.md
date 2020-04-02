@@ -22,6 +22,7 @@ The object detection with input from the D435 camera and the deep learning model
 $ ros2 launch kuka_manipulator object_detection.launch.py
 ```
 Detected objects of the type defined in the model are published to /object_analytics/localization which include:
+Type: object_analytics_msgs/msg/ObjectsInBoxes3D
 - Object:
     name
     probability
