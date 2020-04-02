@@ -21,6 +21,6 @@ The object detection with input from the D435 camera and the deep learning model
 ```
 $ ros2 launch kuka_manipulator object_detection.launch.py
 ```
-Detected objects of the type defined in the model are published to ros2_object_analytics/detected_objects which include the type of object, the precision and coordinates of the 3D bounding box enclosing the object.
+Detected objects of the type defined in the model are published to ros2_object_analytics/detected_objects which include the type of the detected object, the precision and coordinates of the 3D bounding box enclosing the object.
 
 The path to the model specified in param/object_detection.yaml may be incorrect. The path must be defined as the absolute path of the file in your directory.
