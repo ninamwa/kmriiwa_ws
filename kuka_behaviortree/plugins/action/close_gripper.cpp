@@ -1,17 +1,17 @@
 #include "kuka_behaviortree/bt_action_node.hpp"
-#include "kuka_manipulator/action/close_gripper.hpp"
+#include "kmr_msgs/action/close_gripper.hpp"
 
 
 namespace kmr_behavior_tree
 {
-class CloseGripperAction : public BtActionNode<kuka_manipulator::action::CloseGripper>
+class CloseGripperAction : public BtActionNode<kmr_msgs::action::CloseGripper>
 {
 public:
   CloseGripperAction(
     const std::string & xml_tag_name,
     const std::string & action_name,
     const BT::NodeConfiguration & conf)
-  : BtActionNode<kuka_manipulator::action::CloseGripper>(xml_tag_name, action_name, conf)
+  : BtActionNode<kmr_msgs::action::CloseGripper>(xml_tag_name, action_name, conf)
   {
   }
 

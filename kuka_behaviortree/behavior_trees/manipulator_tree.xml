@@ -1,5 +1,6 @@
 
 <root main_tree_to_execute="MainTree">
+
   <BehaviorTree ID="MainTree">
     <Sequence name="main_sequence">
       <SubTree ID="FindObject"/>
@@ -37,10 +38,10 @@
             <FrameEmpty check_frame="frame2"/>
             <FrameEmpty check_frame="frame3"/>
           </Fallback>
-          <ForceFailureNode>
+          <ForceFailure name="force_failure">
             <OpenGripper/>
-          </ForceFailureNode>
-        <Fallback/>
+          </ForceFailure>
+        </Fallback>
         <SubTree ID="MoveToFrame" frame="{empty_frame}"/>
         <OpenGripper/>
         <SubTree ID="MoveToFrame" frame="drive_frame"/>
@@ -49,17 +50,17 @@
   </BehaviorTree>
 
   <BehaviorTree ID="MoveToFrame">
-    <PlanManipulatorPath plan_to_frame="{frame}"/>
-    <MoveManipulator path="{path}" move_to_frame="{move_to_frame}"/>
+    <Sequence name="main_move_to_frame">
+      <PlanManipulatorPath plan_to_frame="{frame}"/>
+      <MoveManipulator path="{path}" move_to_frame="{move_to_frame}"/>
+    </Sequence>
   </BehaviorTree>
 
   <BehaviorTree ID="MoveToObject">
-    <PlanManipulatorPath frame="{frame}" pose="{ObjectPose}"/>
-    <MoveManipulator path="{path}"/>
+    <Sequence name="main_move_to_object">
+      <PlanManipulatorPath plan_to_frame="{frame}" ObjectPose="{pose}"/>
+      <MoveManipulator path="{path}"/>
+    </Sequence>
   </BehaviorTree>
-
-
-
-
 
 </root>

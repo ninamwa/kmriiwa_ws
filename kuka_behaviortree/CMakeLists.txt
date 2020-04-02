@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(kuka_behaviortree)
 
-# Default to C99
-if(NOT CMAKE_C_STANDARD)
-  set(CMAKE_C_STANDARD 99)
-endif()
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -31,7 +27,7 @@ find_package(nav_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
-find_package(kuka_manipulator REQUIRED)
+find_package(kmr_msgs REQUIRED)
 
 set(library_name ${PROJECT_NAME})
 
@@ -47,16 +43,7 @@ set(dependencies
   tf2_ros
   tf2_geometry_msgs
   std_msgs
-  kuka_manipulator
-)
-
-add_library(${library_name} SHARED
-  src/behavior_tree_engine.cpp
-  src/behavior_tree_node2.cpp
-)
-
-ament_target_dependencies(${library_name}
-  ${dependencies}
+  kmr_msgs
 )
 
 add_library(close_gripper_action_bt_node SHARED plugins/action/close_gripper.cpp)
@@ -82,12 +69,26 @@ foreach(bt_plugin ${plugin_libs})
   target_compile_definitions(${bt_plugin} PRIVATE BT_PLUGIN_EXPORT)
 endforeach()
 
-install(TARGETS ${library_name}
-                ${plugin_libs}
+
+add_executable(behavior_tree_node2 src/behavior_tree_node2.cpp)
+add_library(engine SHARED src/behavior_tree_engine.cpp)
+ament_target_dependencies(behavior_tree_node2 ${dependencies})
+target_link_libraries(behavior_tree_node2 engine)
+ament_target_dependencies(engine ${dependencies})
+
+
+
+install(TARGETS behavior_tree_node2 engine
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+
+install(TARGETS ${plugin_libs}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
+
 
 install(
   DIRECTORY launch plugins behavior_trees
@@ -99,13 +100,9 @@ install(DIRECTORY include/
 )
 
 ament_export_include_directories(include)
-
-
 ament_export_libraries(
   ${library_name}
   ${plugin_libs}
 )
-
 ament_export_dependencies(${dependencies})
-
 ament_package()

@@ -20,7 +20,7 @@ import sys
 import math
 import rclpy
 from rclpy.node import Node
-from kuka_communication.msg import LbrStatusdata
+from kmr_msgs.msg import LbrStatusdata
 from builtin_interfaces.msg import Time
 from rclpy.qos import qos_profile_sensor_data
 from script.tcpSocket import TCPSocket

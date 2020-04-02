@@ -1,17 +1,17 @@
 #include "kuka_behaviortree/bt_action_node.hpp"
-#include "kuka_manipulator/action/object_search.hpp"
+#include "kmr_msgs/action/object_search.hpp"
 
 
 namespace kmr_behavior_tree
 {
-class ObjectSearchAction : public BtActionNode<kuka_manipulator::action::ObjectSearch>
+class ObjectSearchAction : public BtActionNode<kmr_msgs::action::ObjectSearch>
 {
 public:
   ObjectSearchAction(
     const std::string & xml_tag_name,
     const std::string & action_name,
     const BT::NodeConfiguration & conf)
-  : BtActionNode<kuka_manipulator::action::ObjectSearch>(xml_tag_name, action_name, conf)
+  : BtActionNode<kmr_msgs::action::ObjectSearch>(xml_tag_name, action_name, conf)
   {
   }
 

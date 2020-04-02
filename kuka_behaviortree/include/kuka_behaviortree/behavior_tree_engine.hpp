@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef KMR_BEHAVIOR_TREE__BEHAVIOR_TREE_ENGINE_HPP_
-#define KMR_BEHAVIOR_TREE__BEHAVIOR_TREE_ENGINE_HPP_
-
 #include <memory>
 #include <string>
 #include <vector>
@@ -23,7 +20,7 @@
 #include "behaviortree_cpp_v3/bt_factory.h"
 #include "behaviortree_cpp_v3/xml_parsing.h"
 
-namespace kmr_behavior_tree
+namespace kmr_behavior_tree_engine
 {
 
 enum class BtStatus { SUCCEEDED, FAILED, CANCELED };
@@ -68,6 +65,4 @@ protected:
   BT::BehaviorTreeFactory factory_;
 };
 
-}  // namespace kmr_behavior_tree
-
-#endif  // KMR_BEHAVIOR_TREE__BEHAVIOR_TREE_ENGINE_HPP_
+}  // namespace kmr_behavior_tree_engine

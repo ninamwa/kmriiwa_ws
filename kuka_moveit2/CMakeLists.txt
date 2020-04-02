@@ -29,7 +29,7 @@ find_package(nav_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(kuka_manipulator REQUIRED)
+find_package(kmr_msgs REQUIRED)
 find_package(rclcpp_action REQUIRED)
 
 
@@ -41,7 +41,7 @@ set(DEPENDENCIES
   "tf2"
   "moveit_ros_planning_interface"
   "Boost"
-  "kuka_manipulator"
+  "kmr_msgs"
   "rclcpp_action"
 )
 

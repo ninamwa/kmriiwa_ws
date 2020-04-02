@@ -47,7 +47,7 @@ public:
   static BT::PortsList providedPorts()
   {
     return {
-      BT::InputPort<std::string>("frame", "Which frame to check if empty"),
+      BT::InputPort<std::string>("check_frame", "Which frame to check if empty"),
       BT::OutputPort<std::string>("empty_frame", "Which frame found to be empty"),
     };
   }

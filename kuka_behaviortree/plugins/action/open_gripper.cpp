@@ -1,17 +1,17 @@
 #include "kuka_behaviortree/bt_action_node.hpp"
-#include "kuka_manipulator/action/open_gripper.hpp"
+#include "kmr_msgs/action/open_gripper.hpp"
 
 
 namespace kmr_behavior_tree
 {
-class OpenGripperAction : public BtActionNode<kuka_manipulator::action::OpenGripper>
+class OpenGripperAction : public BtActionNode<kmr_msgs::action::OpenGripper>
 {
 public:
   OpenGripperAction(
     const std::string & xml_tag_name,
     const std::string & action_name,
     const BT::NodeConfiguration & conf)
-  : BtActionNode<kuka_manipulator::action::OpenGripper>(xml_tag_name, action_name, conf)
+  : BtActionNode<kmr_msgs::action::OpenGripper>(xml_tag_name, action_name, conf)
   {
   }
 

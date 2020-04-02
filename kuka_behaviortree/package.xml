@@ -36,7 +36,7 @@
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>tf2_geometry_msgs</exec_depend>
   <exec_depend>nav2_util</exec_depend>
-  <depend>kuka_manipulator</depend>
+  <depend>kmr_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

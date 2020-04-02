@@ -17,13 +17,14 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "rclcpp/rclcpp.hpp"
 #include "behaviortree_cpp_v3/utils/shared_library.h"
 
 using namespace std::chrono_literals;
 
-namespace kmr_behavior_tree
+namespace kmr_behavior_tree_engine
 {
 
 BehaviorTreeEngine::BehaviorTreeEngine(const std::vector<std::string> & plugin_libraries)
@@ -62,13 +63,13 @@ BehaviorTreeEngine::run(
 }
 
 BT::Tree
-BehaviorTreeEngine::buildTreeFromText(
-  const std::string & xml_string,
-  BT::Blackboard::Ptr blackboard)
+BehaviorTreeEngine::buildTreeFromText(const std::string & xml_string, BT::Blackboard::Ptr blackboard)
 {
   BT::XMLParser p(factory_);
   p.loadFromText(xml_string);
-  return p.instantiateTree(blackboard);
+  BT::Tree t;
+  t=p.instantiateTree(blackboard);
+  return t;
 }
 
-}  // namespace kmr_behavior_tree
+}  // namespace kmr_behavior_tree_engine

@@ -23,29 +23,13 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(trajectory_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 # Install the python module for this package
 ament_python_install_package(script/)
 ament_python_install_package(nodes/)
 
-
-
-set(action_files
-  "action/OpenGripper.action"
-  "action/CloseGripper.action"
-  "action/ObjectSearch.action"
-  "action/PlanToFrame.action"
-  "action/MoveManipulator.action"
-)
-
-
-rosidl_generate_interfaces(${PROJECT_NAME}
-  ${action_files}
-  DEPENDENCIES std_msgs geometry_msgs
-  ADD_LINTER_TESTS
-)
-ament_export_dependencies(rosidl_default_runtime)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -60,7 +44,7 @@ endif()
 
 
 install(
-  DIRECTORY launch action
+  DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
 

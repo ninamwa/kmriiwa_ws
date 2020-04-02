@@ -1,18 +1,18 @@
 #include "kuka_behaviortree/bt_action_node.hpp"
-#include "kuka_manipulator/action/plan_to_frame.hpp"
+#include "kmr_msgs/action/plan_to_frame.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 
 
 namespace kmr_behavior_tree
 {
-class PlanManipulatorPathAction : public BtActionNode<kuka_manipulator::action::PlanToFrame>
+class PlanManipulatorPathAction : public BtActionNode<kmr_msgs::action::PlanToFrame>
 {
 public:
   PlanManipulatorPathAction(
     const std::string & xml_tag_name,
     const std::string & action_name,
     const BT::NodeConfiguration & conf)
-  : BtActionNode<kuka_manipulator::action::PlanToFrame>(xml_tag_name, action_name, conf)
+  : BtActionNode<kmr_msgs::action::PlanToFrame>(xml_tag_name, action_name, conf)
   {
   }
 
@@ -63,7 +63,7 @@ BT_REGISTER_NODES(factory)
     [](const std::string & name, const BT::NodeConfiguration & config)
     {
       return std::make_unique<kmr_behavior_tree::PlanManipulatorPathAction>(
-        name, "plan_manipulator_path", config);
+        name, "/moveit/frame", config);
     };
 
   factory.registerBuilder<kmr_behavior_tree::PlanManipulatorPathAction>(

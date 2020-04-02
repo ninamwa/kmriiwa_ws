@@ -45,8 +45,8 @@ class GripperNode(Node):
         super().__init__('gripper_node')
         self.name='gripper_node'
         # TODO: change port to NUC
-        self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
-        self.activate()
+        #self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
+        #self.activate()
         print("OK")
         self.open_action_server = ActionServer(self,OpenGripper,'open_gripper',self.open_gripper_callback)
         self.close_action_server = ActionServer(self, CloseGripper, 'close_gripper', self.close_gripper_callback)
@@ -137,7 +137,7 @@ class GripperNode(Node):
 
     def getOpenResponse(self):
         result=False
-        self.ser.write(GripperMsg.MotionRequest.value)
+        self.ser.write(GripperMsg.MotionStatusRequest.value)
         gOBJ = self.response_to_value(str(self.ser.readline()),0,1)
         # Collision
         if (gOBJ == GripperMsg.OBJECT_OPENING.value):

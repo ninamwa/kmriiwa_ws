@@ -55,7 +55,7 @@
 #include <moveit_msgs/msg/constraints.hpp>
 #include <moveit_msgs/msg/motion_plan_response.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <kuka_manipulator/action/plan_to_frame.hpp>
+#include <kmr_msgs/action/plan_to_frame.hpp>
 #include "rclcpp_action/rclcpp_action.hpp"
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_cpp_demo");
@@ -70,8 +70,8 @@ public:
           "/fake_joint_trajectory_controller/joint_trajectory", 1))
     , goal_pose_subscriber_(node_->create_subscription<geometry_msgs::msg::PoseStamped>(
       "/moveit/goalpose", 10 ,std::bind(&MoveItCppDemo::goalpose_callback, this, std::placeholders::_1)))
-    , frame_subscriber_(node_->create_subscription<std_msgs::msg::String>("/moveit/frame",10,std::bind(&MoveItCppDemo::frame_callback, this, std::placeholders::_1)))
-    , action_server_(rclcpp_action::create_server<kuka_manipulator::action::PlanToFrame>(
+    , frame_subscriber_(node_->create_subscription<std_msgs::msg::String>("/moveit/frame2",10,std::bind(&MoveItCppDemo::frame_callback, this, std::placeholders::_1)))
+    , action_server_(rclcpp_action::create_server<kmr_msgs::action::PlanToFrame>(
       node_->get_node_base_interface(),
       node_->get_node_clock_interface(),
       node_->get_node_logging_interface(),
@@ -194,20 +194,20 @@ public:
     pose.pose.orientation.w = 1.0;
 
     //arm->setGoal(pose_msg,"gripper_base_link");
-    arm->setGoal("home");
-    MoveItCppDemo::move();
-    rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
+    // arm->setGoal("home");
+    // MoveItCppDemo::move();
+    // rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
     
-    moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
+/*     moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
     start_state->copyJointGroupPositions(joint_model_group, joint_values);
     for (std::size_t i = 0; i < joint_names.size(); ++i)
     {
       RCLCPP_INFO(LOGGER,"Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
     }
 
-    arm->setGoal(pose_msg, "gripper_base_link");
-    MoveItCppDemo::move();
-    rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
+    arm->setGoal(pose_msg, "gripper_base_link"); */
+    //MoveItCppDemo::move();
+    //rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
 
     // arm->setGoal("search_2");
     // MoveItCppDemo::move();
@@ -282,7 +282,7 @@ private:
     }
   }
 
-  rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID & uuid,std::shared_ptr<const kuka_manipulator::action::PlanToFrame::Goal> goal)
+  rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID & uuid,std::shared_ptr<const kmr_msgs::action::PlanToFrame::Goal> goal)
   {
     RCLCPP_INFO(LOGGER, "Received request to move to: %s", goal->frame);
     (void)uuid;
@@ -290,24 +290,24 @@ private:
   }
 
   rclcpp_action::CancelResponse handle_cancel(
-    const std::shared_ptr<rclcpp_action::ServerGoalHandle<kuka_manipulator::action::PlanToFrame>> goal_handle)
+    const std::shared_ptr<rclcpp_action::ServerGoalHandle<kmr_msgs::action::PlanToFrame>> goal_handle)
   {
     RCLCPP_INFO(LOGGER, "Received request to cancel goal");
     (void)goal_handle;
     return rclcpp_action::CancelResponse::ACCEPT;
   }
-  void handle_accepted(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kuka_manipulator::action::PlanToFrame>> goal_handle)
+  void handle_accepted(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kmr_msgs::action::PlanToFrame>> goal_handle)
   {
     std::thread{std::bind(&MoveItCppDemo::execute, this, std::placeholders::_1), goal_handle}.detach();
   }
 
-   void execute(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kuka_manipulator::action::PlanToFrame>> goal_handle)
+   void execute(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kmr_msgs::action::PlanToFrame>> goal_handle)
   {
     RCLCPP_INFO(LOGGER, "Executing goal");
     rclcpp::Rate loop_rate(1);
     const auto goal = goal_handle->get_goal();
     
-    auto result = std::make_shared<kuka_manipulator::action::PlanToFrame::Result>();
+    auto result = std::make_shared<kmr_msgs::action::PlanToFrame::Result>();
 
     arm->setGoal(goal->frame);
     RCLCPP_INFO(LOGGER, "Plan to goal");
@@ -362,7 +362,7 @@ private:
   std::shared_ptr<moveit::planning_interface::PlanningComponent> arm;
   std::set<std::string> planning_pipeline_names;
   moveit::planning_interface::PlanningComponent::PlanRequestParameters default_parameters;
-  rclcpp_action::Server<kuka_manipulator::action::PlanToFrame>::SharedPtr action_server_;
+  rclcpp_action::Server<kmr_msgs::action::PlanToFrame>::SharedPtr action_server_;
 };
 
 

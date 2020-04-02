@@ -28,6 +28,8 @@ from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from script.tcpSocket import TCPSocket
 from script.udpSocket import UDPSocket
 
+from kmr_msgs.action import MoveManipulator
+
 
 
 def cl_red(msge): return '\033[31m' + msge + '\033[0m'
@@ -59,7 +61,8 @@ class LbrCommandsNode(Node):
         # Make a listener for relevant topics
         sub_manipulator_vel = self.create_subscription(String, 'manipulator_vel', self.manipulatorVel_callback, qos_profile_sensor_data)
         sub_shutdown = self.create_subscription(String, 'shutdown', self.shutdown_callback, qos_profile_sensor_data)
-        sub_pathplanning = self.create_subscription(JointTrajectory, '/fake_joint_trajectory_controller/joint_trajectory', self.path_callback, qos_profile_sensor_data)
+        # sub_pathplanning = self.create_subscription(JointTrajectory, '/fake_joint_trajectory_controller/joint_trajectory', self.path_callback, qos_profile_sensor_data)
+        self.path_server = ActionServer(self,MoveManipulator,'move_manipulator',self.move_manipulator_callback)
 
         while not self.soc.isconnected:
             pass
