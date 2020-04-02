@@ -47,18 +47,18 @@ def generate_launch_description():
                PythonLaunchDescriptionSource([gripper_node_launch_file_dir, '/gripper_node.launch.py']),
         ),
 
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([moveit_launch_file_dir, '/moveit.launch.py']),
-        ),
+        #IncludeLaunchDescription(
+        #    PythonLaunchDescriptionSource([moveit_launch_file_dir, '/moveit.launch.py']),
+        #),
 
-        Node(
-            package="kuka_communication",
-            node_executable="lbr_commands_node.py",
-            node_name="lbr_commands_node",
-            output="screen",
-            emulate_tty=True,
-            arguments=['-c', connection_type_TCP, '-ro', robot],
-            parameters=[param_dir]),
+        #Node(
+        #    package="kuka_communication",
+        #    node_executable="lbr_commands_node.py",
+        #    node_name="lbr_commands_node",
+        #    output="screen",
+        #    emulate_tty=True,
+        #    arguments=['-c', connection_type_TCP, '-ro', robot],
+        #    parameters=[param_dir]),
 
 
         Node(

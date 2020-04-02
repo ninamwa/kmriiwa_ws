@@ -45,7 +45,7 @@ class GripperNode(Node):
         super().__init__('gripper_node')
         self.name='gripper_node'
         # TODO: change port to NUC
-        #self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
+        self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
         #self.activate()
         print("OK")
         self.open_action_server = ActionServer(self,OpenGripper,'open_gripper',self.open_gripper_callback)
@@ -89,7 +89,8 @@ class GripperNode(Node):
         activated = False
         while (not activated):
             self.ser.write(GripperMsg.ActivationStatusRequest.value)
-            gSTA  = self.response_to_value(str(self.ser.readline()),2,3)
+            response = self.ser.readline()
+            gSTA  = self.response_to_value(str(response),2,3)
             if (gSTA == GripperMsg.ACTIVATIONCOMPLETE.value):
                 activated = True
                 self.close()

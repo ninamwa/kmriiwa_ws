@@ -31,7 +31,7 @@ BehaviorTreeNode()
   plugin_lib_names_ = get_parameter("plugin_lib_names").as_string_array();
   // plugin_lib_names_ = get_parameter("plugin_lib_names").as_string_array();
   // Create the class that registers our custom nodes and executes the BT
-  bt_ = std::make_unique<kmr_behavior_tree_engine::BehaviorTreeEngine>(plugin_lib_names_);
+  bt_ = std::make_unique<kmr_behavior_tree::BehaviorTreeEngine>(plugin_lib_names_);
 
   auto options = rclcpp::NodeOptions().arguments(
     {"--ros-args",
@@ -50,6 +50,7 @@ BehaviorTreeNode()
   blackboard_->set<rclcpp::Node::SharedPtr>("node", client_node_); // NOLINT
   blackboard_->set<bool>("path_updated", false);
   blackboard_->set<bool>("initial_pose_received", false);
+  blackboard_->set<std::string>("current_frame", "drive_frame");
   
   std::string bt_xml_filename;
   get_parameter("bt_xml_filename", bt_xml_filename);
@@ -73,12 +74,42 @@ BehaviorTreeNode()
 
 private:
   void start_callback(std_msgs::msg::String::SharedPtr msg){
-    RCLCPP_INFO(LOGGER, "I heard: '%s'", msg->data.c_str());
+    RCLCPP_INFO(LOGGER, "Start BT tree: '%s'", msg->data.c_str());
     if (msg->data == "OK"){
-
+      start_bt();
     }
 
 
+  }
+
+  void start_bt(){
+    auto is_canceling = [this]() {
+      return false;
+        };
+
+
+    auto on_loop = [&]() {
+        };
+
+    kmr_behavior_tree::BtStatus rc = bt_->run(&tree_, on_loop, is_canceling);
+    bt_->haltAllActions(tree_.root_node);
+
+    switch (rc) {
+      case kmr_behavior_tree::BtStatus::SUCCEEDED:
+        RCLCPP_INFO(get_logger(), "Object found and handled - succeeded");
+        break;
+
+      case kmr_behavior_tree::BtStatus::FAILED:
+        RCLCPP_ERROR(get_logger(), "Object found and handled - failed");
+        break;
+
+      case kmr_behavior_tree::BtStatus::CANCELED:
+        RCLCPP_INFO(get_logger(), "Object found and handled - canceled");
+        break;
+
+      default:
+        throw std::logic_error("Invalid status return from BT");
+    }
   }
 
 
@@ -87,7 +118,7 @@ private:
   BT::Tree tree_;
   BT::Blackboard::Ptr blackboard_;
   std::string xml_string_;
-  std::unique_ptr<kmr_behavior_tree_engine::BehaviorTreeEngine> bt_;
+  std::unique_ptr<kmr_behavior_tree::BehaviorTreeEngine> bt_;
   std::vector<std::string> plugin_lib_names_;
 
   // A client that we'll use to send a command message to our own task server
