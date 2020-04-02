@@ -21,6 +21,16 @@ def generate_launch_description():
         'behavior_trees',
         xml_file_name)
 
+    
+    connection_type_TCP='TT'
+    robot = 'KMR1'
+    param_dir = LaunchConfiguration(
+        'param_dir',
+        default=os.path.join(
+            get_package_share_directory('kuka_communication'),
+            'param',
+            'bringup.yaml'))
+
     return LaunchDescription([
 
         DeclareLaunchArgument(
@@ -40,6 +50,16 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([moveit_launch_file_dir, '/moveit.launch.py']),
         ),
+
+        Node(
+            package="kuka_communication",
+            node_executable="lbr_commands_node.py",
+            node_name="lbr_commands_node",
+            output="screen",
+            emulate_tty=True,
+            arguments=['-c', connection_type_TCP, '-ro', robot],
+            parameters=[param_dir]),
+
 
         Node(
             package="kuka_behaviortree",

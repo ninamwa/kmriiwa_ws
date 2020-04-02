@@ -42,6 +42,7 @@
                 </ForceFailure>
                 </Fallback>
                 <PlanManipulatorPath plan_to_frame="{frame}"/>
+                <MoveManipulator path="{path}"/>
                 <OpenGripper/>
             </Sequence>
         </Sequence>
@@ -51,6 +52,7 @@
         <Sequence name="main_move_to_frame">
             <PlanManipulatorPath plan_to_frame="{frame}"/>
             <MoveManipulator path="{path}" move_to_frame="{move_to_frame}"/>
+            <MoveManipulator path="{path}"/>
         </Sequence>
     </BehaviorTree>
 

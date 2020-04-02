@@ -93,8 +93,10 @@ class LbrStatusNode(Node):
                     elif (split[0] == "isLBRmoving"):
                         if (split[1] == "true"):
                             msg.is_lbr_moving = True
+                            self.soc.is_lbr_moving = True
                         else:
                             msg.is_lbr_moving = False
+                            self.soc.is_lbr_moving = False
                     elif (split[0] == "LBRhasActiveCommand"):
                         if (split[1] == "true"):
                             msg.lbr_has_active_command = True

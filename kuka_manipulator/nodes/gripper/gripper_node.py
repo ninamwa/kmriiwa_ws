@@ -29,8 +29,8 @@ from sensor_msgs.msg import LaserScan
 from builtin_interfaces.msg import Time
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.action import ActionServer, GoalResponse
-from kuka_manipulator.action import OpenGripper
-from kuka_manipulator.action import CloseGripper
+from kmr_msgs.action import OpenGripper
+from kmr_msgs.action import CloseGripper
 
 from script.gripper_msgs import GripperMsg
 from script.errorcodes import ErrorCodes

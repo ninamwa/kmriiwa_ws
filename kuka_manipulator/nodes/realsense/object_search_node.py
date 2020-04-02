@@ -27,7 +27,7 @@ from geometry_msgs.msg import Point, Pose, Quaternion, Twist
 from builtin_interfaces.msg import Time
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.action import ActionServer, GoalResponse
-from kuka_manipulator.action import ObjectSearch
+from kmr_msgs.action import ObjectSearch
 
 def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 

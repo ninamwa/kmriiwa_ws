@@ -27,8 +27,9 @@ from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 from script.tcpSocket import TCPSocket
 from script.udpSocket import UDPSocket
-
+from rclpy.action import ActionServer, GoalResponse
 from kmr_msgs.action import MoveManipulator
+from kmr_msgs.msg import LbrStatusdata
 
 
 
@@ -61,12 +62,19 @@ class LbrCommandsNode(Node):
         # Make a listener for relevant topics
         sub_manipulator_vel = self.create_subscription(String, 'manipulator_vel', self.manipulatorVel_callback, qos_profile_sensor_data)
         sub_shutdown = self.create_subscription(String, 'shutdown', self.shutdown_callback, qos_profile_sensor_data)
+        sub_statusdata=self.create_subscription(LbrStatusdata, 'lbr_statusdata', self.status_callback, qos_profile_sensor_data)
         # sub_pathplanning = self.create_subscription(JointTrajectory, '/fake_joint_trajectory_controller/joint_trajectory', self.path_callback, qos_profile_sensor_data)
-        self.path_server = ActionServer(self,MoveManipulator,'move_manipulator',self.move_manipulator_callback)
+        self.path_server = ActionServer(self,MoveManipulator,'move_manipulator', self.move_manipulator_callback)
 
-        while not self.soc.isconnected:
-            pass
-        self.get_logger().info('Node is ready')
+        self.isLBRMoving=False
+
+        #while not self.soc.isconnected:
+        #    pass
+        #self.get_logger().info('Node is ready')
+
+    def status_callback(self,data):
+        if data.is_lbr_moving != self.isLBRMoving:
+            self.isLBRMoving = data.is_lbr_moving
 
 
     def shutdown_callback(self, data):
@@ -78,6 +86,17 @@ class LbrCommandsNode(Node):
     def manipulatorVel_callback(self, data):
         msg = 'setLBRmotion ' + data.data
         self.soc.send(msg)
+
+    def move_manipulator_callback(self, goal_handle):
+        self.get_logger().info('Executing goal...')
+        self.isMoving = True
+        self.path_callback(goal_handle.request.path)
+        while (self.isLBRMoving):
+            pass
+        result = MoveManipulator.Result()
+        result.success = True
+        goal_handle.succeed()
+        return result
 
     def path_callback(self, data):
         i=1
