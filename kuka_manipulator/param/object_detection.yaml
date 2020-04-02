@@ -1,0 +1,19 @@
+Pipelines:
+- name: object
+  inputs: [RealSenseCameraTopic]
+  infers:
+    - name: ObjectDetection
+      model: /home/charlotte/kuka_eloquent/src/kuka_manipulator/model/circbox.xml
+      engine: CPU #ELLER GPU ELLER MYRIAD, CPU Extension:/opt/intel/openvino/inference_engine/samples/build/intel64/Release/lib/libcpu_extension.so 
+      label: to/be/set/xxx.labels
+      batch: 1
+      confidence_threshold: 0.9
+      enable_roi_constraint: true # set enable_roi_constraint to false if you don't want to make the inferred ROI (region of interest) constrained into the camera frame
+  outputs: [RosTopic]
+  connects:
+    - left: RealSenseCameraTopic
+      right: [ObjectDetection]
+    - left: ObjectDetection
+      right: [RosTopic]
+
+OpenvinoCommon:
