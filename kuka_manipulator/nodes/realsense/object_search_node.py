@@ -39,21 +39,18 @@ class ObjectSearchNode(Node):
         # TODO: change port to NUC
         self.object_search_action_server = ActionServer(self,ObjectSearch,'object_search',self.object_search_callback)    
 
-        self.client = self.create_client(PipelineSrv, '/controller_server/set_parameters')
-        self.request = PipelineSrv.Request()
-        while not self.client.wait_for_service(timeout_sec=10.0):
-           self.get_logger(        ).info('Waiting for service')
 
 
     def object_search_callback(self, goal_handle):
-        self.startSearch()
+        #self.startSearch()
         self.get_logger().info('Executing goal...')
-        while (self.isSearching()):
-            pass
+        #while (self.isSearching()):
+        #    pass
         result = ObjectSearch.Result()
-        if self.getObject() != None:
-            result.success = True
-            result.pose = self.getObject()
+        #if self.getObject() != None:
+        #    result.success = True
+         #   result.pose = self.getObject()
+        result.success = True
         if result.success == True:
            goal_handle.succeed()
         else:
@@ -74,16 +71,6 @@ class ObjectSearchNode(Node):
         #posen må være av følgende type: geometry_msgs/PoseStamped pose
         #Returner posen på objectet
         return pose
-
-    def def send_pipeline_request(self,msg):
-        self.request.pipeline_request = msg
-        wait = self.client.call_async(self.request)
-        #rclpy.spin_once(self)
-        if wait.result() is not None:
-            print(wait.result())
-            #self.get_logger().info('Request was ' + self.request.parameters[0].name + '. Response is ' + str(wait.result().results.successful)) # + wait.result().results[1])
-        else:
-            self.get_logger().info("Request failed")
 
 def main(args=None):
     rclpy.init(args=args)

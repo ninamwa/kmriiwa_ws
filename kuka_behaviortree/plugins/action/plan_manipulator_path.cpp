@@ -1,7 +1,7 @@
 #include "kuka_behaviortree/bt_action_node.hpp"
 #include "kmr_msgs/action/plan_to_frame.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
-
+#include <geometry_msgs/msg/pose_stamped.hpp>
 
 namespace kmr_behavior_tree
 {
@@ -18,8 +18,7 @@ public:
 
   void on_tick() override
   {
-
-
+    rclcpp::sleep_for(std::chrono::seconds(4));
     if (!getInput("plan_to_frame", plan_to_frame)) {
       RCLCPP_ERROR(node_->get_logger(),"PlanToFrameAction: frame not provided");
       return;
@@ -27,6 +26,16 @@ public:
     goal_.frame = plan_to_frame;
     if (plan_to_frame == "object"){
       getInput("ObjectPose", goal_.pose);
+      geometry_msgs::msg::PoseStamped pose_msg;
+      pose_msg.header.frame_id = "base_footprint";
+      pose_msg.pose.position.x = -0.2;
+      pose_msg.pose.position.y = 0.0;
+      pose_msg.pose.position.z = 0.75;
+      pose_msg.pose.orientation.w = 0.0;
+      pose_msg.pose.orientation.x = 1.0;
+      pose_msg.pose.orientation.y= 0.0;
+      pose_msg.pose.orientation.z = 0.0;
+      goal_.pose = pose_msg;
     }
   }
 
@@ -41,7 +50,7 @@ public:
   {
     return providedBasicPorts(
       {
-        BT::InputPort<trajectory_msgs::msg::JointTrajectory>("plan_to_frame", "The frame MoveIt should plan to"),
+        BT::InputPort<std::string>("plan_to_frame", "The frame MoveIt should plan to"),
         BT::InputPort<geometry_msgs::msg::PoseStamped>("ObjectPose", "Pose of the object manipulator should move to"),
         BT::OutputPort<trajectory_msgs::msg::JointTrajectory>("ManipulatorPath", "The path MoveIt has planned for the manipulator"),
         BT::OutputPort<std::string>("move_to_frame", "Frame we should move to"),

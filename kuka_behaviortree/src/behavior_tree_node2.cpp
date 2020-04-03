@@ -48,8 +48,9 @@ BehaviorTreeNode()
 
   // Put items on the blackboard
   blackboard_->set<rclcpp::Node::SharedPtr>("node", client_node_); // NOLINT
-  blackboard_->set<bool>("path_updated", false);
-  blackboard_->set<bool>("initial_pose_received", false);
+  blackboard_->set<bool>("frame_1", true);
+  blackboard_->set<bool>("frame_2", true);
+  blackboard_->set<bool>("frame_3", true);
   blackboard_->set<std::string>("current_frame", "drive_frame");
   
   std::string bt_xml_filename;

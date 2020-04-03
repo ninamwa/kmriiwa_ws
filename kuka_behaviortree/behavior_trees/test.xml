@@ -10,16 +10,14 @@
 
     <BehaviorTree ID="TestTree2">
         <Sequence name="sequence">
-            <CloseGripper/>
-            <OpenGripper/>
+            <PlanManipulatorPath plan_to_frame="search_1"/>
         </Sequence>
     </BehaviorTree> 
 
     <BehaviorTree ID="TestTree">
         <Sequence name="main_sequence">
-            <CloseGripper/>
-            <OpenGripper/>
-            <TestTree2/>
+            <PlanManipulatorPath plan_to_frame="home"/>
+            <SubTree ID="TestTree2"/>
         </Sequence>
     </BehaviorTree> 
 

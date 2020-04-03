@@ -25,8 +25,8 @@ from rclpy.utilities import remove_ros_args
 import argparse
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
-from script.tcpSocket import TCPSocket
-from script.udpSocket import UDPSocket
+#from script.tcpSocket import TCPSocket
+#from script.udpSocket import UDPSocket
 from rclpy.action import ActionServer, GoalResponse
 from kmr_msgs.action import MoveManipulator
 from kmr_msgs.msg import LbrStatusdata
@@ -52,13 +52,13 @@ class LbrCommandsNode(Node):
         else:
             ip=None
 
-        if connection_type == 'TCP':
-            self.soc = TCPSocket(ip,port,self.name)
-        elif connection_type == 'UDP':
-            self.soc=UDPSocket(ip,port,self.name)
-        else:
-            self.soc=None
-
+        #if connection_type == 'TCP':
+        #    self.soc = TCPSocket(ip,port,self.name)
+        #elif connection_type == 'UDP':
+        #    self.soc=UDPSocket(ip,port,self.name)
+        #else:
+        #    self.soc=None
+        self.soc=None
         # Make a listener for relevant topics
         sub_manipulator_vel = self.create_subscription(String, 'manipulator_vel', self.manipulatorVel_callback, qos_profile_sensor_data)
         sub_shutdown = self.create_subscription(String, 'shutdown', self.shutdown_callback, qos_profile_sensor_data)

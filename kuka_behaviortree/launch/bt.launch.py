@@ -15,7 +15,7 @@ def generate_launch_description():
 
     plugin_lib_names =['close_gripper_action_bt_node', 'open_gripper_action_bt_node','move_manipulator_action_bt_node','plan_manipulator_path_action_bt_node','object_search_action_bt_node','frame_empty_condition_bt_node']
     #xml_file_name = 'manipulator_tree.xml'
-    xml_file_name = 'test.xml'
+    xml_file_name = 'm_tree.xml'
     xml = os.path.join(
         get_package_share_directory('kuka_behaviortree'),
         'behavior_trees',
@@ -37,28 +37,30 @@ def generate_launch_description():
             'bt_xml_filename', default_value='kuka_behaviortree/behavior_trees/manipulator_tree.xml',
             description='File to read BT tree from'),
 
-        #DeclareLaunchArgument(
-        #    'plugin_lib_names',
-        #    default_value='',
-        #    description='plugin-libs'),
-
-
         IncludeLaunchDescription(
                PythonLaunchDescriptionSource([gripper_node_launch_file_dir, '/gripper_node.launch.py']),
         ),
 
-        #IncludeLaunchDescription(
-        #    PythonLaunchDescriptionSource([moveit_launch_file_dir, '/moveit.launch.py']),
-        #),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([moveit_launch_file_dir, '/moveit.launch.py']),
+        ),
 
-        #Node(
-        #    package="kuka_communication",
-        #    node_executable="lbr_commands_node.py",
-        #    node_name="lbr_commands_node",
-        #    output="screen",
-        #    emulate_tty=True,
-        #    arguments=['-c', connection_type_TCP, '-ro', robot],
-        #    parameters=[param_dir]),
+        Node(
+            package="kuka_communication",
+            node_executable="lbr_commands_node.py",
+            node_name="lbr_commands_node",
+            output="screen",
+            emulate_tty=True,
+            arguments=['-c', connection_type_TCP, '-ro', robot],
+            parameters=[param_dir]),
+
+        Node(
+            package="kuka_manipulator",
+            node_executable="object_search_node.py",
+            node_name="object_search_node",
+            output="screen",
+            emulate_tty=True,
+            ),
 
 
         Node(

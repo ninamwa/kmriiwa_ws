@@ -45,40 +45,42 @@ class GripperNode(Node):
         super().__init__('gripper_node')
         self.name='gripper_node'
         # TODO: change port to NUC
-        self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
+        #self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
         #self.activate()
-        print("OK")
+        #print("OK")
         self.open_action_server = ActionServer(self,OpenGripper,'open_gripper',self.open_gripper_callback)
         self.close_action_server = ActionServer(self, CloseGripper, 'close_gripper', self.close_gripper_callback)
     
 
     def open_gripper_callback(self, goal_handle):
-        self.get_logger().info('Executing goal...')
-        self.open()
-        while (self.isMoving()):
-            pass
+        self.get_logger().info('Executing open_gripper goal...')
+        #self.open()
+        #while (self.isMoving()):
+        #    pass
         result = OpenGripper.Result() 
-        result.success = self.getOpenResponse()
+        #result.success = self.getOpenResponse()
+        result.success = True
         if result.success == True:
            goal_handle.succeed()
         else:
            goal_handle.abort()
-        print("OK")
+        print("OPEN GRIPPER OK")
         return result
 
     def close_gripper_callback(self, goal_handle):
-        self.get_logger().info('Executing goal...')
-        self.close()
-        while (self.isMoving()):
-            pass
+        self.get_logger().info('Executing close_gripper goal...')
+        #self.close()
+        #while (self.isMoving()):
+        #    pass
         
         result = CloseGripper.Result()
-        result.success = self.getClosedResponse()
+        #result.success = self.getClosedResponse()
+        result.success = True
         if result.success == True:
            goal_handle.succeed()
         else:
            goal_handle.abort()
-        print("OK")
+        print("CLOSE GRIPPER OK")
         return result
 
 
