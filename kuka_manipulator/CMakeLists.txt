@@ -55,6 +55,7 @@ install(
     script/gripper_msgs.py
     nodes/manipulator_node.py
     nodes/gripper/gripper_node.py
+    nodes/realsense/object_search_node.py
     DESTINATION lib/${PROJECT_NAME}
 )
 

@@ -20,7 +20,7 @@
 #include "behaviortree_cpp_v3/bt_factory.h"
 #include "behaviortree_cpp_v3/xml_parsing.h"
 
-namespace kmr_behavior_tree_engine
+namespace kmr_behavior_tree
 {
 
 enum class BtStatus { SUCCEEDED, FAILED, CANCELED };
@@ -65,4 +65,4 @@ protected:
   BT::BehaviorTreeFactory factory_;
 };
 
-}  // namespace kmr_behavior_tree_engine
+}  // namespace kmr_behavior_tree

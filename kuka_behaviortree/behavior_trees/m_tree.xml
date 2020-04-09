@@ -1,0 +1,60 @@
+<root main_tree_to_execute="MainTree">
+
+  <BehaviorTree ID="MainTree">
+    <Sequence name="main_sequence">
+        <Fallback name="find_object">
+            <Sequence name="search_frame1">
+                <Sequence name="search1">
+                    <PlanManipulatorPath plan_to_frame="search_1"/>
+                    <MoveManipulator path="{path}"/>
+                </Sequence>
+                <ObjectSearch/>
+            </Sequence>
+            <Sequence name="search_frame2">
+                <Sequence name="search2">
+                    <PlanManipulatorPath plan_to_frame="search_2"/>
+                    <MoveManipulator path="{path}"/>
+                </Sequence>
+                <ObjectSearch/>
+            </Sequence>
+            <Sequence name="search_frame3">
+                <Sequence name="search3">
+                    <PlanManipulatorPath plan_to_frame="search_3"/>
+                    <MoveManipulator path="{path}"/>
+                </Sequence>
+                <ObjectSearch/>
+            </Sequence>
+        </Fallback>
+        <Sequence name="handle_object">
+            <Sequence name="pick_object">
+                <Sequence name="main_move_to_object">
+                    <PlanManipulatorPath plan_to_frame="object" ObjectPose="{pose}"/>
+                    <MoveManipulator path="{path}"/>
+                </Sequence>
+                <CloseGripper/>
+            </Sequence>
+            <Sequence name="leave_object">
+                <Fallback name="find_empty_frame">
+                    <Fallback name="check_empty_frame">
+                        <FrameEmpty check_frame="frame_1" empty_frame="{empty_frame}"/>
+                        <FrameEmpty check_frame="frame_2"/>
+                        <FrameEmpty check_frame="frame_3"/>
+                    </Fallback>
+                    <ForceFailure name="force_failure">
+                        <OpenGripper/>
+                    </ForceFailure>
+                </Fallback>
+                <Sequence name="emptyframe">
+                    <PlanManipulatorPath plan_to_frame="{empty_frame}"/>
+                    <MoveManipulator path="{path}"/>
+                </Sequence>
+                <OpenGripper/>
+                <Sequence name="drive">
+                    <PlanManipulatorPath plan_to_frame="drive_frame"/>
+                    <MoveManipulator path="{path}"/>
+                </Sequence>
+            </Sequence>
+        </Sequence>
+    </Sequence>
+  </BehaviorTree> 
+</root>

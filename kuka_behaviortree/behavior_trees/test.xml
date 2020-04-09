@@ -1,5 +1,5 @@
 
-<root main_tree_to_execute="HandleObject">
+<root main_tree_to_execute="TestTree">
 
     <BehaviorTree ID="MainTree">
         <Sequence name="main_sequence">
@@ -7,6 +7,23 @@
             <SubTree ID="HandleObject"/>
         </Sequence>
     </BehaviorTree> 
+
+    <BehaviorTree ID="TestTree2">
+        <Sequence name="sequence">
+            <PlanManipulatorPath plan_to_frame="search_1"/>
+        </Sequence>
+    </BehaviorTree> 
+
+    <BehaviorTree ID="TestTree">
+        <Sequence name="main_sequence">
+            <PlanManipulatorPath plan_to_frame="home"/>
+            <SubTree ID="TestTree2"/>
+        </Sequence>
+    </BehaviorTree> 
+
+
+
+
 
     <BehaviorTree ID="FindObject">
         <Fallback name="search_object">
@@ -42,7 +59,7 @@
                 </ForceFailure>
                 </Fallback>
                 <PlanManipulatorPath plan_to_frame="{frame}"/>
-                <MoveManipulator path="{path}"/>
+               
                 <OpenGripper/>
             </Sequence>
         </Sequence>

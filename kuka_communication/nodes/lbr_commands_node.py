@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import sys
 import rclpy
 from rclpy.node import Node
@@ -52,13 +51,13 @@ class LbrCommandsNode(Node):
         else:
             ip=None
 
-        if connection_type == 'TCP':
-            self.soc = TCPSocket(ip,port,self.name)
-        elif connection_type == 'UDP':
-            self.soc=UDPSocket(ip,port,self.name)
-        else:
-            self.soc=None
-
+        #if connection_type == 'TCP':
+        #    self.soc = TCPSocket(ip,port,self.name)
+        #elif connection_type == 'UDP':
+        #    self.soc=UDPSocket(ip,port,self.name)
+        #else:
+        #    self.soc=None
+        self.soc=None
         # Make a listener for relevant topics
         sub_manipulator_vel = self.create_subscription(String, 'manipulator_vel', self.manipulatorVel_callback, qos_profile_sensor_data)
         sub_shutdown = self.create_subscription(String, 'shutdown', self.shutdown_callback, qos_profile_sensor_data)

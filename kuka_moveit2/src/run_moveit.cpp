@@ -71,15 +71,6 @@ public:
     , goal_pose_subscriber_(node_->create_subscription<geometry_msgs::msg::PoseStamped>(
       "/moveit/goalpose", 10 ,std::bind(&MoveItCppDemo::goalpose_callback, this, std::placeholders::_1)))
     , frame_subscriber_(node_->create_subscription<std_msgs::msg::String>("/moveit/frame2",10,std::bind(&MoveItCppDemo::frame_callback, this, std::placeholders::_1)))
-    , action_server_(rclcpp_action::create_server<kmr_msgs::action::PlanToFrame>(
-      node_->get_node_base_interface(),
-      node_->get_node_clock_interface(),
-      node_->get_node_logging_interface(),
-      node_->get_node_waitables_interface(),
-      "/moveit/frame",
-      std::bind(&MoveItCppDemo::handle_goal, this,  std::placeholders::_1,  std::placeholders::_2),
-      std::bind(&MoveItCppDemo::handle_cancel, this,  std::placeholders::_1),
-      std::bind(&MoveItCppDemo::handle_accepted, this,  std::placeholders::_1)))
   {
   }
 
@@ -93,7 +84,17 @@ public:
     arm = std::make_shared<moveit::planning_interface::PlanningComponent>("manipulator", moveit_cpp_);
 
     // A little delay before running the plan
-    rclcpp::sleep_for(std::chrono::seconds(3));
+    rclcpp::sleep_for(std::chrono::seconds(1));
+
+    action_server_ = rclcpp_action::create_server<kmr_msgs::action::PlanToFrame>(
+      node_->get_node_base_interface(),
+      node_->get_node_clock_interface(),
+      node_->get_node_logging_interface(),
+      node_->get_node_waitables_interface(),
+      "/moveit/frame",
+      std::bind(&MoveItCppDemo::handle_goal, this,  std::placeholders::_1,  std::placeholders::_2),
+      std::bind(&MoveItCppDemo::handle_cancel, this,  std::placeholders::_1),
+      std::bind(&MoveItCppDemo::handle_accepted, this,  std::placeholders::_1));
 
     // Create collision object, planning shouldn't be too easy
     moveit_msgs::msg::CollisionObject collision_object;
@@ -154,11 +155,11 @@ public:
       planning_scene_monitor::LockedPlanningSceneRW scene(moveit_cpp_->getPlanningSceneMonitor());
       scene->processCollisionObjectMsg(collision_object);
     }  // Unlock PlanningScene
-    robot_model_loader::RobotModelLoader robot_model_loader(node_,"robot_description",true);
+    /* robot_model_loader::RobotModelLoader robot_model_loader(node_,"robot_description",true);
     robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
     RCLCPP_INFO(LOGGER,"Model frame: %s", kinematic_model->getModelFrame().c_str());
     robot_state::RobotStatePtr kinematic_state(new robot_state::RobotState(kinematic_model));
-    //kinematic_state->setToDefaultValues();
+    kinematic_state->setToDefaultValues();
     const robot_state::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("manipulator");
 
     const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
@@ -167,7 +168,7 @@ public:
     for (std::size_t i = 0; i < joint_names.size(); ++i)
     {
       RCLCPP_INFO(LOGGER,"Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
-    }
+    } */
   
 
 
@@ -284,7 +285,7 @@ private:
 
   rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID & uuid,std::shared_ptr<const kmr_msgs::action::PlanToFrame::Goal> goal)
   {
-    RCLCPP_INFO(LOGGER, "Received request to move to: %s", goal->frame);
+    RCLCPP_INFO(LOGGER, "Received request to move to: %s", (goal->frame).c_str());
     (void)uuid;
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -309,14 +310,22 @@ private:
     
     auto result = std::make_shared<kmr_msgs::action::PlanToFrame::Result>();
 
-    arm->setGoal(goal->frame);
-    RCLCPP_INFO(LOGGER, "Plan to goal");
+    if (goal->frame == "object"){
+      RCLCPP_INFO(LOGGER, "GoalPose Received: %f, %f, %f", goal->pose.pose.position.x,goal->pose.pose.position.y,goal->pose.pose.position.z);
+      arm->setGoal(goal->pose,"gripper_base_link");
+    }else{
+        RCLCPP_INFO(LOGGER, "GoalFrame Received: %s", (goal->frame).c_str());
+        arm->setGoal(goal->frame);
+    }
+
     default_parameters.planning_attempts = 1;
     default_parameters.planning_time = 5.0;
     default_parameters.max_velocity_scaling_factor = 0.4;
     default_parameters.max_acceleration_scaling_factor = 0.4;
-    RCLCPP_INFO(LOGGER, "Initialize node");
-    planning_pipeline_names.begin();
+
+    planning_pipeline_names = moveit_cpp_->getPlanningPipelineNames("manipulator");
+    if (!planning_pipeline_names.empty())
+      default_parameters.planning_pipeline = *planning_pipeline_names.begin();
     const auto plan_solution = arm->plan(default_parameters);
 
     // Check if there is a cancel request

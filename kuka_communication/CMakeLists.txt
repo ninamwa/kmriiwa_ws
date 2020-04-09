@@ -62,7 +62,7 @@ endif()
 
 # Install python scripts
 install(
-  DIRECTORY launch param
+  DIRECTORY launch param script
   DESTINATION share/${PROJECT_NAME}
 )
 

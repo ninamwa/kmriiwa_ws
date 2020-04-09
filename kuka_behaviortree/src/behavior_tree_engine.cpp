@@ -24,7 +24,7 @@
 
 using namespace std::chrono_literals;
 
-namespace kmr_behavior_tree_engine
+namespace kmr_behavior_tree
 {
 
 BehaviorTreeEngine::BehaviorTreeEngine(const std::vector<std::string> & plugin_libraries)
@@ -72,4 +72,4 @@ BehaviorTreeEngine::buildTreeFromText(const std::string & xml_string, BT::Blackb
   return t;
 }
 
-}  // namespace kmr_behavior_tree_engine
+}  // namespace kmr_behavior_tree
