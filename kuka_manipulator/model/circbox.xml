@@ -4927,7 +4927,7 @@
 			</output>
 		</layer>
 		<layer id="236" name="PriorBoxClustered_0" precision="FP32" type="PriorBoxClustered">
-			<data clip="0" flip="0" height="30.0,42.42640687119285,84.8528137423857" offset="0.5" variance="0.1,0.1,0.2,0.2" width="30.0,84.85281374238572,42.42640687119286"/>
+			<data clip="0" flip="0" height="30.0,42.42640750339557,84.85281500679115" offset="0.5" variance="0.1,0.1,0.2,0.2" width="30.0,84.85281500679116,42.42640750339558"/>
 			<input>
 				<port id="0">
 					<dim>1</dim>
@@ -4951,7 +4951,7 @@
 			</output>
 		</layer>
 		<layer id="237" name="PriorBoxClustered_1" precision="FP32" type="PriorBoxClustered">
-			<data clip="0" flip="0" height="104.99999940000001,74.24621160032342,148.49242320064684,60.62177791850055,181.8744304326306,125.49900311954674" offset="0.5" variance="0.1,0.1,0.2,0.2" width="104.99999940000001,148.49242320064687,74.24621160032343,181.86533375550164,60.618745844451475,125.49900311954674"/>
+			<data clip="0" flip="0" height="105.0,74.24621202458748,148.49242404917496,60.62177826491071,181.87443025268067,125.49900360609514" offset="0.5" variance="0.1,0.1,0.2,0.2" width="105.0,148.49242404917499,74.24621202458749,181.8653347947321,60.618746597214425,125.49900360609514"/>
 			<input>
 				<port id="0">
 					<dim>1</dim>
@@ -4975,7 +4975,7 @@
 			</output>
 		</layer>
 		<layer id="238" name="PriorBoxClustered_2" precision="FP32" type="PriorBoxClustered">
-			<data clip="0" flip="0" height="149.99999880000001,106.06601632945399,212.13203265890797,86.60253968562355,259.8206143098823,171.02631229141326" offset="0.5" variance="0.1,0.1,0.2,0.2" width="149.99999880000001,212.132032658908,106.066016329454,259.80761905687064,86.59820815127762,171.02631229141326"/>
+			<data clip="0" flip="0" height="149.99999910593033,106.06601654577939,212.13203309155878,86.6025398622525,259.82061309803515,171.02631247102158" offset="0.5" variance="0.1,0.1,0.2,0.2" width="149.99999910593033,212.13203309155884,106.06601654577942,259.8076195867575,86.5982089084265,171.02631247102158"/>
 			<input>
 				<port id="0">
 					<dim>1</dim>
@@ -4999,7 +4999,7 @@
 			</output>
 		</layer>
 		<layer id="239" name="PriorBoxClustered_3" precision="FP32" type="PriorBoxClustered">
-			<data clip="0" flip="0" height="194.99999820000002,137.88582105858458,275.77164211716916,112.58330145274655,337.766798187134,216.33307444771364" offset="0.5" variance="0.1,0.1,0.2,0.2" width="194.99999820000002,275.77164211716916,137.88582105858458,337.74990435823963,112.57767045810377,216.33307444771364"/>
+			<data clip="0" flip="0" height="194.99999821186066,137.88582106697132,275.77164213394263,112.58330145959431,337.7667959433896,216.33307432710285" offset="0.5" variance="0.1,0.1,0.2,0.2" width="194.99999821186066,275.77164213394263,137.88582106697132,337.7499043787829,112.57767121963856,216.33307432710285"/>
 			<input>
 				<port id="0">
 					<dim>1</dim>
@@ -5023,7 +5023,7 @@
 			</output>
 		</layer>
 		<layer id="240" name="PriorBoxClustered_4" precision="FP32" type="PriorBoxClustered">
-			<data clip="0" flip="0" height="239.99999760000003,169.70562578771515,339.4112515754303,138.56406321986955,415.7129820643857,261.5339339282763" offset="0.5" variance="0.1,0.1,0.2,0.2" width="239.99999760000003,339.4112515754303,169.70562578771515,415.69218965960863,138.55713276492992,261.5339339282763"/>
+			<data clip="0" flip="0" height="239.99999731779099,169.7056255881632,339.4112511763264,138.5640630569361,415.71297878874407,261.53393351009646" offset="0.5" variance="0.1,0.1,0.2,0.2" width="239.99999731779099,339.41125117632646,169.70562558816323,415.69218917080826,138.55713353085062,261.53393351009646"/>
 			<input>
 				<port id="0">
 					<dim>1</dim>
@@ -5047,7 +5047,7 @@
 			</output>
 		</layer>
 		<layer id="241" name="PriorBoxClustered_5" precision="FP32" type="PriorBoxClustered">
-			<data clip="0" flip="0" height="284.999997,201.5254305168457,403.0508610336914,164.54482498699255,493.6591659416373,292.4038288053014" offset="0.5" variance="0.1,0.1,0.2,0.2" width="284.999997,403.05086103369143,201.52543051684572,493.63447496097757,164.53659507175607,292.4038288053014"/>
+			<data clip="0" flip="0" height="284.9999964237213,201.5254301093551,403.0508602187102,164.54482465427787,493.6591616340985,292.40382850967666" offset="0.5" variance="0.1,0.1,0.2,0.2" width="284.9999964237213,403.0508602187103,201.52543010935514,493.6344739628336,164.5365958420627,292.40382850967666"/>
 			<input>
 				<port id="0">
 					<dim>1</dim>
@@ -5113,7 +5113,7 @@
 			</output>
 		</layer>
 		<layer id="243" name="DetectionOutput" precision="FP32" type="DetectionOutput">
-			<data code_type="caffe.PriorBoxParameter.CENTER_SIZE" confidence_threshold="9.9999999e-09" input_height="1" input_width="1" keep_top_k="100" nms_threshold="0.60000002" normalized="1" num_classes="2" pad_mode="caffe.ResizeParameter.CONSTANT" resize_mode="caffe.ResizeParameter.WARP" share_location="1" top_k="100" variance_encoded_in_target="0"/>
+			<data code_type="caffe.PriorBoxParameter.CENTER_SIZE" confidence_threshold="9.99999993922529e-09" input_height="1" input_width="1" keep_top_k="100" nms_threshold="0.6000000238418579" normalized="1" num_classes="2" pad_mode="caffe.ResizeParameter.CONSTANT" resize_mode="caffe.ResizeParameter.WARP" share_location="1" top_k="100" variance_encoded_in_target="0"/>
 			<input>
 				<port id="0">
 					<dim>1</dim>
@@ -5456,7 +5456,7 @@
 			<mean_values value="()"/>
 			<move_to_preprocess value="False"/>
 			<output_dir value="DIR"/>
-			<reverse_input_channels value="False"/>
+			<reverse_input_channels value="True"/>
 			<scale_values value="()"/>
 			<silent value="False"/>
 			<steps value="False"/>
