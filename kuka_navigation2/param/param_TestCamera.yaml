@@ -107,16 +107,16 @@ controller_server:
     FollowPath.linear_granularity: 0.05
     FollowPath.angular_granularity: 0.025
     FollowPath.time_granularity: 0.05
-    FollowPath.xy_goal_tolerance: 0.55
-    FollowPath.yaw_goal_tolerance: 0.25
+    FollowPath.xy_goal_tolerance: 0.6
+    FollowPath.yaw_goal_tolerance: 1.2
     FollowPath.transform_tolerance: 0.2
     FollowPath.critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
     FollowPath.BaseObstacle.scale: 0.02
-    FollowPath.PathAlign.scale: 10.0
-    FollowPath.GoalAlign.scale: 10.0
-    FollowPath.PathDist.scale: 3.0
-    FollowPath.GoalDist.scale: 4.0
-    FollowPath.RotateToGoal.scale: 2.0
+    FollowPath.PathAlign.scale: 0.0
+    FollowPath.GoalAlign.scale: 0.0
+    FollowPath.PathDist.scale: 32.0
+    FollowPath.GoalDist.scale: 24.0
+    FollowPath.RotateToGoal.scale: 12.0
 
 controller_server_rclcpp_node:
   ros__parameters:
@@ -138,7 +138,8 @@ local_costmap:
       resolution: 0.5
       robot_radius: 0.54
       inflation_layer:
-        cost_scaling_factor: 3.0
+        cost_scaling_factor: 1.0
+        inflation_layer.inflation_radius: 0.1
       obstacle_layer:
         enabled: True
         observation_sources: scan_1 scan_2
@@ -241,7 +242,7 @@ planner_server:
     planner_plugin_types: ["nav2_navfn_planner/NavfnPlanner"]
     planner_plugin_ids: ["GridBased"]
     use_sim_time: True
-    GridBased.tolerance: 2.0
+    GridBased.tolerance: 1.0
     GridBased.use_astar: false
     GridBased.allow_unknown: true
 
@@ -270,4 +271,4 @@ recoveries_server:
     - nav2_recoveries/Wait
     rotational_acc_lim: 0.2
     simulate_ahead_time: 2.0
-    use_sim_time: true
+    use_sim_time: True

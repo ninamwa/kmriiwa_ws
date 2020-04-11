@@ -26,13 +26,19 @@
             </Sequence>
         </Fallback>
         <Sequence name="handle_object">
-            <Sequence name="pick_object">
-                <Sequence name="main_move_to_object">
-                    <PlanManipulatorPath plan_to_frame="object" ObjectPose="{pose}"/>
+            <Fallback name="handle_not_able_to_close">
+                <Sequence name="pick_object">
+                    <Sequence name="main_move_to_object">
+                        <PlanManipulatorPath plan_to_frame="object" ObjectPose="{pose}"/>
+                        <MoveManipulator path="{path}"/>
+                    </Sequence>
+                    <CloseGripper/>
+                </Sequence>
+                <Sequence name="movetodrive">
+                    <PlanManipulatorPath plan_to_frame="drive_frame"/>
                     <MoveManipulator path="{path}"/>
                 </Sequence>
-                <CloseGripper/>
-            </Sequence>
+            </Fallback>
             <Sequence name="leave_object">
                 <Fallback name="find_empty_frame">
                     <Fallback name="check_empty_frame">
