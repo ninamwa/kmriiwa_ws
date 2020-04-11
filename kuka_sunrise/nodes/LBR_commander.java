@@ -21,6 +21,8 @@ package API_ROS2_Sunrise;
 import API_ROS2_Sunrise.ISocket;
 import API_ROS2_Sunrise.TCPSocket;
 import API_ROS2_Sunrise.UDPSocket;
+import API_ROS2_Sunrise.LBR_commander.PTPpoint;
+
 
 // RoboticsAPI
 import com.kuka.roboticsAPI.deviceModel.JointPosition;
@@ -30,10 +32,12 @@ import com.kuka.roboticsAPI.geometricModel.AbstractFrame;
 import com.kuka.roboticsAPI.motionModel.IMotionContainer;
 import static com.kuka.roboticsAPI.motionModel.BasicMotions.ptp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class LBR_commander extends Node{
 	
-	// Runtime Variables
 
 	// Robot Specific
 	LBR lbr;
@@ -44,6 +48,9 @@ public class LBR_commander extends Node{
 	private final double defaultVelocity = 0.2;
 	AbstractFrame drivePos;
 	ICommandContainer LBR_currentMotion;
+	
+	private List<SplineMotionJP<?>> splineSegments = new ArrayList<SplineMotionJP<?>>();
+	PathThread followPathThread;
 
 
 	public LBR_commander(int port,LBR robot, String ConnectionType, AbstractFrame drivepos) {
@@ -68,6 +75,7 @@ public class LBR_commander extends Node{
 		Thread emergencystopthread = new MonitorEmergencyStopThread();
 		emergencystopthread.start();
 		
+		followPathThread = new PathThread();
 		CommandedjointPos = lbr.getCurrentJointPosition();
 		
 		while(isNodeRunning())
@@ -84,12 +92,114 @@ public class LBR_commander extends Node{
 			if ((splt[0]).equals("setLBRmotion")&& (!(getEmergencyStop()))){
 				JointLBRMotion(Commandstr);
 				}
-			if ((splt[0]).equals("path")&& (!(getEmergencyStop()))){
-				setisPathFinished(false);
-				// TODO: I path - is finished - sett til true!!
+			if ((splt[0]).equals("pathPointLBR")&& (!(getEmergencyStop()))){
+				addPointToSegment(Commandstr);
 				}
 		}
     }
+	private void addPointToSegment(String commandstr){
+		int ArrayLength = lbr.getJointCount();
+		String []lineSplt = commandstr.split(">");
+		String pointType = lineSplt[1];
+		
+
+		double[] poses = new double[ArrayLength];
+		double[] velocities = new double[ArrayLength];;
+		double[] accelerations = new double[ArrayLength];;
+		
+		
+		// Read message
+		for(int i = 0; i < ArrayLength ; ++i){
+			poses[i] = Double.parseDouble(lineSplt[2].split(" ")[i]);
+			double vel = Math.abs(Double.parseDouble(lineSplt[3].split(" ")[i]));
+			if(vel>1){
+				vel = 1;
+			}else if(vel<-1){
+				vel = -1;
+			}
+			velocities[i] = vel;
+			double accel = Math.abs(Double.parseDouble(lineSplt[4].split(" ")[i]));
+			if(accel>1){
+				accel = 1.0;
+			}else if(vel<-1){
+				accel = -1.0;
+			}
+			accelerations[i] = accel;
+		}
+		
+		// KAN IKKE BRUKE STARTPOINT fordi velocity = 0
+		if(pointType.equals("StartPoint")){
+			splineSegments.clear();
+		}else{
+			PTPpoint ptp = new PTPpoint(pointType, new JointPosition(poses), velocities, accelerations);
+			splineSegments.add(ptp.getPTP());
+			if(pointType.equals("EndPoint")){
+				followPathThread.run();
+			}
+		}
+	}
+	private void addPointToSegment(String commandstr){
+		int ArrayLength = lbr.getJointCount();
+		String []lineSplt = commandstr.split(">");
+		String pointType = lineSplt[1];
+		
+
+		double[] poses = new double[ArrayLength];
+		double[] velocities = new double[ArrayLength];;
+		double[] accelerations = new double[ArrayLength];;
+		
+		
+		// Read message
+		for(int i = 0; i < ArrayLength ; ++i){
+			poses[i] = Double.parseDouble(lineSplt[2].split(" ")[i]);
+			double vel = Math.abs(Double.parseDouble(lineSplt[3].split(" ")[i]));
+			if(vel>1){
+				vel = 1;
+			}else if(vel<-1){
+				vel = -1;
+			}
+			velocities[i] = vel;
+			double accel = Math.abs(Double.parseDouble(lineSplt[4].split(" ")[i]));
+			if(accel>1){
+				accel = 1.0;
+			}else if(vel<-1){
+				accel = -1.0;
+			}
+			accelerations[i] = accel;
+		}
+		
+		// Skip start point as velocity and acceleration is 0
+		if(pointType.equals("StartPoint")){
+			splineSegments.clear();
+		}else{
+			PTPpoint ptp = new PTPpoint(pointType, new JointPosition(poses), velocities, accelerations);
+			splineSegments.add(ptp.getPTP());
+			if(pointType.equals("EndPoint")){
+				followPathThread.run();
+			}
+		}
+	}
+	
+	// TODO: what happens if an emergency stop is triggered?
+	private class PathThread extends Thread {
+		public void run(){
+			if( !(getEmergencyStop()) && !splineSegments.isEmpty() && (isSocketConnected()) && (!(closed)) ){
+					SplineJP spline = new SplineJP(splineSegments.toArray(new SplineMotionJP<?>[splineSegments.size()]));
+					LBR_is_Moving = true;
+					currentmotion = lbr.move(spline);
+					if(currentmotion.isFinished()){
+						LBR_is_Moving = false;
+						
+						splineSegments.clear();
+						// TODO: DO SOMETHING WITH THE GRIPPER :D
+					}
+					}else{
+						LBR_is_Moving = false;
+					}
+				}
+			
+		}
+
 	
 	private void JointLBRMotion(String commandstr) {
 		if(isNodeRunning() && !(getEmergencyStop())){
