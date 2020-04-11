@@ -24,12 +24,11 @@ from rclpy.qos import qos_profile_sensor_data
 from rclpy.utilities import remove_ros_args
 import argparse
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-
-#from script.tcpSocket import TCPSocket
-#from script.udpSocket import UDPSocket
-from rclpy.action import ActionServer, GoalResponse
-from kmr_msgs.action import MoveManipulator
 from kmr_msgs.msg import LbrStatusdata
+from kmr_msgs.action import MoveManipulator
+from tcpSocket import TCPSocket
+from udpSocket import UDPSocket
+from rclpy.action import ActionServer, GoalResponse
 
 
 

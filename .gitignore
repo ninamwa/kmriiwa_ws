@@ -65,3 +65,4 @@ build-*/
 /.metadata/
 .metadata/
 .metadata
+COLCON_IGNORE

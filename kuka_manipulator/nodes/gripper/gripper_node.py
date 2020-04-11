@@ -50,7 +50,7 @@ class GripperNode(Node):
         #print("OK")
         self.open_action_server = ActionServer(self,OpenGripper,'open_gripper',self.open_gripper_callback)
         self.close_action_server = ActionServer(self, CloseGripper, 'close_gripper', self.close_gripper_callback)
-    
+
 
     def open_gripper_callback(self, goal_handle):
         self.get_logger().info('Executing open_gripper goal...')

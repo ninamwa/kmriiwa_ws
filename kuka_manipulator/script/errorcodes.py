@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from enum import Enum
+
 class ErrorCodes(Enum):
 
     NO_OBJECT = "No object found while closing"
