@@ -1,10 +1,9 @@
 # Goal
-string frame
+trajectory_msgs/JointTrajectory path
 
 ---
 # Result
 bool success
-string frame
 string error
 
 ---

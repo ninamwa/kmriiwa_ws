@@ -100,7 +100,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/wheels/omni_wheel_1.dae</uri>
+            <uri>model://kmr/meshes/wheels/omni_wheel_1.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -130,7 +130,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/wheels/omni_wheel_1.dae</uri>
+            <uri>model://kmr/meshes/wheels/omni_wheel_1.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -169,7 +169,7 @@
             <geometry>
               <mesh>
                 <scale>1 1 1</scale>
-                <uri>model://kuka/meshes/wheels/omni_wheel_1.dae</uri>
+                <uri>model://kmr/meshes/wheels/omni_wheel_1.dae</uri>
               </mesh>
             </geometry>
         </visual>
@@ -199,7 +199,7 @@
             <geometry>
               <mesh>
                 <scale>1 1 1</scale>
-                <uri>model://kuka/meshes/wheels/omni_wheel_1.dae</uri>
+                <uri>model://kmr/meshes/wheels/omni_wheel_1.dae</uri>
               </mesh>
             </geometry>
        </visual>
@@ -217,7 +217,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/sensors/visual/sick_lms1xx.dae</uri>
+            <uri>model://kmr/meshes/sensors/visual/sick_lms1xx.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -226,7 +226,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/sensors/collision/sick_lms1xx.stl</uri>
+            <uri>model://kmr/meshes/sensors/collision/sick_lms1xx.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -277,7 +277,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/sensors/collision/sick_lms1xx.stl</uri>
+            <uri>model://kmr/meshes/sensors/collision/sick_lms1xx.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -286,7 +286,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/sensors/visual/sick_lms1xx.dae</uri>
+            <uri>model://kmr/meshes/sensors/visual/sick_lms1xx.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -337,7 +337,7 @@
             <geometry>
               <mesh>
                 <scale>1 1 1</scale>
-                <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/base_link.dae</uri>
+                <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/base_link.dae</uri>
               </mesh>
             </geometry>
          </visual>
@@ -346,7 +346,7 @@
             <geometry>
               <mesh>
                 <scale>1 1 1</scale>
-                <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/base_link.stl</uri>
+                <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/base_link.stl</uri>
               </mesh>
             </geometry>
          </collision>
@@ -368,7 +368,7 @@
             <geometry>
               <mesh>
                 <scale>1 1 1</scale>
-                <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_1.stl</uri>
+                <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_1.stl</uri>
               </mesh>
             </geometry>
           </collision>
@@ -378,7 +378,7 @@
             <geometry>
               <mesh>
                 <scale>1 1 1</scale>
-                <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_1.dae</uri>
+                <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_1.dae</uri>
               </mesh>
             </geometry>
           </visual>
@@ -399,7 +399,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_2.stl</uri>
+            <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_2.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -408,7 +408,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_2.dae</uri>
+            <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_2.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -430,7 +430,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_3.dae</uri>
+            <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_3.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -439,7 +439,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_3.stl</uri>
+            <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_3.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -460,7 +460,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_4.stl</uri>
+            <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_4.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -469,7 +469,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_4.dae</uri>
+            <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_4.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -492,7 +492,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_5.stl</uri>
+            <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_5.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -501,7 +501,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_5.dae</uri>
+            <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_5.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -522,7 +522,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_6.stl</uri>
+            <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_6.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -531,7 +531,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_6.dae</uri>
+            <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_6.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -552,7 +552,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/lbr_iiwa_14_r820/collision/link_7.stl</uri>
+            <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_7.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -561,7 +561,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/lbr_iiwa_14_r820/visual/link_7.dae</uri>
+            <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_7.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -600,7 +600,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://kuka/meshes/sensors/visual/r200.dae</uri>
+            <uri>model://kmr/meshes/sensors/visual/r200.dae</uri>
           </mesh>
         </geometry>
       </visual>

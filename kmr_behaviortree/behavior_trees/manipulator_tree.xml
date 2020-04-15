@@ -1,0 +1,66 @@
+
+<root main_tree_to_execute="MainTree">
+
+  <BehaviorTree ID="MainTree">
+    <Sequence name="main_sequence">
+      <SubTree ID="FindObject"/>
+      <SubTree ID="HandleObject"/>
+    </Sequence>
+  </BehaviorTree> 
+
+  <BehaviorTree ID="FindObject">
+    <Fallback name="search_object">
+      <Sequence name="search_frame1">
+        <SubTree ID="MoveToFrame" frame="search_1"/>
+        <ObjectSearch/>
+      </Sequence>
+      <Sequence name="search_frame2">
+        <SubTree ID="MoveToFrame" frame="search_2"/>
+        <ObjectSearch/>
+      </Sequence>
+      <Sequence name="search_frame3">
+        <SubTree ID="MoveToFrame" frame="search_3"/>
+        <ObjectSearch/>
+      </Sequence>
+    </Fallback>
+  </BehaviorTree>
+
+  <BehaviorTree ID="HandleObject">
+    <Sequence name="handle_object_sequence">
+      <Sequence name="pick_object">
+        <SubTree ID="MoveToObject" frame="object" pose="{ObjectPose}"/>
+        <CloseGripper/>
+      </Sequence>
+      <Sequence name="leave_object">
+        <Fallback name="find_empty_frame">
+          <Fallback name="check_empty_frame">
+            <FrameEmpty check_frame="frame1"/>
+            <FrameEmpty check_frame="frame2"/>
+            <FrameEmpty check_frame="frame3"/>
+          </Fallback>
+          <ForceFailure name="force_failure">
+            <OpenGripper/>
+          </ForceFailure>
+        </Fallback>
+        <SubTree ID="MoveToFrame" frame="{empty_frame}"/>
+        <OpenGripper/>
+        <SubTree ID="MoveToFrame" frame="drive_frame"/>
+      </Sequence>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="MoveToFrame">
+    <Sequence name="main_move_to_frame">
+      <PlanManipulatorPath plan_to_frame="{frame}"/>
+      <MoveManipulator path="{path}" move_to_frame="{move_to_frame}"/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="MoveToObject">
+    <Sequence name="main_move_to_object">
+      <PlanManipulatorPath plan_to_frame="{frame}" ObjectPose="{pose}"/>
+      <MoveManipulator path="{path}"/>
+    </Sequence>
+  </BehaviorTree>
+
+</root>

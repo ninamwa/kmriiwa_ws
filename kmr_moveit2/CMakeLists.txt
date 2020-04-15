@@ -29,6 +29,7 @@ find_package(nav_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(kmr_msgs REQUIRED)
 find_package(kmr_manipulator REQUIRED)
 find_package(rclcpp_action REQUIRED)
 
@@ -41,12 +42,14 @@ set(DEPENDENCIES
   "tf2"
   "moveit_ros_planning_interface"
   "Boost"
+  "kmr_msgs"
   "kmr_manipulator"
   "rclcpp_action"
 )
 
 add_executable(run_moveit_cpp src/run_moveit.cpp)
 ament_target_dependencies(run_moveit_cpp ${DEPENDENCIES})
+
 
 install(TARGETS run_moveit_cpp
   EXPORT export_${PROJECT_NAME}
