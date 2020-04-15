@@ -55,7 +55,7 @@ class NavigationNode(Node):
         self.highestspeed = [0.5, 0.0, 1.5, 0.5]
         self.last_update_time = 0
 
-        self.action_client = ActionClient(self, NavigateToPose, '/NavigateToPose')
+        self.action_client = ActionClient(self, NavigateToPose, '/navigate_to_pose')
         self.waypoint_client = ActionClient(self, FollowWaypoints, '/FollowWaypoints')
         while not self.action_client.wait_for_server(timeout_sec=10.0):
             self.get_logger().info('Waiting for NavigateToPose service')
@@ -73,7 +73,7 @@ class NavigationNode(Node):
         sub_status = self.create_subscription(Bool, 'clear', self.status2_callback, qos_profile_sensor_data)
 
         st=0
-        while(False):
+        while(True):
             time.sleep(0.1)
             if (st == 25):
                 initial = PoseWithCovarianceStamped()

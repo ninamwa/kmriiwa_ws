@@ -12,14 +12,20 @@ def generate_launch_description():
 
     gripper_node_launch_file_dir = os.path.join(get_package_share_directory('kuka_manipulator'),'launch')
     moveit_launch_file_dir = os.path.join(get_package_share_directory('kuka_moveit2'), 'launch')
-
-    plugin_lib_names =['close_gripper_action_bt_node', 'open_gripper_action_bt_node','move_manipulator_action_bt_node','plan_manipulator_path_action_bt_node','object_search_action_bt_node','frame_empty_condition_bt_node']
+    navigation_launch_file_dir = os.path.join(get_package_share_directory('kuka_navigation2'), 'launch')
+    
     #xml_file_name = 'manipulator_tree.xml'
-    xml_file_name = 'm_tree.xml'
+    xml_file_name = 'full_tree.xml'
     xml = os.path.join(
         get_package_share_directory('kuka_behaviortree'),
         'behavior_trees',
         xml_file_name)
+    bt_param_dir = LaunchConfiguration(
+        'bt_param_dir',
+        default=os.path.join(
+            get_package_share_directory('kuka_behaviortree'),
+            'param',
+            'param.yaml'))
 
     
     connection_type_TCP='TT'
@@ -33,10 +39,6 @@ def generate_launch_description():
 
     return LaunchDescription([
 
-        DeclareLaunchArgument(
-            'bt_xml_filename', default_value='kuka_behaviortree/behavior_trees/manipulator_tree.xml',
-            description='File to read BT tree from'),
-
         IncludeLaunchDescription(
                PythonLaunchDescriptionSource([gripper_node_launch_file_dir, '/gripper_node.launch.py']),
         ),
@@ -44,6 +46,10 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([moveit_launch_file_dir, '/moveit.launch.py']),
         ),
+
+        #IncludeLaunchDescription(
+        #    PythonLaunchDescriptionSource([navigation_launch_file_dir, '/navigation2.launch.py']),
+        #),
 
         Node(
             package="kuka_communication",
@@ -65,10 +71,10 @@ def generate_launch_description():
 
         Node(
             package="kuka_behaviortree",
-            node_executable="behavior_tree_node2",
-            node_name="behavior_tree_node2",
+            node_executable="behavior_tree_node",
+            node_name="behavior_tree_node",
             output='screen',
-            parameters=[{'bt_xml_filename': xml},{'plugin_lib_names': plugin_lib_names}],
+            parameters=[{'bt_xml_filename': xml}, bt_param_dir],
             emulate_tty=True,
             ),
 

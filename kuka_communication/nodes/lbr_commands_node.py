@@ -26,8 +26,8 @@ import argparse
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from kmr_msgs.msg import LbrStatusdata
 from kmr_msgs.action import MoveManipulator
-from tcpSocket import TCPSocket
-from udpSocket import UDPSocket
+#from tcpSocket import TCPSocket
+#from udpSocket import UDPSocket
 from rclpy.action import ActionServer, GoalResponse
 
 

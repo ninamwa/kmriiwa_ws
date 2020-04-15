@@ -28,6 +28,7 @@ find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(kmr_msgs REQUIRED)
+find_package(nav2_msgs REQUIRED)
 
 set(library_name ${PROJECT_NAME})
 
@@ -44,6 +45,7 @@ set(dependencies
   tf2_geometry_msgs
   std_msgs
   kmr_msgs
+  nav2_msgs
 )
 
 add_library(close_gripper_action_bt_node SHARED plugins/action/close_gripper.cpp)
@@ -64,21 +66,24 @@ list(APPEND plugin_libs object_search_action_bt_node)
 add_library(frame_empty_condition_bt_node SHARED plugins/condition/frame_empty.cpp)
 list(APPEND plugin_libs frame_empty_condition_bt_node)
 
+add_library(navigation_bt_node SHARED plugins/action/navigation.cpp)
+list(APPEND plugin_libs navigation_bt_node)
+
 foreach(bt_plugin ${plugin_libs})
   ament_target_dependencies(${bt_plugin} ${dependencies})
   target_compile_definitions(${bt_plugin} PRIVATE BT_PLUGIN_EXPORT)
 endforeach()
 
 
-add_executable(behavior_tree_node2 src/behavior_tree_node2.cpp)
+add_executable(behavior_tree_node src/behavior_tree_node.cpp)
 add_library(engine SHARED src/behavior_tree_engine.cpp)
-ament_target_dependencies(behavior_tree_node2 ${dependencies})
-target_link_libraries(behavior_tree_node2 engine)
+ament_target_dependencies(behavior_tree_node ${dependencies})
+target_link_libraries(behavior_tree_node engine)
 ament_target_dependencies(engine ${dependencies})
 
 
 
-install(TARGETS behavior_tree_node2 engine
+install(TARGETS behavior_tree_node engine
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -91,7 +96,7 @@ install(TARGETS ${plugin_libs}
 
 
 install(
-  DIRECTORY launch plugins behavior_trees
+  DIRECTORY launch plugins behavior_trees param
   DESTINATION share/${PROJECT_NAME}
 )
 
