@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="kuka" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="kmr" xmlns:xacro="http://ros.org/wiki/xacro">
 
   <link name="base_footprint"/>
 
@@ -44,8 +44,8 @@
         </geometry>
       </collision>
       <inertial>
-          <mass value="364"/>
-          <inertia ixx="25.86" ixy="0.0" ixz="0.0" iyy="47.42" iyz="0.0" izz="49.2"/>
+          <mass value="55.04"/>
+          <inertia ixx="5.383" ixy="0.0" ixz="0.0" iyy="7.170" iyz="0.0" izz="1.854"/>
         </inertial>
   </link>
 
@@ -69,9 +69,9 @@
         </geometry>
       </collision>
       <inertial>
-          <mass value="364"/>
-          <inertia ixx="25.86" ixy="0.0" ixz="0.0" iyy="47.42" iyz="0.0" izz="49.2"/>
-      </inertial>
+          <mass value="18.42"/>
+          <inertia ixx="1.0866" ixy="0.0" ixz="0.0" iyy="1.437" iyz="0.0" izz="0.357"/>
+        </inertial>
     </link>
 
   <joint name="base_middle_to_top_joint" type="fixed">
@@ -94,8 +94,8 @@
         </geometry>
       </collision>
       <inertial>
-          <mass value="364"/>
-          <inertia ixx="25.86" ixy="0.0" ixz="0.0" iyy="47.42" iyz="0.0" izz="49.2"/>
+          <mass value="339.96"/>
+          <inertia ixx="39.1077" ixy="0.0" ixz="0.0" iyy="42.397" iyz="0.0" izz="18.238"/>
         </inertial>
   </link>
 
@@ -131,16 +131,20 @@
       <visual>
         <origin xyz="0 0 0" rpy="3.1413 0 0"/>
         <geometry>
-            <mesh filename="package://kuka_bringup/meshes/sensors/visual/sick_lms1xx.dae" />
+            <mesh filename="package://kmr_bringup/meshes/sensors/visual/sick_lms1xx.dae" />
         </geometry>
         <material name="dark"/>
       </visual>
       <collision>
           <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
           <geometry>
-              <mesh filename="package://kuka_bringup/meshes/sensors/collision/sick_lms1xx.stl" />
+              <mesh filename="package://kmr_bringup/meshes/sensors/collision/sick_lms1xx.stl" />
           </geometry>
       </collision>
+      <inertial>
+          <mass value="1.2"/>
+          <inertia ixx="0.002355" ixy="0.0" ixz="0.0" iyy="0.002355" iyz="0.0" izz="0.0002809"/>
+        </inertial>
   </link>
 
   <joint name="laser_B4_joint" type="fixed">
@@ -153,23 +157,27 @@
       <visual>
         <origin xyz="0.0 0 0" rpy="0 3.1413 3.1413"/>
         <geometry>
-            <mesh filename="package://kuka_bringup/meshes/sensors/visual/sick_lms1xx.dae" />
+            <mesh filename="package://kmr_bringup/meshes/sensors/visual/sick_lms1xx.dae" />
         </geometry>
         <material name="dark"/>
       </visual>
       <collision>
           <origin xyz="0 0 0" rpy="0 0 0"/>
           <geometry>
-                <mesh filename="package://kuka_bringup/meshes/sensors/collision/sick_lms1xx.stl" />
+                <mesh filename="package://kmr_bringup/meshes/sensors/collision/sick_lms1xx.stl" />
           </geometry>
       </collision>
+      <inertial>
+          <mass value="1.2"/>
+          <inertia ixx="0.002355" ixy="0.0" ixz="0.0" iyy="0.002355" iyz="0.0" izz="0.0002809"/>
+        </inertial>
   </link>
 
   <link name="front_left_wheel_link">
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/wheels/omni_wheel_1.dae" />
+          <mesh filename="package://kmr_bringup/meshes/wheels/omni_wheel_1.dae" />
         </geometry>
       </visual>
       <collision>
@@ -189,7 +197,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/wheels/omni_wheel_1.dae" />
+          <mesh filename="package://kmr_bringup/meshes/wheels/omni_wheel_1.dae" />
         </geometry>
       </visual>
       <collision>
@@ -209,7 +217,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/wheels/omni_wheel_1.dae" />
+          <mesh filename="package://kmr_bringup/meshes/wheels/omni_wheel_1.dae" />
         </geometry>
       </visual>
       <collision>
@@ -229,7 +237,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/wheels/omni_wheel_1.dae" />
+          <mesh filename="package://kmr_bringup/meshes/wheels/omni_wheel_1.dae" />
         </geometry>
       </visual>
       <collision>
@@ -291,13 +299,13 @@
       <visual>
         <origin rpy="0.0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/visual/base_link.dae"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/base_link.dae"/>
         </geometry>
       </visual>
       <collision>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/collision/base_link.stl"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/base_link.stl"/>
         </geometry>
       </collision>
   </link>
@@ -305,13 +313,13 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/visual/link_1.dae"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_1.dae"/>
         </geometry>
       </visual>
       <collision>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/collision/link_1.stl"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_1.stl"/>
         </geometry>
       </collision>
   </link>
@@ -319,13 +327,13 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/visual/link_2.dae"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_2.dae"/>
         </geometry>
       </visual>
       <collision>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/collision/link_2.stl"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_2.stl"/>
         </geometry>
       </collision>
   </link>
@@ -333,13 +341,13 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/visual/link_3.dae"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_3.dae"/>
         </geometry>
       </visual>
       <collision>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/collision/link_3.stl"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_3.stl"/>
         </geometry>
       </collision>
   </link>
@@ -347,13 +355,13 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/visual/link_4.dae"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_4.dae"/>
         </geometry>
       </visual>
       <collision>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/collision/link_4.stl"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_4.stl"/>
         </geometry>
       </collision>
   </link>
@@ -361,13 +369,13 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/visual/link_5.dae"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_5.dae"/>
         </geometry>
       </visual>
       <collision>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/collision/link_5.stl"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_5.stl"/>
         </geometry>
       </collision>
   </link>
@@ -375,13 +383,13 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/visual/link_6.dae"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_6.dae"/>
         </geometry>
       </visual>
       <collision>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/collision/link_6.stl"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_6.stl"/>
         </geometry>
       </collision>
   </link>
@@ -389,13 +397,13 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/visual/link_7.dae"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_7.dae"/>
         </geometry>
       </visual>
       <collision>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/lbr_iiwa_14_r820/collision/link_7.stl"/>
+          <mesh filename="package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_7.stl"/>
         </geometry>
       </collision>
   </link>
@@ -469,7 +477,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kuka_bringup/meshes/gripper/visual/robotiq_arg2f_85_base_link.dae" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_base_link.dae" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="">
         <color rgba="0.1 0.1 0.1 1" />
@@ -478,7 +486,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kuka_bringup/meshes/gripper/collision/robotiq_arg2f_base_link.stl" />
+        <mesh filename="package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_base_link.stl" />
       </geometry>
     </collision>
   </link>
@@ -495,7 +503,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/visual/robotiq_arg2f_85_outer_knuckle.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_outer_knuckle.dae" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="">
           <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
@@ -504,7 +512,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/collision/robotiq_arg2f_85_outer_knuckle.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_outer_knuckle.dae" scale="0.001 0.001 0.001"/>
         </geometry>
       </collision>
     </link>
@@ -512,7 +520,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/visual/robotiq_arg2f_85_outer_knuckle.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_outer_knuckle.dae" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="">
           <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
@@ -521,7 +529,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/collision/robotiq_arg2f_85_outer_knuckle.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_outer_knuckle.dae" scale="0.001 0.001 0.001"/>
         </geometry>
       </collision>
     </link>
@@ -530,7 +538,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/visual/robotiq_arg2f_85_outer_finger.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_outer_finger.dae" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="">
           <color rgba="0.1 0.1 0.1 1" />
@@ -539,7 +547,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/collision/robotiq_arg2f_85_outer_finger.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_outer_finger.dae" scale="0.001 0.001 0.001"/>
         </geometry>
       </collision>
     </link>
@@ -548,7 +556,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/visual/robotiq_arg2f_85_outer_finger.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_outer_finger.dae" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="">
           <color rgba="0.1 0.1 0.1 1" />
@@ -557,7 +565,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/collision/robotiq_arg2f_85_outer_finger.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_outer_finger.dae" scale="0.001 0.001 0.001"/>
         </geometry>
       </collision>
     </link>
@@ -566,7 +574,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/visual/robotiq_arg2f_85_inner_knuckle.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_inner_knuckle.dae" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="">
           <color rgba="0.1 0.1 0.1 1" />
@@ -575,7 +583,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/collision/robotiq_arg2f_85_inner_knuckle.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_inner_knuckle.dae" scale="0.001 0.001 0.001"/>
         </geometry>
       </collision>
     </link>
@@ -584,7 +592,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/visual/robotiq_arg2f_85_inner_knuckle.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_inner_knuckle.dae" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="">
           <color rgba="0.1 0.1 0.1 1" />
@@ -593,7 +601,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/collision/robotiq_arg2f_85_inner_knuckle.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_inner_knuckle.dae" scale="0.001 0.001 0.001"/>
         </geometry>
       </collision>
     </link>
@@ -602,7 +610,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/visual/robotiq_arg2f_85_inner_finger.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_inner_finger.dae" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="">
           <color rgba="0.1 0.1 0.1 1" />
@@ -611,7 +619,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/collision/robotiq_arg2f_85_inner_finger.dae" scale="0.001 0.001 0.001" />
+          <mesh filename="package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_inner_finger.dae" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
     </link>
@@ -620,7 +628,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/visual/robotiq_arg2f_85_inner_finger.dae" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_inner_finger.dae" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="">
           <color rgba="0.1 0.1 0.1 1" />
@@ -629,7 +637,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kuka_bringup/meshes/gripper/collision/robotiq_arg2f_85_inner_finger.dae" scale="0.001 0.001 0.001" />
+          <mesh filename="package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_inner_finger.dae" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
     </link>
@@ -745,8 +753,6 @@
       <limit lower="0" upper="0.8" velocity="2.0" effort="1000" />
     </joint>
 
-    <link name="gripper_middle_point">
-
 
     <material name="aluminum">
       <color rgba="0.5 0.5 0.5 1"/>
@@ -762,7 +768,7 @@
       <visual>
       <origin xyz="0.0149 0.0 0.0125" rpy="1.570796 0 1.570796"/>
         <geometry>
-	        <mesh filename="package://kuka_bringup/meshes/sensors/visual/d435.dae" />
+	        <mesh filename="package://kmr_bringup/meshes/sensors/visual/d435.dae" />
         </geometry>
         <material name="aluminum"/>
       </visual>
