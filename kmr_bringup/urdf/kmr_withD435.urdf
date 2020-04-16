@@ -99,27 +99,6 @@
         </inertial>
   </link>
 
-  <joint name="camera_joint" type="fixed">
-    <origin xyz="0.483 0.0 0.2625" rpy="0 0 0"/>
-    <parent link="base_link_top"/>
-    <child link="d435_link"/>
-</joint>
-
-<link name="d435_link">
-  <visual>
-    <origin xyz="0 0 0" rpy="1.57 0 1.57"/>
-    <geometry>
-      <mesh filename="package://turtlebot3_description/meshes/sensors/r200.dae" />
-    </geometry>
-  </visual>
-  <collision>
-    <origin xyz="0.003 0.065 0.007" rpy="0 0 0"/>
-    <geometry>
-      <box size="0.012 0.132 0.020"/>
-    </geometry>
-  </collision>
-</link>
-
 
   <joint name="laser_B1_joint" type="fixed">
           <parent link="base_link" />
@@ -288,6 +267,11 @@
   </joint>
 
   <link name="base_iiwa">
+      <inertial>
+        <origin xyz="-0.1 0 0.07" rpy="0 0 0"/>
+        <mass value="5"/>
+        <inertia ixx="0.05"  ixy="0"  ixz="0" iyy="0.06" iyz="0" izz="0.03" />
+      </inertial>
       <visual>
         <origin rpy="0.0 0 0" xyz="0 0 0"/>
         <geometry>
@@ -302,6 +286,11 @@
       </collision>
   </link>
   <link name="link_1">
+      <inertial>
+        <origin xyz="0 -0.03 0.12" rpy="0 0 0"/>
+        <mass value="4"/>
+        <inertia ixx="0.1"  ixy="0"  ixz="0" iyy="0.09" iyz="0" izz="0.02" />
+      </inertial>
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
@@ -316,6 +305,11 @@
       </collision>
   </link>
   <link name="link_2">
+      <inertial>
+        <origin xyz="0.0003 0.059 0.042" rpy="0 0 0"/>
+        <mass value="4"/>
+        <inertia ixx="0.05"  ixy="0"  ixz="0" iyy="0.018" iyz="0" izz="0.044" />
+      </inertial>
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
@@ -330,6 +324,11 @@
       </collision>
   </link>
   <link name="link_3">
+      <inertial>
+        <origin xyz="0 0.03 0.13" rpy="0 0 0"/>
+        <mass value="3"/>
+        <inertia ixx="0.08"  ixy="0"  ixz="0" iyy="0.075" iyz="0" izz="0.01" />
+      </inertial>
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
@@ -344,6 +343,11 @@
       </collision>
   </link>
   <link name="link_4">
+      <inertial>
+        <origin xyz="0 0.067 0.034" rpy="0 0 0"/>
+        <mass value="2.7"/>
+        <inertia ixx="0.03"  ixy="0"  ixz="0" iyy="0.01" iyz="0" izz="0.029" />
+      </inertial>
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
@@ -358,6 +362,11 @@
       </collision>
   </link>
   <link name="link_5">
+      <inertial>
+        <origin xyz="0.0001 0.021 0.076" rpy="0 0 0"/>
+        <mass value="1.7"/>
+        <inertia ixx="0.02"  ixy="0"  ixz="0" iyy="0.018" iyz="0" izz="0.005" />
+      </inertial>
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
@@ -372,6 +381,11 @@
       </collision>
   </link>
   <link name="link_6">
+      <inertial>
+        <origin xyz="0 0.0006 0.0004" rpy="0 0 0"/>
+        <mass value="1.8"/>
+        <inertia ixx="0.005"  ixy="0"  ixz="0" iyy="0.0036" iyz="0" izz="0.0047" />
+      </inertial>
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
@@ -386,6 +400,11 @@
       </collision>
   </link>
   <link name="link_7">
+      <inertial>
+        <origin xyz="0 0 0.02" rpy="0 0 0"/>
+        <mass value="0.3"/>
+        <inertia ixx="0.001"  ixy="0"  ixz="0" iyy="0.001" iyz="0" izz="0.001" />
+      </inertial>
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
@@ -466,6 +485,19 @@
 
 
   <link name="gripper_base_link">
+    <inertial>
+      <origin
+        xyz="0.00021987 -2.3546E-10 0.030163"
+        rpy="0 0 0" />
+      <mass value="0.30915" />
+      <inertia
+        ixx="0.00028972"
+        ixy="-5.7879E-10"
+        ixz="-1.8543E-06"
+        iyy="0.00030737"
+        iyz="1.682E-12"
+        izz="0.00019914" />
+    </inertial>
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
@@ -492,6 +524,20 @@
     </joint>
 
     <link name="left_outer_knuckle">
+      <inertial>
+        <origin
+          xyz="0.0178331863169983 3.68915177224286E-11 0.0021442477325704"
+          rpy="0 0 0" />
+        <mass
+          value="0.00684838849434396" />
+        <inertia
+          ixx="2.66832029033166E-07"
+          ixy="1.66142314639824E-15"
+          ixz="1.45945633322873E-07"
+          iyy="1.3889233257419E-06"
+          iyz="2.82951161241588E-15"
+          izz="1.26603336914415E-06" />
+      </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
@@ -509,6 +555,20 @@
       </collision>
     </link>
     <link name="right_outer_knuckle">
+      <inertial>
+        <origin
+          xyz="0.0178097074051638 3.60493211424024E-11 0.00233123458346721"
+          rpy="0 0 0" />
+        <mass
+          value="0.00684838849401352" />
+        <inertia
+          ixx="2.70004361573169E-07"
+          ixy="1.59579467624491E-15"
+          ixz="1.56396493788199E-07"
+          iyy="1.38892332558312E-06"
+          iyz="2.82357800318817E-15"
+          izz="1.26286103637978E-06" />
+      </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
@@ -527,6 +587,20 @@
     </link>
 
     <link name="left_outer_finger">
+      <inertial>
+        <origin
+          xyz="0.00131451599174296 2.88942057994543E-15 0.0215404163180413"
+          rpy="0 0 0" />
+        <mass
+          value="0.0273093985570947" />
+        <inertia
+          ixx="8.51629628283022E-06"
+          ixy="2.58174336207405E-19"
+          ixz="3.83829504344079E-07"
+          iyy="6.9133328065108E-06"
+          iyz="-7.58589926143789E-19"
+          izz="2.25006832221981E-06" />
+      </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
@@ -545,6 +619,20 @@
     </link>
 
     <link name="right_outer_finger">
+      <inertial>
+        <origin
+          xyz="0.00108844269639009 -2.611488350845E-15 0.0215530225245502"
+          rpy="0 0 0" />
+        <mass
+          value="0.0273093985570947" />
+        <inertia
+          ixx="8.52366028592721E-06"
+          ixy="3.41683380899422E-19"
+          ixz="3.18003675694284E-07"
+          iyy="6.91333280651081E-06"
+          iyz="7.37726682706417E-19"
+          izz="2.24270431912283E-06" />
+      </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
@@ -563,6 +651,20 @@
     </link>
 
     <link name="left_inner_knuckle">
+      <inertial>
+        <origin
+          xyz="0.017097546626628 -3.93808524389535E-10 0.0224918438201868"
+          rpy="0 0 0" />
+        <mass
+          value="0.0110930853895903" />
+        <inertia
+          ixx="4.23392770691541E-06"
+          ixy="5.748978936968E-15"
+          ixz="1.78855677119788E-06"
+          iyy="3.96548790524392E-06"
+          iyz="1.05464666369669E-14"
+          izz="3.24068002883007E-06" />
+      </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
@@ -581,6 +683,20 @@
     </link>
 
     <link name="right_inner_knuckle">
+      <inertial>
+        <origin
+          xyz="0.0168606186773776 3.93808471820465E-10 0.0226699950793434"
+          rpy="0 0 0" />
+        <mass
+          value="0.0110930853895903" />
+        <inertia
+          ixx="4.27134775939882E-06"
+          ixy="-8.53568456728898E-15"
+          ixz="1.77774229944246E-06"
+          iyy="3.96548790524392E-06"
+          iyz="-8.45108024914164E-15"
+          izz="3.20325997634666E-06" />
+      </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
@@ -599,6 +715,20 @@
     </link>
 
     <link name="left_inner_finger">
+      <inertial>
+        <origin
+          xyz="0.0060275613594574 -6.29183141465421E-15 0.00669925693133241"
+          rpy="0 0 0" />
+        <mass
+          value="0.00724255346165745" />
+        <inertia
+          ixx="1.47824274053603E-06"
+          ixy="-3.94884463570303E-19"
+          ixz="-3.45268847648622E-07"
+          iyy="1.70064480838395E-06"
+          iyz="3.5059838910097E-19"
+          izz="4.77151336838364E-07" />
+      </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
@@ -617,6 +747,20 @@
     </link>
 
     <link name="right_inner_finger">
+      <inertial>
+        <origin
+          xyz="0.00602756228812038 -6.47284509480176E-15 0.00669925609578108"
+          rpy="0 0 0" />
+        <mass
+          value="0.00724255346165744" />
+        <inertia
+          ixx="1.47824283625957E-06"
+          ixy="-3.95952064019123E-19"
+          ixz="-3.45268708875543E-07"
+          iyy="1.70064480838394E-06"
+          iyz="3.55286507960029E-19"
+          izz="4.77151241114822E-07" />
+      </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
@@ -654,6 +798,13 @@
           <color rgba="0.9 0.0 0.0 1" />
         </material>
       </collision>
+      <inertial>
+          <mass value="0.019555" />
+          <origin xyz="0.0 0.0 0.0" />
+          <inertia ixx = "0.000002" ixy = "0.000000" ixz = "0.000000"
+                    iyx = "0.000000" iyy = "0.000005" iyz = "0.000000"
+                    izx = "0.000000" izy = "0.000000" izz = "0.000006" />
+      </inertial>
     </link>
     <link name="right_inner_finger_pad">
       <visual>
@@ -673,6 +824,22 @@
         <material name="">
           <color rgba="0.9 0.0 0.0 1" />
         </material>
+      </collision>
+      <inertial>
+        <mass value="0.019555" />
+        <origin xyz="0.0 0.0 0.0" />
+        <inertia ixx = "0.000002" ixy = "0.000000" ixz = "0.000000"
+                  iyx = "0.000000" iyy = "0.000005" iyz = "0.000000"
+                  izx = "0.000000" izy = "0.000000" izz = "0.000006" />
+      </inertial>
+    </link>
+
+    <link name="gripper_middle_point">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
       </collision>
     </link>
 
@@ -750,13 +917,13 @@
       <color rgba="0.5 0.5 0.5 1"/>
     </material>
     <!-- camera body, with origin at bottom screw mount -->
-    <joint name="camera_joint2" type="fixed">
+    <joint name="d435_joint" type="fixed">
       <origin xyz="0.483 0.0 0.2625" rpy="0 0 0"/>
       <parent link="base_link_top"/>
       <child link="camera_link" />
     </joint>
 
-    <link name="camera_link">
+    <link name="d435_link">
       <visual>
       <origin xyz="0.0149 0.0 0.0125" rpy="1.570796 0 1.570796"/>
         <geometry>
