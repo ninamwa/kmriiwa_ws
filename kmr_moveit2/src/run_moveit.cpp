@@ -55,7 +55,7 @@
 #include <moveit_msgs/msg/constraints.hpp>
 #include <moveit_msgs/msg/motion_plan_response.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <kmr_manipulator/action/drive_to_frame.hpp>
+#include <kmr_msgs/action/plan_to_frame.hpp>
 #include "rclcpp_action/rclcpp_action.hpp"
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_cpp_demo");
@@ -68,17 +68,9 @@ public:
     , robot_state_publisher_(node_->create_publisher<moveit_msgs::msg::DisplayRobotState>("display_robot_state", 1))
     , trajectory_publisher_(node_->create_publisher<trajectory_msgs::msg::JointTrajectory>(
           "/fake_joint_trajectory_controller/joint_trajectory", 1))
-    , goal_pose_subscriber_(node_->create_subscription<geometry_msgs::msg::PoseStamped>("/moveit/goalpose", 10 ,std::bind(&MoveItCppDemo::goalpose_callback, this, std::placeholders::_1)))
-    , frame_subscriber_(node_->create_subscription<std_msgs::msg::String>("/moveit/frame",10,std::bind(&MoveItCppDemo::frame_callback, this, std::placeholders::_1)))
-    , action_server_(rclcpp_action::create_server<kmr_manipulator::action::DriveToFrame>(
-      node_->get_node_base_interface(),
-      node_->get_node_clock_interface(),
-      node_->get_node_logging_interface(),
-      node_->get_node_waitables_interface(),
-      "/moveit/frame",
-      std::bind(&MoveItCppDemo::handle_goal, this,  std::placeholders::_1,  std::placeholders::_2),
-      std::bind(&MoveItCppDemo::handle_cancel, this,  std::placeholders::_1),
-      std::bind(&MoveItCppDemo::handle_accepted, this,  std::placeholders::_1)))
+    , goal_pose_subscriber_(node_->create_subscription<geometry_msgs::msg::PoseStamped>(
+      "/moveit/goalpose", 10 ,std::bind(&MoveItCppDemo::goalpose_callback, this, std::placeholders::_1)))
+    , frame_subscriber_(node_->create_subscription<std_msgs::msg::String>("/moveit/frame2",10,std::bind(&MoveItCppDemo::frame_callback, this, std::placeholders::_1)))
   {
   }
 
@@ -92,7 +84,17 @@ public:
     arm = std::make_shared<moveit::planning_interface::PlanningComponent>("manipulator", moveit_cpp_);
 
     // A little delay before running the plan
-    rclcpp::sleep_for(std::chrono::seconds(3));
+    rclcpp::sleep_for(std::chrono::seconds(1));
+
+    action_server_ = rclcpp_action::create_server<kmr_msgs::action::PlanToFrame>(
+      node_->get_node_base_interface(),
+      node_->get_node_clock_interface(),
+      node_->get_node_logging_interface(),
+      node_->get_node_waitables_interface(),
+      "/moveit/frame",
+      std::bind(&MoveItCppDemo::handle_goal, this,  std::placeholders::_1,  std::placeholders::_2),
+      std::bind(&MoveItCppDemo::handle_cancel, this,  std::placeholders::_1),
+      std::bind(&MoveItCppDemo::handle_accepted, this,  std::placeholders::_1));
 
     // Create collision object, planning shouldn't be too easy
     moveit_msgs::msg::CollisionObject collision_object;
@@ -153,11 +155,11 @@ public:
       planning_scene_monitor::LockedPlanningSceneRW scene(moveit_cpp_->getPlanningSceneMonitor());
       scene->processCollisionObjectMsg(collision_object);
     }  // Unlock PlanningScene
-    robot_model_loader::RobotModelLoader robot_model_loader(node_,"robot_description",true);
+    /* robot_model_loader::RobotModelLoader robot_model_loader(node_,"robot_description",true);
     robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
     RCLCPP_INFO(LOGGER,"Model frame: %s", kinematic_model->getModelFrame().c_str());
     robot_state::RobotStatePtr kinematic_state(new robot_state::RobotState(kinematic_model));
-    //kinematic_state->setToDefaultValues();
+    kinematic_state->setToDefaultValues();
     const robot_state::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("manipulator");
 
     const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
@@ -166,7 +168,7 @@ public:
     for (std::size_t i = 0; i < joint_names.size(); ++i)
     {
       RCLCPP_INFO(LOGGER,"Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
-    }
+    } */
   
 
 
@@ -193,20 +195,20 @@ public:
     pose.pose.orientation.w = 1.0;
 
     //arm->setGoal(pose_msg,"gripper_base_link");
-    arm->setGoal("home");
-    MoveItCppDemo::move();
-    rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
+    // arm->setGoal("home");
+    // MoveItCppDemo::move();
+    // rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
     
-    moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
+/*     moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
     start_state->copyJointGroupPositions(joint_model_group, joint_values);
     for (std::size_t i = 0; i < joint_names.size(); ++i)
     {
       RCLCPP_INFO(LOGGER,"Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
     }
 
-    arm->setGoal(pose_msg, "gripper_base_link");
-    MoveItCppDemo::move();
-    rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
+    arm->setGoal(pose_msg, "gripper_base_link"); */
+    //MoveItCppDemo::move();
+    //rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
 
     // arm->setGoal("search_2");
     // MoveItCppDemo::move();
@@ -281,39 +283,46 @@ private:
     }
   }
 
-  rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID & uuid,std::shared_ptr<const kmr_manipulator::action::DriveToFrame::Goal> goal)
+  rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID & uuid,std::shared_ptr<const kmr_msgs::action::PlanToFrame::Goal> goal)
   {
-    RCLCPP_INFO(LOGGER, "Received request to move to: %s", goal->frame);
+    RCLCPP_INFO(LOGGER, "Received request to move to: %s", (goal->frame).c_str());
     (void)uuid;
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
 
   rclcpp_action::CancelResponse handle_cancel(
-    const std::shared_ptr<rclcpp_action::ServerGoalHandle<kmr_manipulator::action::DriveToFrame>> goal_handle)
+    const std::shared_ptr<rclcpp_action::ServerGoalHandle<kmr_msgs::action::PlanToFrame>> goal_handle)
   {
     RCLCPP_INFO(LOGGER, "Received request to cancel goal");
     (void)goal_handle;
     return rclcpp_action::CancelResponse::ACCEPT;
   }
-  void handle_accepted(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kmr_manipulator::action::DriveToFrame>> goal_handle)
+  void handle_accepted(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kmr_msgs::action::PlanToFrame>> goal_handle)
   {
     std::thread{std::bind(&MoveItCppDemo::execute, this, std::placeholders::_1), goal_handle}.detach();
   }
 
-   void execute(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kmr_manipulator::action::DriveToFrame>> goal_handle)
+   void execute(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kmr_msgs::action::PlanToFrame>> goal_handle)
   {
     RCLCPP_INFO(LOGGER, "Executing goal");
     rclcpp::Rate loop_rate(1);
     const auto goal = goal_handle->get_goal();
     
-    auto result = std::make_shared<kmr_manipulator::action::DriveToFrame::Result>();
+    auto result = std::make_shared<kmr_msgs::action::PlanToFrame::Result>();
 
-    arm->setGoal(goal->frame);
-    RCLCPP_INFO(LOGGER, "Plan to goal");
+    if (goal->frame == "object"){
+      RCLCPP_INFO(LOGGER, "GoalPose Received: %f, %f, %f", goal->pose.pose.position.x,goal->pose.pose.position.y,goal->pose.pose.position.z);
+      arm->setGoal(goal->pose,"gripper_base_link");
+    }else{
+        RCLCPP_INFO(LOGGER, "GoalFrame Received: %s", (goal->frame).c_str());
+        arm->setGoal(goal->frame);
+    }
+
     default_parameters.planning_attempts = 1;
     default_parameters.planning_time = 5.0;
     default_parameters.max_velocity_scaling_factor = 0.4;
     default_parameters.max_acceleration_scaling_factor = 0.4;
+
     planning_pipeline_names = moveit_cpp_->getPlanningPipelineNames("manipulator");
     if (!planning_pipeline_names.empty())
       default_parameters.planning_pipeline = *planning_pipeline_names.begin();
@@ -362,7 +371,7 @@ private:
   std::shared_ptr<moveit::planning_interface::PlanningComponent> arm;
   std::set<std::string> planning_pipeline_names;
   moveit::planning_interface::PlanningComponent::PlanRequestParameters default_parameters;
-  rclcpp_action::Server<kmr_manipulator::action::DriveToFrame>::SharedPtr action_server_;
+  rclcpp_action::Server<kmr_msgs::action::PlanToFrame>::SharedPtr action_server_;
 };
 
 

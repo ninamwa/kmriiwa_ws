@@ -76,12 +76,14 @@ controller_server:
     controller_frequency: 20.0
     controller_plugin_types: ["dwb_core::DWBLocalPlanner"]
     controller_plugin_ids: ["FollowPath"]
-    min_x_velocity_threshold: 0.001
-    min_y_velocity_threshold: 0.001
-    min_theta_velocity_threshold: 0.001
+    min_x_velocity_threshold: 0.0001
+    min_y_velocity_threshold: 0.0001
+    min_theta_velocity_threshold: 0.0001
 
     # DWB parameters
     FollowPath.debug_trajectory_details: True
+    FollowPath.movement_time_allowance: 30.0
+    FollowPath.publish_cost_grid_pc: True
     FollowPath.min_vel_x: -0.3
     FollowPath.min_vel_y: -0.2
     FollowPath.max_vel_x: 0.3
@@ -103,7 +105,7 @@ controller_server:
     FollowPath.vx_samples: 20
     FollowPath.vy_samples: 20
     FollowPath.vtheta_samples: 40
-    FollowPath.sim_time: 3.0
+    FollowPath.sim_time: 1.
     FollowPath.linear_granularity: 0.05
     FollowPath.angular_granularity: 0.025
     FollowPath.time_granularity: 0.05
@@ -116,7 +118,12 @@ controller_server:
     FollowPath.GoalAlign.scale: 0.0
     FollowPath.PathDist.scale: 32.0
     FollowPath.GoalDist.scale: 24.0
-    FollowPath.RotateToGoal.scale: 12.0
+    FollowPath.RotateToGoal.scale: 32.0
+    FollowPath.RotateToGoal.slowing_factor: 5.0
+    FollowPath.RotateToGoal.lookahead_time: -1.0
+    FollowPath.short_circuit_trajectory_evaluation: True
+    FollowPath.stateful: False
+#   FollowPath.trans_stopped_velocity: 0.25
 
 controller_server_rclcpp_node:
   ros__parameters:
@@ -133,13 +140,13 @@ local_costmap:
       plugin_names: ["obstacle_layer", "voxel_layer", "inflation_layer"]
       plugin_types: ["nav2_costmap_2d::ObstacleLayer", "nav2_costmap_2d::VoxelLayer", "nav2_costmap_2d::InflationLayer"]
       rolling_window: true
-      width: 3
-      height: 3
+      width: 3 # 10: BaseObstacle 
+      height: 3 # 3,6,10: RotateToGoal
       resolution: 0.5
       robot_radius: 0.54
       inflation_layer:
         cost_scaling_factor: 1.0
-        inflation_layer.inflation_radius: 0.1
+        inflation_layer.inflation_radius: 0.55
       obstacle_layer:
         enabled: True
         observation_sources: scan_1 scan_2

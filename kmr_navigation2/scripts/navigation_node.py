@@ -55,12 +55,12 @@ class NavigationNode(Node):
         self.highestspeed = [0.5, 0.0, 1.5, 0.5]
         self.last_update_time = 0
 
-        #self.action_client = ActionClient(self, NavigateToPose, '/NavigateToPose')
-        #self.waypoint_client = ActionClient(self, FollowWaypoints, '/FollowWaypoints')
-        #while not self.action_client.wait_for_server(timeout_sec=10.0):
-        #    self.get_logger().info('Waiting for NavigateToPose service')
-        #while not self.waypoint_client.wait_for_server(timeout_sec=10.0):
-        #    self.get_logger().info('Waiting for Waypoint service')
+        self.action_client = ActionClient(self, NavigateToPose, '/navigate_to_pose')
+        self.waypoint_client = ActionClient(self, FollowWaypoints, '/FollowWaypoints')
+        while not self.action_client.wait_for_server(timeout_sec=10.0):
+            self.get_logger().info('Waiting for NavigateToPose service')
+        while not self.waypoint_client.wait_for_server(timeout_sec=10.0):
+            self.get_logger().info('Waiting for Waypoint service')
 
         self.client = self.create_client(SetParameters, '/controller_server/set_parameters')
         self.request = SetParameters.Request()
@@ -73,8 +73,8 @@ class NavigationNode(Node):
         sub_status = self.create_subscription(Bool, 'clear', self.status2_callback, qos_profile_sensor_data)
 
         st=0
-        while(False):
-            #time.sleep(0.1)
+        while(True):
+            time.sleep(0.1)
             if (st == 25):
                 initial = PoseWithCovarianceStamped()
                 initial.header.frame_id = "map"
@@ -94,14 +94,14 @@ class NavigationNode(Node):
                 initial.pose.pose.position = point
                 initial.pose.pose.orientation = quat
 
-                #initial_pub.publish(initial)
+                initial_pub.publish(initial)
 
             if (st == 80):
                 t=0
-                #self.send_goal()
+                self.send_goal()
                 #self.send_waypoint_goal()
 
-            #print(st)
+            #print(st
             st=st+1
 
     def create_pose(self,x,y,th):
@@ -227,9 +227,6 @@ def main(argv=None):
     navigation_node = NavigationNode()
 
     rclpy.spin(navigation_node)
-
-    #while rclpy.ok():
-    #    rclpy.spin_once(odometry_node)
     try:
         navigation_node.destroy_node()
         rclpy.shutdown()
