@@ -46,7 +46,7 @@
       <inertial>
           <mass value="55.04"/>
           <inertia ixx="5.383" ixy="0.0" ixz="0.0" iyy="7.170" iyz="0.0" izz="1.854"/>
-      </inertial>
+        </inertial>
   </link>
 
   <joint name="base_bottom_to_middle_joint" type="fixed">
