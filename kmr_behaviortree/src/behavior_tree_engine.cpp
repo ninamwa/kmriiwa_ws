@@ -68,6 +68,7 @@ BehaviorTreeEngine::buildTreeFromText(const std::string & xml_string, BT::Blackb
   BT::XMLParser p(factory_);
   p.loadFromText(xml_string);
   BT::Tree t;
+  std::cout << "hei" << std::endl;
   t=p.instantiateTree(blackboard);
   return t;
 }

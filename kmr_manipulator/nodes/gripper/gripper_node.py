@@ -32,8 +32,8 @@ from rclpy.action import ActionServer, GoalResponse
 from kmr_msgs.action import OpenGripper
 from kmr_msgs.action import CloseGripper
 
-from script.gripper_msgs import GripperMsg
-from script.errorcodes import ErrorCodes
+from gripper_msgs import GripperMsg
+from errorcodes import ErrorCodes
 
 
 from enum import Enum

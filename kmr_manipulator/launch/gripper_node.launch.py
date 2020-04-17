@@ -13,7 +13,7 @@ def generate_launch_description():
     return LaunchDescription([
 
         Node(
-            package="kuka_manipulator",
+            package="kmr_manipulator",
             node_executable="gripper_node.py",
             node_name="gripper_node",
             output='screen',
