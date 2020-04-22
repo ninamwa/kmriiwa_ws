@@ -155,23 +155,7 @@ public:
       planning_scene_monitor::LockedPlanningSceneRW scene(moveit_cpp_->getPlanningSceneMonitor());
       scene->processCollisionObjectMsg(collision_object);
     }  // Unlock PlanningScene
-    /* robot_model_loader::RobotModelLoader robot_model_loader(node_,"robot_description",true);
-    robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
-    RCLCPP_INFO(LOGGER,"Model frame: %s", kinematic_model->getModelFrame().c_str());
-    robot_state::RobotStatePtr kinematic_state(new robot_state::RobotState(kinematic_model));
-    kinematic_state->setToDefaultValues();
-    const robot_state::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("manipulator");
-
-    const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
-    std::vector<double> joint_values;
-    kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
-    for (std::size_t i = 0; i < joint_names.size(); ++i)
-    {
-      RCLCPP_INFO(LOGGER,"Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
-    } */
   
-
-
     // Set joint state goal
     RCLCPP_INFO(LOGGER, "Set goal");
     //arm.setGoal("pose1");
@@ -194,17 +178,12 @@ public:
     pose.pose.position.z = 0.9;
     pose.pose.orientation.w = 1.0;
 
-    //arm->setGoal(pose_msg,"gripper_base_link");
+    arm->setGoal(pose_msg,"gripper_middle_point");
     // arm->setGoal("home");
-    // MoveItCppDemo::move();
-    // rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
+    MoveItCppDemo::move();
+    rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
     
-/*     moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
-    start_state->copyJointGroupPositions(joint_model_group, joint_values);
-    for (std::size_t i = 0; i < joint_names.size(); ++i)
-    {
-      RCLCPP_INFO(LOGGER,"Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
-    }
+/* 
 
     arm->setGoal(pose_msg, "gripper_base_link"); */
     //MoveItCppDemo::move();
@@ -339,18 +318,16 @@ private:
     {
       // Check if goal is done
       if (rclcpp::ok()) {
+        moveit_msgs::msg::RobotTrajectory robot_trajectory;
+        plan_solution.trajectory->getRobotTrajectoryMsg(robot_trajectory);
         result->success = true;
         result->frame = goal->frame;
+        result->path = robot_trajectory.joint_trajectory;
         goal_handle->succeed(result);
         RCLCPP_INFO(LOGGER, "Goal Succeeded");
+        visualizeTrajectory(*plan_solution.trajectory);
       }
 
-      visualizeTrajectory(*plan_solution.trajectory);
-
-      RCLCPP_INFO(LOGGER, "Sending the trajectory for execution");
-      moveit_msgs::msg::RobotTrajectory robot_trajectory;
-      plan_solution.trajectory->getRobotTrajectoryMsg(robot_trajectory);
-      trajectory_publisher_->publish(robot_trajectory.joint_trajectory);
     }
     else{
         result->success = false;

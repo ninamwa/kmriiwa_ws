@@ -36,10 +36,12 @@
                         </Sequence>
                         <CloseGripper/>
                     </Sequence>
-                    <Sequence name="movetodrive">
-                        <PlanManipulatorPath plan_to_frame="drive_frame"/>
-                        <MoveManipulator path="{path}"/>
-                    </Sequence>
+                    <ForceFailure name="force_failure1">
+                        <Sequence name="movetodrive">
+                            <PlanManipulatorPath plan_to_frame="drive_frame"/>
+                            <MoveManipulator path="{path}"/>
+                        </Sequence>
+                    </ForceFailure>
                 </Fallback>
                 <Sequence name="leave_object">
                     <Fallback name="find_empty_frame">
@@ -48,7 +50,7 @@
                             <FrameEmpty check_frame="frame_2"/>
                             <FrameEmpty check_frame="frame_3"/>
                         </Fallback>
-                        <ForceFailure name="force_failure">
+                        <ForceFailure name="force_failure2">
                             <OpenGripper/>
                         </ForceFailure>
                     </Fallback>

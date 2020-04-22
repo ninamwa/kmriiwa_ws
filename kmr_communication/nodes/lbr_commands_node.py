@@ -58,11 +58,14 @@ class LbrCommandsNode(Node):
         #else:
         #    self.soc=None
         self.soc=None
+
+
         # Make a listener for relevant topics
+        # Denne første skal nok fjernes (ble brukt før vi la på actions)
+        # sub_pathplanning = self.create_subscription(JointTrajectory, '/fake_joint_trajectory_controller/joint_trajectory', self.path_callback, qos_profile_sensor_data)
         sub_manipulator_vel = self.create_subscription(String, 'manipulator_vel', self.manipulatorVel_callback, qos_profile_sensor_data)
         sub_shutdown = self.create_subscription(String, 'shutdown', self.shutdown_callback, qos_profile_sensor_data)
         sub_statusdata=self.create_subscription(LbrStatusdata, 'lbr_statusdata', self.status_callback, qos_profile_sensor_data)
-        # sub_pathplanning = self.create_subscription(JointTrajectory, '/fake_joint_trajectory_controller/joint_trajectory', self.path_callback, qos_profile_sensor_data)
         self.path_server = ActionServer(self,MoveManipulator,'move_manipulator', self.move_manipulator_callback)
 
         self.isLBRMoving=False
@@ -88,7 +91,7 @@ class LbrCommandsNode(Node):
 
     def move_manipulator_callback(self, goal_handle):
         self.get_logger().info('Executing goal...')
-        self.isMoving = True
+        self.isLBRMoving = True
         self.path_callback(goal_handle.request.path)
         while (self.isLBRMoving):
             pass

@@ -94,7 +94,7 @@ def generate_launch_description():
                                   output='screen',
                                   )
 
-    return LaunchDescription([ static_tf,run_moveit_node,fake_joint_driver_node,
+    return LaunchDescription([ static_tf,rviz_node,run_moveit_node,fake_joint_driver_node,
      #IncludeLaunchDescription(
      #       PythonLaunchDescriptionSource([state_publisher_launch_file_dir, '/state_publisher.launch.py']),
      #   ),

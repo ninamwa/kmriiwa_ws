@@ -14,6 +14,20 @@ public:
   : BtActionNode<kmr_msgs::action::OpenGripper>(xml_tag_name, action_name, conf)
   {
   }
+  
+  BT::NodeStatus on_success() override
+  {
+    std::string current_frame;
+    current_frame = config().blackboard->get<std::string>("current_frame");
+    if (current_frame.compare("frame_1") == 0 || current_frame.compare("frame_2") == 0 || current_frame.compare("frame_3") == 0 ){
+      config().blackboard->set(current_frame, false);
+    }
+    
+    return BT::NodeStatus::SUCCESS;
+  }
+
+
+
 
 };
 

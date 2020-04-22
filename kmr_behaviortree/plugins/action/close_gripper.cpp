@@ -18,15 +18,6 @@ public:
   void on_tick() override
   {
   }
-
-  BT::NodeStatus on_success() override
-  {
-    std::string current_frame;
-    current_frame = config().blackboard->get<std::string>("current_frame");
-    config().blackboard->set(current_frame, false);
-    return BT::NodeStatus::SUCCESS;
-  }
-
 };
 
 }  // namespace kmr_behavior_tree

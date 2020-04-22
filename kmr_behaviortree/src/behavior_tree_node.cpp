@@ -68,7 +68,7 @@ BehaviorTreeNode()
   blackboard_ = BT::Blackboard::create();
 
   // Put items on the blackboard
-  blackboard_->set<rclcpp::Node::SharedPtr>("clientnode", client_node_); // NOLINT
+  blackboard_->set<rclcpp::Node::SharedPtr>("node", client_node_); // NOLINT
   blackboard_->set<bool>("frame_1", true);
   blackboard_->set<bool>("frame_2", true);
   blackboard_->set<bool>("frame_3", true);

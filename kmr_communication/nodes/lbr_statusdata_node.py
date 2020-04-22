@@ -62,7 +62,6 @@ class LbrStatusNode(Node):
 
         # Make Publisher for statusdata
         self.pub_lbr_statusdata = self.create_publisher(LbrStatusdata, 'lbr_statusdata', qos_profile_sensor_data)
-        self.pub_path_status = self.create_publisher(Bool, 'path_finished', qos_profile_sensor_data)
 
         while not self.soc.isconnected:
             pass
@@ -72,11 +71,11 @@ class LbrStatusNode(Node):
 
     def run(self):
         while rclpy.ok() and self.soc.isconnected:
-            self.status_callback(self.pub_lbr_statusdata,self.pub_path_status, self.soc.lbr_statusdata)
+            self.status_callback(self.pub_lbr_statusdata, self.soc.lbr_statusdata)
 
 
 
-    def status_callback(self,status_publisher, path_publisher, data):
+    def status_callback(self,status_publisher, data):
         if data != None:
             msg = LbrStatusdata()
             msg.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
@@ -99,7 +98,7 @@ class LbrStatusNode(Node):
                             self.soc.is_lbr_moving = False
                     elif (split[0] == "LBRhasActiveCommand"):
                         if (split[1] == "true"):
-                            msg.lbr_has_active_command = True
+                            msg.lbr_active_command = True
                         else:
                             msg.lbr_has_active_command = False
                     elif (split[0] == "LBRsafetyStop"):
@@ -107,10 +106,6 @@ class LbrStatusNode(Node):
                             msg.lbr_safetystop = True
                         else:
                             msg.lbr_safetystop = False
-                    elif (split[0] == "PathIsFinished"):
-                        if (split[1] != self.path_finished):
-                            self.path_finished = split[1]
-                            path_publisher(self.path_finished)
                 status_publisher.publish(msg)
 
     def getTimestamp(self,nano):
