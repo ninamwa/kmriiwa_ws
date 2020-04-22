@@ -97,47 +97,7 @@ public class LBR_commander extends Node{
 				}
 		}
     }
-	private void addPointToSegment(String commandstr){
-		int ArrayLength = lbr.getJointCount();
-		String []lineSplt = commandstr.split(">");
-		String pointType = lineSplt[1];
-		
 
-		double[] poses = new double[ArrayLength];
-		double[] velocities = new double[ArrayLength];;
-		double[] accelerations = new double[ArrayLength];;
-		
-		
-		// Read message
-		for(int i = 0; i < ArrayLength ; ++i){
-			poses[i] = Double.parseDouble(lineSplt[2].split(" ")[i]);
-			double vel = Math.abs(Double.parseDouble(lineSplt[3].split(" ")[i]));
-			if(vel>1){
-				vel = 1;
-			}else if(vel<-1){
-				vel = -1;
-			}
-			velocities[i] = vel;
-			double accel = Math.abs(Double.parseDouble(lineSplt[4].split(" ")[i]));
-			if(accel>1){
-				accel = 1.0;
-			}else if(vel<-1){
-				accel = -1.0;
-			}
-			accelerations[i] = accel;
-		}
-		
-		// KAN IKKE BRUKE STARTPOINT fordi velocity = 0
-		if(pointType.equals("StartPoint")){
-			splineSegments.clear();
-		}else{
-			PTPpoint ptp = new PTPpoint(pointType, new JointPosition(poses), velocities, accelerations);
-			splineSegments.add(ptp.getPTP());
-			if(pointType.equals("EndPoint")){
-				followPathThread.run();
-			}
-		}
-	}
 	private void addPointToSegment(String commandstr){
 		int ArrayLength = lbr.getJointCount();
 		String []lineSplt = commandstr.split(">");
@@ -252,7 +212,7 @@ public class LBR_commander extends Node{
 							currentmotion.cancel();
 							CommandedjointPos.set(lbr.getCurrentJointPosition());
 						}
-						setisLBRMoving(true);
+						setisLBRMoving(false);
 						}
 				}
 			}
