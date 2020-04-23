@@ -38,9 +38,9 @@ def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 
 
 
-class NavigationNode(Node):
+class NavigationSupportNode(Node):
     def __init__(self):
-        super().__init__('navigation_node')
+        super().__init__('navigation_support_node')
 
 
         self.warning_field_clear = True
@@ -55,19 +55,19 @@ class NavigationNode(Node):
         self.highestspeed = [0.5, 0.0, 1.5, 0.5]
         self.last_update_time = 0
 
-        self.action_client = ActionClient(self, NavigateToPose, '/navigate_to_pose')
-        self.waypoint_client = ActionClient(self, FollowWaypoints, '/FollowWaypoints')
-        while not self.action_client.wait_for_server(timeout_sec=10.0):
-            self.get_logger().info('Waiting for NavigateToPose service')
-        while not self.waypoint_client.wait_for_server(timeout_sec=10.0):
-            self.get_logger().info('Waiting for Waypoint service')
+        #self.action_client = ActionClient(self, NavigateToPose, '/navigate_to_pose')
+        #self.waypoint_client = ActionClient(self, FollowWaypoints, '/FollowWaypoints')
+        #while not self.action_client.wait_for_server(timeout_sec=10.0):
+        #    self.get_logger().info('Waiting for NavigateToPose service')
+        #while not self.waypoint_client.wait_for_server(timeout_sec=10.0):
+        #    self.get_logger().info('Waiting for Waypoint service')
 
         self.client = self.create_client(SetParameters, '/controller_server/set_parameters')
         self.request = SetParameters.Request()
         while not self.client.wait_for_service(timeout_sec=10.0):
            self.get_logger(        ).info('Waiting for service')
 
-        initial_pub = self.create_publisher(PoseWithCovarianceStamped, 'initialpose', qos_profile_sensor_data)
+        #initial_pub = self.create_publisher(PoseWithCovarianceStamped, 'initialpose', qos_profile_sensor_data)
 
         sub_status = self.create_subscription(KmpStatusdata, 'kmp_statusdata', self.status_callback, qos_profile_sensor_data)
         sub_status = self.create_subscription(Bool, 'clear', self.status2_callback, qos_profile_sensor_data)
@@ -224,11 +224,11 @@ class NavigationNode(Node):
 def main(argv=None):
 
     rclpy.init(args=argv)
-    navigation_node = NavigationNode()
+    navigation_support_node = NavigationSupportNode()
 
-    rclpy.spin(navigation_node)
+    rclpy.spin(navigation_support_node)
     try:
-        navigation_node.destroy_node()
+        navigation_support_node.destroy_node()
         rclpy.shutdown()
     except:
         print(cl_red('Error: ') + "rclpy shutdown failed")
