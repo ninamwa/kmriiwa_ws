@@ -1,4 +1,4 @@
-run_moveit_cpp:
+run_moveit:
   ros__parameters:
     planning_scene_monitor_options:
       name: "planning_scene_monitor"

@@ -54,16 +54,16 @@ def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 #PipelineRequest pipeline_request          # request content of pipeline service
 #---
 #Pipeline[] pipelines    # return all pipeline status
-class ObjectSearchNode(Node):
+class ObjectDetectionNode(Node):
     def __init__(self):
-        super().__init__('object_search_node')
-        self.name='object_search_node'
+        super().__init__('object_detection_node')
+        self.name='object_detection_node'
         self.detection_threshold = 0.99
         self.detected_object_pose = None
         self.pipelinename = "object"
 
         # TODO: change port to NUC
-        self.object_search_action_server = ActionServer(self,ObjectSearch,'object_search',self.object_search_callback)
+        self.object_detection_action_server = ActionServer(self,ObjectSearch,'object_search',self.object_search_callback)
 
         self.client = self.create_client(PipelineSrv, '/openvino_toolkit/pipeline_service')
         self.request = PipelineSrv.Request()
@@ -73,8 +73,7 @@ class ObjectSearchNode(Node):
 
         sub_LocalizedObject = self.create_subscription(ObjectsInBoxes3D, '/object_analytics/localization', self.detectedObject_callback, qos_profile_sensor_data)
 
-        self.startSearch()
-        self.isSearching = True
+        self.endSearch()
 
     def detectedObject_callback(self, ObjectsInBoxes):
         for instance in ObjectsInBoxes.objects_in_boxes:
@@ -91,7 +90,7 @@ class ObjectSearchNode(Node):
         while (self.isSearching):
             pass
         result = ObjectSearch.Result()
-        if self.self.detected_object_pose != None:
+        if self.detected_object_pose != None:
             result.success = True
             result.pose = self.detected_object_pose
             self.detected_object_pose = None
@@ -129,11 +128,11 @@ class ObjectSearchNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    object_search_node = ObjectSearchNode()
+    object_detection_node = ObjectDetectionNode()
 
-    rclpy.spin(object_search_node)
+    rclpy.spin(object_detection_node)
     try:
-        object_search_node.destroy_node()
+        object_detection_node.destroy_node()
         rclpy.shutdown()
     except:
         print(cl_red('Error: ') + "rclpy shutdown failed")

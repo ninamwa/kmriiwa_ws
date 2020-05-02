@@ -14,14 +14,16 @@ behavior_tree_node:
         orientation: 1.0
 
     WS3:
-        position: -2.0,0.0
+        position: -3.0,0.0
+        orientation: 1.0
+    HOME: 
+        postion: -2.0,0.0
         orientation: 1.0
     plugin_lib_names:
-    - close_gripper_action_bt_node
-    - open_gripper_action_bt_node
+    - move_gripper_action_bt_node
     - move_manipulator_action_bt_node
     - plan_manipulator_path_action_bt_node
     - object_search_action_bt_node
-    - frame_empty_condition_bt_node
-    - navigation_bt_node
+    - empty_frame_condition_bt_node
+    - navigate_vehicle_bt_node
 

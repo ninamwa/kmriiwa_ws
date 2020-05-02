@@ -23,8 +23,7 @@ find_package(trajectory_msgs REQUIRED)
 
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "action/OpenGripper.action"
-  "action/CloseGripper.action"
+  "action/Gripper.action"
   "action/ObjectSearch.action"
   "action/PlanToFrame.action"
   "action/MoveManipulator.action"

@@ -48,11 +48,9 @@ set(dependencies
   nav2_msgs
 )
 
-add_library(close_gripper_action_bt_node SHARED plugins/action/close_gripper.cpp)
-list(APPEND plugin_libs close_gripper_action_bt_node)
 
-add_library(open_gripper_action_bt_node SHARED plugins/action/open_gripper.cpp)
-list(APPEND plugin_libs open_gripper_action_bt_node)
+add_library(move_gripper_action_bt_node SHARED plugins/action/move_gripper.cpp)
+list(APPEND plugin_libs move_gripper_action_bt_node)
 
 add_library(move_manipulator_action_bt_node SHARED plugins/action/move_manipulator.cpp)
 list(APPEND plugin_libs move_manipulator_action_bt_node)
@@ -63,11 +61,11 @@ list(APPEND plugin_libs plan_manipulator_path_action_bt_node)
 add_library(object_search_action_bt_node SHARED plugins/action/object_search.cpp)
 list(APPEND plugin_libs object_search_action_bt_node)
 
-add_library(frame_empty_condition_bt_node SHARED plugins/condition/frame_empty.cpp)
-list(APPEND plugin_libs frame_empty_condition_bt_node)
+add_library(empty_frame_condition_bt_node SHARED plugins/condition/empty_frame.cpp)
+list(APPEND plugin_libs empty_frame_condition_bt_node)
 
-add_library(navigation_bt_node SHARED plugins/action/navigation.cpp)
-list(APPEND plugin_libs navigation_bt_node)
+add_library(navigate_vehicle_bt_node SHARED plugins/action/navigate_vehicle.cpp)
+list(APPEND plugin_libs navigate_vehicle_bt_node)
 
 foreach(bt_plugin ${plugin_libs})
   ament_target_dependencies(${bt_plugin} ${dependencies})

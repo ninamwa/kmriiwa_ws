@@ -29,8 +29,7 @@ from sensor_msgs.msg import LaserScan
 from builtin_interfaces.msg import Time
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.action import ActionServer, GoalResponse
-from kmr_msgs.action import OpenGripper
-from kmr_msgs.action import CloseGripper
+from kmr_msgs.action import Gripper
 
 from gripper_msgs import GripperMsg
 from errorcodes import ErrorCodes
@@ -47,40 +46,28 @@ class GripperNode(Node):
         # TODO: change port to NUC
         #self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
         #self.activate()
-        #print("OK")
-        self.open_action_server = ActionServer(self,OpenGripper,'open_gripper',self.open_gripper_callback)
-        self.close_action_server = ActionServer(self, CloseGripper, 'close_gripper', self.close_gripper_callback)
+        #print("Activated")
+        self.gripper_action_server = ActionServer(self,Gripper,'move_gripper',self.move_gripper_callback)
 
+    def move_gripper_callback(self, goal_handle):
+        self.get_logger().info('Executing gripper goal...')
+        result = Gripper.Result()
+        if goal_handle.request.action == "open":
+            self.open()
+            while (self.isMoving()):
+                pass
+            result.success = self.getOpenResponse()
+        elif goal_handle.request.action == "close":
+            self.close()
+            while (self.isMoving()):
+                pass
+            result.success = self.getClosedResponse()
 
-    def open_gripper_callback(self, goal_handle):
-        self.get_logger().info('Executing open_gripper goal...')
-        #self.open()
-        #while (self.isMoving()):
-        #    pass
-        result = OpenGripper.Result() 
-        #result.success = self.getOpenResponse()
-        result.success = True
         if result.success == True:
            goal_handle.succeed()
         else:
            goal_handle.abort()
-        print("OPEN GRIPPER OK")
-        return result
-
-    def close_gripper_callback(self, goal_handle):
-        self.get_logger().info('Executing close_gripper goal...')
-        #self.close()
-        #while (self.isMoving()):
-        #    pass
-        
-        result = CloseGripper.Result()
-        #result.success = self.getClosedResponse()
-        result.success = True
-        if result.success == True:
-           goal_handle.succeed()
-        else:
-           goal_handle.abort()
-        print("CLOSE GRIPPER OK")
+        print("GRIPPER ACTION OK")
         return result
 
 

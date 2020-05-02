@@ -842,14 +842,12 @@
       </inertial>
     </link>
 
-    <link name="gripper_middle_point">
-      <visual>
-        <origin xyz="0 0 0" rpy="0 0 0" />
-      </visual>
-      <collision>
-        <origin xyz="0 0 0" rpy="0 0 0" />
-      </collision>
-    </link>
+    <joint name="gripper_middle_point" type="fixed">
+      <origin xyz="0 0.0 0.14" rpy="0 0 0"/>
+      <parent link="gripper_base_link" />
+      <child link="gripper_middle_point" />
+    </joint>
+    <link name="gripper_middle_point"/>
 
     <joint name="left_outer_finger_joint" type="fixed">
       <origin xyz="0 0.0315 -0.0041" rpy="0 0 0"/>
@@ -928,7 +926,7 @@
     <joint name="d435_joint" type="fixed">
       <origin xyz="0.483 0.0 0.2625" rpy="0 0 0"/>
       <parent link="base_link_top"/>
-      <child link="camera_link" />
+      <child link="d435_link" />
     </joint>
 
     <link name="d435_link">
@@ -956,7 +954,7 @@
     <!-- camera depth joints and links -->
     <joint name="camera_depth_joint" type="fixed">
       <origin xyz="0.0149 -0.0075 0.0125" rpy="0 0 0"/>
-      <parent link="camera_link"/>
+      <parent link="d435_link"/>
       <child link="camera_depth_frame" />
     </joint>
     <link name="camera_depth_frame"/>

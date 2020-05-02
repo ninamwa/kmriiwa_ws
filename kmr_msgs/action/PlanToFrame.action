@@ -5,7 +5,6 @@ geometry_msgs/PoseStamped pose
 ---
 # Result
 bool success
-string frame
 trajectory_msgs/JointTrajectory path
 string error
 
