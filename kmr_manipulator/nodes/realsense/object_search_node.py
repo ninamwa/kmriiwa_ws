@@ -26,7 +26,7 @@ from geometry_msgs.msg import Point, Pose, Quaternion, Twist
 from builtin_interfaces.msg import Time
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.action import ActionServer, GoalResponse
-from kuka_manipulator.action import ObjectSearch
+from kmr_manipulator.action import ObjectSearch
 from pipeline_srv_msgs.srv import PipelineSrv
 from pipeline_srv_msgs.msg import PipelineRequest
 from object_analytics_msgs.msg import ObjectsInBoxes3D

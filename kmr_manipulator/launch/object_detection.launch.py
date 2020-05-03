@@ -9,8 +9,8 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    object_param = os.path.join(get_package_share_directory('kuka_manipulator'), 'param', 'object_detection.yaml')
-    object_model = os.path.join(get_package_share_directory('kuka_manipulator'), 'model', 'circbox.xml')
+    object_param = os.path.join(get_package_share_directory('kmr_manipulator'), 'param', 'object_detection.yaml')
+    object_model = os.path.join(get_package_share_directory('kmr_manipulator'), 'model', 'circbox.xml')
 
     camera_base_frame_id = LaunchConfiguration('base_frame_id', default='ManipulatorCamera_link')
     camera_serial_no = LaunchConfiguration('serial_no', default='831612071154')
@@ -54,7 +54,7 @@ def generate_launch_description():
 
     # Object Search Node
     searchnode = Node(
-    package='kuka_manipulator', node_executable='object_search_node.py', node_name='object_search_node',
+    package='kmr_manipulator', node_executable='object_search_node.py', node_name='object_search_node',
     output='screen')
 
     # object_analytics_rviz, add to launch description if desired
