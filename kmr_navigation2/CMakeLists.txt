@@ -48,7 +48,7 @@ install(
   PROGRAMS
     scripts/twist_keyboard.py
     scripts/pose_keyboard.py
-    scripts/navigation_node.py
+    scripts/navigation_support_node.py
     scripts/manipulator_keyboard.py
     scripts/test_navigation.py
     scripts/keyboard.py

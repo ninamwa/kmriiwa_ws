@@ -25,7 +25,7 @@ public:
     }
     goal_.frame = plan_to_frame;
     if (plan_to_frame == "object"){
-      getInput("ObjectPose", goal_.pose);
+      getInput("object_pose", goal_.pose);
       geometry_msgs::msg::PoseStamped pose_msg;
       pose_msg.header.frame_id = "base_footprint";
       pose_msg.pose.position.x = -0.2;
@@ -41,7 +41,7 @@ public:
 
   BT::NodeStatus on_success() override
   {
-    setOutput("ManipulatorPath", result_.result->path);
+    setOutput("manipulator_path", result_.result->path);
     setOutput("move_to_frame", plan_to_frame);
     return BT::NodeStatus::SUCCESS;
   }
@@ -51,8 +51,8 @@ public:
     return providedBasicPorts(
       {
         BT::InputPort<std::string>("plan_to_frame", "The frame MoveIt should plan to"),
-        BT::InputPort<geometry_msgs::msg::PoseStamped>("ObjectPose", "Pose of the object manipulator should move to"),
-        BT::OutputPort<trajectory_msgs::msg::JointTrajectory>("ManipulatorPath", "The path MoveIt has planned for the manipulator"),
+        BT::InputPort<geometry_msgs::msg::PoseStamped>("object_pose", "Pose of the object manipulator should move to"),
+        BT::OutputPort<trajectory_msgs::msg::JointTrajectory>("manipulator_path", "The path MoveIt has planned for the manipulator"),
         BT::OutputPort<std::string>("move_to_frame", "Frame we should move to"),
       });
   }

@@ -30,7 +30,6 @@ def load_yaml(package_name, file_path):
 def generate_launch_description():
     # moveit_cpp.yaml is passed by filename for now since it's node specific
     moveit_cpp_yaml_file_name = get_package_share_directory('kmr_moveit2') + "/config/moveit_cpp.yaml"
-    move2pose_yaml_file_name = get_package_share_directory('kmr_moveit2') + "/config/move_to_pose.yaml"
 
     # Component yaml files are grouped in separate namespaces
     robot_description_config = load_file('kmr_bringup', 'urdf/kmr_withD435.urdf')
@@ -57,9 +56,9 @@ def generate_launch_description():
     state_publisher_launch_file_dir = os.path.join(get_package_share_directory('kmr_bringup'), 'launch')
 
     # MoveItCpp demo executable
-    run_moveit_node = Node(node_name='run_moveit_cpp',
+    run_moveit_node = Node(node_name='run_moveit',
                                package='kmr_moveit2',
-                               node_executable='run_moveit_cpp',
+                               node_executable='run_moveit',
                                output='screen',
                                emulate_tty=True,
                                parameters=[moveit_cpp_yaml_file_name,

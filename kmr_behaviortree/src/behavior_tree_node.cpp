@@ -15,6 +15,7 @@
 #include "kmr_msgs/action/open_gripper.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+#include <nav2_msgs/action/navigate_to_pose.hpp>
 
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("behavior_tree_node");
@@ -26,24 +27,30 @@ BehaviorTreeNode()
 : Node("behavior_tree_node")
 {
   RCLCPP_INFO(LOGGER, "Initialize node!");
-  publisher_ = this->create_publisher<std_msgs::msg::String>("pub_topic", 10);
   start_subscriber_ = this->create_subscription<std_msgs::msg::String>("start_topic", 10,std::bind(&BehaviorTreeNode::start_callback, this, std::placeholders::_1));
   initial_publisher_ = this->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>("initialpose", 10);
+  action_client_ = rclcpp_action::create_client<nav2_msgs::action::NavigateToPose>(this->get_node_base_interface(),
+      this->get_node_graph_interface(),
+      this->get_node_logging_interface(),
+      this->get_node_waitables_interface(),
+      "navigate_to_pose");
+
 
   const std::vector<std::string> plugin_libs = {
-    "close_gripper_action_bt_node",
-    "open_gripper_action_bt_node",
+    "move_gripper_action_bt_node",
     "move_manipulator_action_bt_node",
     "plan_manipulator_path_action_bt_node",
     "object_search_action_bt_node",
-    "frame_empty_condition_bt_node",
-    "navigation_bt_node",
+    "empty_frame_condition_bt_node",
+    "navigate_vehicle_bt_node",
   };
   
   declare_parameter("plugin_lib_names", plugin_libs);
   declare_parameter("bt_xml_filename");
   declare_parameter("WS1.position");
   declare_parameter("WS1.orientation");
+  declare_parameter("HOME.position");
+  declare_parameter("HOME.orientation");
   declare_parameter("goal_list");
 
   
@@ -69,10 +76,10 @@ BehaviorTreeNode()
 
   // Put items on the blackboard
   blackboard_->set<rclcpp::Node::SharedPtr>("node", client_node_); // NOLINT
-  blackboard_->set<bool>("frame_1", true);
-  blackboard_->set<bool>("frame_2", true);
-  blackboard_->set<bool>("frame_3", true);
-  blackboard_->set<std::string>("current_frame", "drive_frame");
+  blackboard_->set<bool>("carryarea1", true);
+  blackboard_->set<bool>("carryarea2", true);
+  blackboard_->set<bool>("carryarea3", true);
+  blackboard_->set<std::string>("current_frame", "driveposition");
   
   std::string bt_xml_filename;
   get_parameter("bt_xml_filename", bt_xml_filename);
@@ -92,12 +99,27 @@ BehaviorTreeNode()
   tree_ = bt_->buildTreeFromText(xml_string_, blackboard_);
   RCLCPP_INFO(LOGGER, "BehaviorTree successfully created");
 
+  // Publish initial pose to be HOME position
+  std::string position;
+  float orientation;
+  get_parameter("HOME.position", position);
+  get_parameter("HOME.orientation", orientation);
+
+  std::string delimiter = ",";
+  std::string x_token = position.substr(0, position.find(delimiter)); 
+  position.erase(0, position.find(delimiter) + delimiter.length());
+  std::string y_token = position.substr(0, position.find(delimiter)); 
+
+  float x = std::stof(x_token); 
+  float y = std::stof(y_token);
+
   geometry_msgs::msg::PoseWithCovarianceStamped initial;
   initial.header.frame_id = "map";
   geometry_msgs::msg::Point point;
-  point.x = -2.0;  
+  point.x = x;  
+  point.y =y;
   geometry_msgs::msg::Quaternion quat;
-  quat.w = 0.1;
+  quat.w = orientation;
   initial.pose.pose.position = point;
   initial.pose.pose.orientation = quat;
 
@@ -117,10 +139,17 @@ private:
   }
 
   void start_bt(){
-    bool res;
-    res = initializeGoalPose();
+    bool res = initializeGoalPose();
     if (!res){
-      exit(1);
+      geometry_msgs::msg::PoseStamped goal_pose;
+      goal_pose = create_pose("HOME");
+      bool nav_res = send_navigation_goal(goal_pose);
+      if (nav_res){
+        RCLCPP_INFO(LOGGER, "Navigated successfully home!");
+      }
+      else{
+        RCLCPP_INFO(LOGGER, "Failed to navigate back home!");
+      }
     }
 
     auto is_canceling = [this]() {
@@ -142,6 +171,7 @@ private:
 
       case kmr_behavior_tree::BtStatus::FAILED:
         RCLCPP_ERROR(get_logger(), "Object found and handled - failed");
+        start_bt();
         break;
 
       case kmr_behavior_tree::BtStatus::CANCELED:
@@ -157,23 +187,11 @@ private:
     if (!goal_list.empty()){
       std::string goal_station;
       geometry_msgs::msg::PoseStamped goal_pose;
-      std::string position;
-      float orientation;
 
       goal_station = goal_list.front();
       goal_list.erase(goal_list.begin()); 
-      get_parameter(goal_station + "." + "position", position);
-      get_parameter(goal_station + "." + "orientation", orientation);
 
-      std::string delimiter = ",";
-      std::string x_token = position.substr(0, position.find(delimiter)); 
-      position.erase(0, position.find(delimiter) + delimiter.length());
-      std::string y_token = position.substr(0, position.find(delimiter)); 
-
-      float x = std::stof(x_token); 
-      float y = std::stof(y_token);
-
-      goal_pose = create_pose(x,y,orientation);
+      goal_pose = create_pose(goal_station);
       RCLCPP_INFO(get_logger(), "Starting BT with new goal");
       // Update the goal pose on the blackboard
       blackboard_->set("current_goalpose", goal_pose);
@@ -182,8 +200,77 @@ private:
       return false;
     }
   }
+
+  bool send_navigation_goal(geometry_msgs::msg::PoseStamped pose){
+    auto is_action_server_ready = action_client_->wait_for_action_server(std::chrono::seconds(5));
+      if (!is_action_server_ready) {
+        RCLCPP_ERROR(LOGGER,"NavigateToPose action server is not available.");
+        return false;
+      }
+
+      // Send the goal pose
+      auto navigation_goal_ = nav2_msgs::action::NavigateToPose::Goal();
+      navigation_goal_.pose = pose;
+
+      // Enable result awareness by providing an empty lambda function
+      auto send_goal_options = rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SendGoalOptions();
+      send_goal_options.result_callback = [](auto) {};
+
+      auto future_goal_handle = action_client_->async_send_goal(navigation_goal_, send_goal_options);
+      if (rclcpp::spin_until_future_complete(client_node_, future_goal_handle) != rclcpp::executor::FutureReturnCode::SUCCESS)
+      {
+        RCLCPP_ERROR(LOGGER, "Send goal call failed");
+        return false;
+      }
+
+      // Get the goal handle and save so that we can check on completion in the timer callback
+      rclcpp_action::ClientGoalHandle<nav2_msgs::action::NavigateToPose>::SharedPtr navigation_goal_handle_ = future_goal_handle.get();
+      if (!navigation_goal_handle_) {
+        RCLCPP_ERROR(LOGGER, "Goal was rejected by server");
+        return false;
+      }
+
+      // Wait for the server to be done with the goal
+      auto result_future = action_client_->async_get_result(navigation_goal_handle_);
+
+      RCLCPP_INFO(LOGGER, "Waiting for result");
+      if (rclcpp::spin_until_future_complete(client_node_, result_future) != rclcpp::executor::FutureReturnCode::SUCCESS){
+        RCLCPP_ERROR(LOGGER, "get result call failed :(");
+        return false;
+      }
+
+      rclcpp_action::ClientGoalHandle<nav2_msgs::action::NavigateToPose>::WrappedResult wrapped_result = result_future.get();
+
+      switch (wrapped_result.code) {
+        case rclcpp_action::ResultCode::SUCCEEDED:
+          return true;
+        case rclcpp_action::ResultCode::ABORTED:
+          RCLCPP_ERROR(LOGGER, "Goal was aborted");
+          return false;
+        case rclcpp_action::ResultCode::CANCELED:
+          RCLCPP_ERROR(LOGGER, "Goal was canceled");
+          return false;
+        default:
+          RCLCPP_ERROR(LOGGER, "Unknown result code");
+          return false;
+      }
+  }
   
-  geometry_msgs::msg::PoseStamped create_pose(float x, float y, float th){
+  geometry_msgs::msg::PoseStamped create_pose(std::string goal_station){
+    std::string position;
+    float orientation;
+
+    get_parameter(goal_station + "." + "position", position);
+    get_parameter(goal_station + "." + "orientation", orientation);
+
+    std::string delimiter = ",";
+    std::string x_token = position.substr(0, position.find(delimiter)); 
+    position.erase(0, position.find(delimiter) + delimiter.length());
+    std::string y_token = position.substr(0, position.find(delimiter)); 
+
+    float x = std::stof(x_token); 
+    float y = std::stof(y_token);
+    
     geometry_msgs::msg::PoseStamped p;
     geometry_msgs::msg::Point point;
     geometry_msgs::msg::Quaternion quat;
@@ -196,7 +283,7 @@ private:
     quat.x = 0.0;
     quat.y = 0.0;
     quat.z = 0.0;
-    quat.w = th;
+    quat.w = orientation;
 
     p.pose.position = point;
     p.pose.orientation = quat;
@@ -205,10 +292,9 @@ private:
        
 
 
-
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr start_subscriber_;
   rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr initial_publisher_;
+  rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SharedPtr action_client_;
   BT::Tree tree_;
   BT::Blackboard::Ptr blackboard_;
   std::string xml_string_;

@@ -3,13 +3,13 @@
 
     <BehaviorTree ID="TestTree2">
         <Sequence name="sequence">
-            <CloseGripper/>
+            <MoveGripper action="close"/>
         </Sequence>
     </BehaviorTree> 
 
     <BehaviorTree ID="TestTree">
         <Sequence name="main_sequence">
-            <OpenGripper/>
+            <MoveGripper action="open"/>
             <SubTree ID="TestTree2"/>
         </Sequence>
     </BehaviorTree> 

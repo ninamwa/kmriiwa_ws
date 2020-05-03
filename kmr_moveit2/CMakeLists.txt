@@ -47,11 +47,11 @@ set(DEPENDENCIES
   "rclcpp_action"
 )
 
-add_executable(run_moveit_cpp src/run_moveit.cpp)
-ament_target_dependencies(run_moveit_cpp ${DEPENDENCIES})
+add_executable(run_moveit src/run_moveit_node.cpp)
+ament_target_dependencies(run_moveit ${DEPENDENCIES})
 
 
-install(TARGETS run_moveit_cpp
+install(TARGETS run_moveit
   EXPORT export_${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME}
 )

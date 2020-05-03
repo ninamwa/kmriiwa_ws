@@ -15,7 +15,7 @@ def generate_launch_description():
     navigation_launch_file_dir = os.path.join(get_package_share_directory('kmr_navigation2'), 'launch')
     
     #xml_file_name = 'manipulator_tree.xml'
-    xml_file_name = 'test.xml'
+    xml_file_name = 'full_tree.xml'
     xml = os.path.join(
         get_package_share_directory('kmr_behaviortree'),
         'behavior_trees',

@@ -60,17 +60,17 @@
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_cpp_demo");
 
-class MoveItCppDemo
+class RunMoveIt
 {
 public:
-  MoveItCppDemo(const rclcpp::Node::SharedPtr& node)
+  RunMoveIt(const rclcpp::Node::SharedPtr& node)
     : node_(node)
     , robot_state_publisher_(node_->create_publisher<moveit_msgs::msg::DisplayRobotState>("display_robot_state", 1))
     , trajectory_publisher_(node_->create_publisher<trajectory_msgs::msg::JointTrajectory>(
           "/fake_joint_trajectory_controller/joint_trajectory", 1))
     , goal_pose_subscriber_(node_->create_subscription<geometry_msgs::msg::PoseStamped>(
-      "/moveit/goalpose", 10 ,std::bind(&MoveItCppDemo::goalpose_callback, this, std::placeholders::_1)))
-    , frame_subscriber_(node_->create_subscription<std_msgs::msg::String>("/moveit/frame2",10,std::bind(&MoveItCppDemo::frame_callback, this, std::placeholders::_1)))
+      "/moveit/goalpose", 10 ,std::bind(&RunMoveIt::goalpose_callback, this, std::placeholders::_1)))
+    , frame_subscriber_(node_->create_subscription<std_msgs::msg::String>("/moveit/frame2",10,std::bind(&RunMoveIt::frame_callback, this, std::placeholders::_1)))
   {
   }
 
@@ -92,9 +92,9 @@ public:
       node_->get_node_logging_interface(),
       node_->get_node_waitables_interface(),
       "/moveit/frame",
-      std::bind(&MoveItCppDemo::handle_goal, this,  std::placeholders::_1,  std::placeholders::_2),
-      std::bind(&MoveItCppDemo::handle_cancel, this,  std::placeholders::_1),
-      std::bind(&MoveItCppDemo::handle_accepted, this,  std::placeholders::_1));
+      std::bind(&RunMoveIt::handle_goal, this,  std::placeholders::_1,  std::placeholders::_2),
+      std::bind(&RunMoveIt::handle_cancel, this,  std::placeholders::_1),
+      std::bind(&RunMoveIt::handle_accepted, this,  std::placeholders::_1));
 
     // Create collision object, planning shouldn't be too easy
     moveit_msgs::msg::CollisionObject collision_object;
@@ -153,7 +153,7 @@ public:
     // Add object to planning scene
     {  // Lock PlanningScene
       planning_scene_monitor::LockedPlanningSceneRW scene(moveit_cpp_->getPlanningSceneMonitor());
-      scene->processCollisionObjectMsg(collision_object);
+      //scene->processCollisionObjectMsg(collision_object);
     }  // Unlock PlanningScene
   
     // Set joint state goal
@@ -178,24 +178,24 @@ public:
     pose.pose.position.z = 0.9;
     pose.pose.orientation.w = 1.0;
 
-    arm->setGoal(pose_msg,"gripper_middle_point");
-    // arm->setGoal("home");
-    MoveItCppDemo::move();
+    // arm->setGoal(pose_msg,"gripper_middle_point");
+    arm->setGoal("driveposition");
+    RunMoveIt::move();
     rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
     
 /* 
 
     arm->setGoal(pose_msg, "gripper_base_link"); */
-    //MoveItCppDemo::move();
+    //RunMoveIt::move();
     //rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
 
-    // arm->setGoal("search_2");
-    // MoveItCppDemo::move();
+    // arm->setGoal("search2");
+    // RunMoveIt::move();
 
     // rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
 
-    // arm->setGoal("search_3");
-    // MoveItCppDemo::move();
+    // arm->setGoal("search3");
+    // RunMoveIt::move();
     
   }
 
@@ -225,7 +225,7 @@ private:
 
   void goalpose_callback(geometry_msgs::msg::PoseStamped::SharedPtr msg)
   {
-/*     ::planning_interface::MotionPlanRequest req;
+    /*   ::planning_interface::MotionPlanRequest req;
     moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
     start_state->update();
     moveit::core::robotStateToRobotStateMsg(*start_state, req.start_state);
@@ -278,7 +278,7 @@ private:
   }
   void handle_accepted(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kmr_msgs::action::PlanToFrame>> goal_handle)
   {
-    std::thread{std::bind(&MoveItCppDemo::execute, this, std::placeholders::_1), goal_handle}.detach();
+    std::thread{std::bind(&RunMoveIt::execute, this, std::placeholders::_1), goal_handle}.detach();
   }
 
    void execute(const std::shared_ptr<rclcpp_action::ServerGoalHandle<kmr_msgs::action::PlanToFrame>> goal_handle)
@@ -321,7 +321,6 @@ private:
         moveit_msgs::msg::RobotTrajectory robot_trajectory;
         plan_solution.trajectory->getRobotTrajectoryMsg(robot_trajectory);
         result->success = true;
-        result->frame = goal->frame;
         result->path = robot_trajectory.joint_trajectory;
         goal_handle->succeed(result);
         RCLCPP_INFO(LOGGER, "Goal Succeeded");
@@ -331,7 +330,6 @@ private:
     }
     else{
         result->success = false;
-        result->frame = goal->frame;
         goal_handle->abort(result);
         RCLCPP_INFO(LOGGER, "Goal Failed - Planning Failed");
 
@@ -358,9 +356,9 @@ int main(int argc, char** argv)
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions node_options;
   node_options.automatically_declare_parameters_from_overrides(true);
-  rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("run_moveit_cpp", "", node_options);
+  rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("run_moveit", "", node_options);
 
-  MoveItCppDemo demo(node);
+  RunMoveIt demo(node);
   std::thread run_demo([&demo]() {
     rclcpp::sleep_for(std::chrono::seconds(3));
     demo.init();

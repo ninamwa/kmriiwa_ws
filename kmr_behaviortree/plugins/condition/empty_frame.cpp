@@ -3,19 +3,19 @@
 namespace kmr_behavior_tree
 {
 
-class FrameEmptyCondition : public BT::ConditionNode
+class EmptyFrameCondition : public BT::ConditionNode
 {
 public:
-  FrameEmptyCondition(
+  EmptyFrameCondition(
     const std::string & condition_name,
     const BT::NodeConfiguration & conf)
   : BT::ConditionNode(condition_name, conf)
   {
   }
 
-  FrameEmptyCondition() = delete;
+  EmptyFrameCondition() = delete;
 
-  ~FrameEmptyCondition()
+  ~EmptyFrameCondition()
   {
     cleanup();
   }
@@ -66,5 +66,5 @@ private:
 #include "behaviortree_cpp_v3/bt_factory.h"
 BT_REGISTER_NODES(factory)
 {
-  factory.registerNodeType<kmr_behavior_tree::FrameEmptyCondition>("FrameEmpty");
+  factory.registerNodeType<kmr_behavior_tree::EmptyFrameCondition>("EmptyFrame");
 }

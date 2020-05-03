@@ -23,10 +23,10 @@
 namespace kmr_behavior_tree
 {
 
-class NavigationAction : public BtActionNode<nav2_msgs::action::NavigateToPose>
+class NavigateVehicleAction : public BtActionNode<nav2_msgs::action::NavigateToPose>
 {
 public:
-  NavigationAction(
+  NavigateVehicleAction(
     const std::string & xml_tag_name,
     const std::string & action_name,
     const BT::NodeConfiguration & conf)
@@ -55,10 +55,10 @@ BT_REGISTER_NODES(factory)
   BT::NodeBuilder builder =
     [](const std::string & name, const BT::NodeConfiguration & config)
     {
-      return std::make_unique<kmr_behavior_tree::NavigationAction>(
+      return std::make_unique<kmr_behavior_tree::NavigateVehicleAction>(
         name, "navigate_to_pose", config);
     };
 
-  factory.registerBuilder<kmr_behavior_tree::NavigationAction>(
-    "Navigation", builder);
+  factory.registerBuilder<kmr_behavior_tree::NavigateVehicleAction>(
+    "NavigateVehicle", builder);
 }
