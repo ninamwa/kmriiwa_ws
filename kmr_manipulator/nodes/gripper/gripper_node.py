@@ -29,10 +29,9 @@ from sensor_msgs.msg import LaserScan
 from builtin_interfaces.msg import Time
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.action import ActionServer, GoalResponse
-from kmr_msgs.action import Gripper
-
 from gripper_msgs import GripperMsg
 from errorcodes import ErrorCodes
+from kmr_msgs.action import Gripper
 
 
 from enum import Enum
@@ -43,10 +42,9 @@ class GripperNode(Node):
     def __init__(self):
         super().__init__('gripper_node')
         self.name='gripper_node'
-        # TODO: change port to NUC
-        #self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
-        #self.activate()
-        #print("Activated")
+        self.ser = serial.Serial(port="/dev/ttyUSB1", baudrate=115200, timeout=1, parity=serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
+        self.activate()
+        print("Activated") 
         self.gripper_action_server = ActionServer(self,Gripper,'move_gripper',self.move_gripper_callback)
 
     def move_gripper_callback(self, goal_handle):
@@ -73,17 +71,17 @@ class GripperNode(Node):
 
     def activate(self):
         # Activation Request
+        self.ser.write(GripperMsg.ClearMemory.value)
+        data_raw = self.ser.readline()
         self.ser.write(GripperMsg.ActivationRequest.value)
         data_raw = self.ser.readline()
         activated = False
         while (not activated):
             self.ser.write(GripperMsg.ActivationStatusRequest.value)
             response = self.ser.readline()
-            gSTA  = self.response_to_value(str(response),2,3)
+            gSTA=self.response_to_gSTA(response)
             if (gSTA == GripperMsg.ACTIVATIONCOMPLETE.value):
                 activated = True
-                self.close()
-                self.open()
             if (gSTA == GripperMsg.ACTIVATIONINPROGRESS.value):
                 print("Gripper activation in progress...")
 
@@ -100,7 +98,7 @@ class GripperNode(Node):
     def isMoving(self):
         result=False
         self.ser.write(GripperMsg.MotionStatusRequest.value)
-        gOBJ = self.response_to_value(str(self.ser.readline()),0,1)
+        gOBJ = self.response_to_gOBJ(str(self.ser.readline()))
         # Not Moving
         if(gOBJ==GripperMsg.NOTMOVING.value):
             result=False
@@ -114,7 +112,7 @@ class GripperNode(Node):
     def getClosedResponse(self):
         result = False
         self.ser.write(GripperMsg.MotionStatusRequest.value)
-        gOBJ = self.response_to_value(str(self.ser.readline()),0,1)
+        gOBJ = self.response_to_gOBJ(str(self.ser.readline()))
         # Closed, no object:
         if(gOBJ==GripperMsg.REQUESTEDPOSITION.value):
             result=False
@@ -128,7 +126,7 @@ class GripperNode(Node):
     def getOpenResponse(self):
         result=False
         self.ser.write(GripperMsg.MotionStatusRequest.value)
-        gOBJ = self.response_to_value(str(self.ser.readline()),0,1)
+        gOBJ = self.response_to_gOBJ(str(self.ser.readline()))
         # Collision
         if (gOBJ == GripperMsg.OBJECT_OPENING.value):
             result = False
@@ -139,17 +137,19 @@ class GripperNode(Node):
             print(ErrorCodes.OPEN)
         return result
 
+    def response_to_gSTA(self,data_string):
+        binascii = str(binascii.hexlify(response))
+        gSTA = list(binascii)[6] # eller 8 hvis b og ' kommer med
+        return int(gSTA)
 
-    def response_to_value(self,data_string,bit1,bit2):
+    def response_to_gOBJ(self,data_string):
         # moving only meaningful if gGTO = 1
         hexa = data_string.split("\\")[4].split("x")[1]
         binary = bin(int(hexa, 16))[2:].zfill(8)
-        value = 2*int(binary[bit1]) + 1*int(binary[bit2])
-        # for gOBJ:
-        if(bit1==0 and bit2==1):
-            gGTO = binary[4]
-            if (value==0 and gGTO!=1):
-                value=-1
+        value = 2*int(binary[0]) + 1*int(binary[1])
+        gGTO = binary[4]
+        if (value==0 and gGTO!=1):
+            value=-1
         return value
 
 

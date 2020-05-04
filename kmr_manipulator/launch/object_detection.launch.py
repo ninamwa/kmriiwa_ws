@@ -13,7 +13,7 @@ def generate_launch_description():
     object_model = os.path.join(get_package_share_directory('kmr_manipulator'), 'model', 'circbox.xml')
 
     camera_base_frame_id = LaunchConfiguration('base_frame_id', default='ManipulatorCamera_link')
-    camera_serial_no = LaunchConfiguration('serial_no', default='831612071154')
+    camera_serial_no = LaunchConfiguration('serial_no', default='831612070671')
 
     default_rviz = os.path.join(get_package_share_directory('object_analytics_node'), 'launch', 'rviz/default.rviz')
 
@@ -71,4 +71,4 @@ def generate_launch_description():
     package='rviz2', node_executable='rviz2', output='screen',
     arguments=['--display-config', default_rviz])
 
-    return launch.LaunchDescription([realsensenode,openvinonode,oanode,searchnode])
+    return launch.LaunchDescription([realsensenode,openvinonode,oanode])
