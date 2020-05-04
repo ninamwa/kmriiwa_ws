@@ -26,7 +26,7 @@ from geometry_msgs.msg import Point, Pose, Quaternion, Twist
 from builtin_interfaces.msg import Time
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.action import ActionServer, GoalResponse
-from kmr_manipulator.action import ObjectSearch
+from kmr_msgs.action import ObjectSearch
 from pipeline_srv_msgs.srv import PipelineSrv
 from pipeline_srv_msgs.msg import PipelineRequest
 from object_analytics_msgs.msg import ObjectsInBoxes3D
@@ -58,11 +58,10 @@ class ObjectDetectionNode(Node):
     def __init__(self):
         super().__init__('object_detection_node')
         self.name='object_detection_node'
-        self.detection_threshold = 0.99
+        self.detection_threshold = 0.95
         self.detected_object_pose = None
         self.pipelinename = "object"
 
-        # TODO: change port to NUC
         self.object_detection_action_server = ActionServer(self,ObjectSearch,'object_search',self.object_search_callback)
 
         self.client = self.create_client(PipelineSrv, '/openvino_toolkit/pipeline_service')
@@ -72,16 +71,16 @@ class ObjectDetectionNode(Node):
            self.get_logger(        ).info('Waiting for service')
 
         sub_LocalizedObject = self.create_subscription(ObjectsInBoxes3D, '/object_analytics/localization', self.detectedObject_callback, qos_profile_sensor_data)
-
         self.endSearch()
+
+
 
     def detectedObject_callback(self, ObjectsInBoxes):
         for instance in ObjectsInBoxes.objects_in_boxes:
             probability = instance.object.probability
-            print(probability)
+            #print(probability)
             if(probability>=self.detection_threshold and self.isSearching):
                 self.detected_object_pose = self.getBoundingBoxMidPoint(instance.min, instance.max)
-                print("---------------END SEARCH-------------------")
                 self.endSearch()
 
     def object_search_callback(self, goal_handle):
@@ -112,7 +111,8 @@ class ObjectDetectionNode(Node):
     def getBoundingBoxMidPoint(self,min,max):
         midpoint = PoseStamped()
         midpoint.pose.position.x = min.x - (min.x-max.x)/2
-        print("MIDPOIOINT FOUND")
+        midpoint.pose.position.y = min.y - (min.y-max.y)/2
+        midpoint.pose.position.z = min.z - (min.z-max.z)/2
         return midpoint
 
 
@@ -124,7 +124,7 @@ class ObjectDetectionNode(Node):
             print("Wait result" + wait.result())
             self.get_logger().info('Request was ' + self.request.parameters[0].name + '. Response is ' + str(wait.result().results.successful)) # + wait.result().results[1])
         else:
-            self.get_logger().info("Request failed")
+            self.get_logger().info("Request sent")
 
 def main(args=None):
     rclpy.init(args=args)

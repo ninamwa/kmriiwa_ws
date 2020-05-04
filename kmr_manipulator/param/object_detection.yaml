@@ -13,8 +13,8 @@ Pipelines:
   connects:
     - left: RealSenseCameraTopic
       right: [ObjectDetection]
-    - left: ObjectDetection
-      right: [ImageWindow]
+#    - left: ObjectDetection
+#      right: [ImageWindow]
     - left: ObjectDetection
       right: [RosTopic]
 

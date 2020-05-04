@@ -71,4 +71,4 @@ def generate_launch_description():
     package='rviz2', node_executable='rviz2', output='screen',
     arguments=['--display-config', default_rviz])
 
-    return launch.LaunchDescription([realsensenode,openvinonode,oanode])
+    return launch.LaunchDescription([realsensenode,openvinonode,oanode,searchnode])
