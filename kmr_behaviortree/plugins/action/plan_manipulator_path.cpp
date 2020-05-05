@@ -2,6 +2,7 @@
 #include "kmr_msgs/action/plan_to_frame.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include <geometry_msgs/msg/pose_stamped.hpp>
+#include <iostream>
 
 namespace kmr_behavior_tree
 {
@@ -18,7 +19,6 @@ public:
 
   void on_tick() override
   {
-    rclcpp::sleep_for(std::chrono::seconds(4));
     if (!getInput("plan_to_frame", plan_to_frame)) {
       RCLCPP_ERROR(node_->get_logger(),"PlanToFrameAction: frame not provided");
       return;

@@ -8,21 +8,21 @@
                 <Sequence name="search_frame1">
                     <Sequence name="search1">
                         <PlanManipulatorPath plan_to_frame="search1"/>
-                        <MoveManipulator path="{path}"/>
+                        <MoveManipulator path="{manipulator_path}"/>
                     </Sequence>
                     <ObjectSearch/>
                 </Sequence>
                 <Sequence name="search_frame2">
                     <Sequence name="search2">
                         <PlanManipulatorPath plan_to_frame="search2"/>
-                        <MoveManipulator path="{path}"/>
+                        <MoveManipulator path="{manipulator_path}"/>
                     </Sequence>
                     <ObjectSearch/>
                 </Sequence>
                 <Sequence name="search_frame3">
                     <Sequence name="search3">
                         <PlanManipulatorPath plan_to_frame="search3"/>
-                        <MoveManipulator path="{path}"/>
+                        <MoveManipulator path="{manipulator_path}"/>
                     </Sequence>
                     <ObjectSearch/>
                 </Sequence>
@@ -32,14 +32,14 @@
                     <Sequence name="pick_object">
                         <Sequence name="main_move_to_object">
                             <PlanManipulatorPath plan_to_frame="object" object_pose="{pose}"/>
-                            <MoveManipulator path="{path}"/>
+                            <MoveManipulator path="{manipulator_path}"/>
                         </Sequence>
                         <MoveGripper action="close"/>
                     </Sequence>
                     <ForceFailure name="force_failure1">
                         <Sequence name="movetodrive">
                             <PlanManipulatorPath plan_to_frame="driveposition"/>
-                            <MoveManipulator path="{path}"/>
+                            <MoveManipulator path="{manipulator_path}"/>
                         </Sequence>
                     </ForceFailure>
                 </Fallback>
@@ -56,12 +56,12 @@
                     </Fallback>
                     <Sequence name="emptyframe">
                         <PlanManipulatorPath plan_to_frame="{empty_frame}"/>
-                        <MoveManipulator path="{path}"/>
+                        <MoveManipulator path="{manipulator_path}"/>
                     </Sequence>
                     <MoveGripper action="open"/>
                     <Sequence name="drive">
                         <PlanManipulatorPath plan_to_frame="driveposition"/>
-                        <MoveManipulator path="{path}"/>
+                        <MoveManipulator path="{manipulator_path}"/>
                     </Sequence>
                 </Sequence>
             </Sequence>

@@ -1,16 +1,14 @@
 
 <root main_tree_to_execute="TestTree">
 
-    <BehaviorTree ID="TestTree2">
-        <Sequence name="sequence">
-            <MoveGripper action="close"/>
-        </Sequence>
-    </BehaviorTree> 
-
     <BehaviorTree ID="TestTree">
         <Sequence name="main_sequence">
-            <MoveGripper action="open"/>
-            <SubTree ID="TestTree2"/>
+            <PlanManipulatorPath plan_to_frame="carryarea1" manipulator_path="{manipulator_path}"/>
+            <MoveManipulator path="{manipulator_path}"/>
+            <PlanManipulatorPath plan_to_frame="carryarea2" manipulator_path="{manipulator_path}"/>
+            <MoveManipulator path="{manipulator_path}"/>
+            <PlanManipulatorPath plan_to_frame="carryarea3" manipulator_path="{manipulator_path}"/>
+            <MoveManipulator path="{manipulator_path}"/>
         </Sequence>
     </BehaviorTree> 
 

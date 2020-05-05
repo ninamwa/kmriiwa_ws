@@ -23,6 +23,7 @@ public:
 
   BT::NodeStatus on_success() override
   {
+    RCLCPP_INFO(node_->get_logger(),"PlanToFrameAction: frame not provided");
     if(action == "open"){
       std::string current_frame;
       current_frame = config().blackboard->get<std::string>("current_frame");
