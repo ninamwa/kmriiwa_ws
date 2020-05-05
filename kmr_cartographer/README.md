@@ -16,15 +16,11 @@ The following packages needs to be installed:
 As of now, the launch file is not correctly launching the cartographer nodes, and this needs to be launched on its own. 
 
 You need four terminals where you are running the commands: 
-
 ```
-$ ros2 run kuka_communication client_TCP.py 
-```
-```
-$ ros2 launch kuka_cartographer cartographer.launch.py
+$ ros2 launch kmr_cartographer cartographer.launch.py
 ```
 ```
-$ ros2 run cartographer_ros cartographer_node -configuration_directory PATH_TO/config -configuration_basename kuka_2d.lua
+$ ros2 run cartographer_ros cartographer_node -configuration_directory $HOME/PROJECT-NAME/src/kmr_cartographer/config -configuration_basename kmr_2d.lua
 ```
 ```
 $ ros2 run cartographer_ros occupancy_grid_node
@@ -38,4 +34,4 @@ If you want to save the map which are created, this can be done by running the f
 $ ros2 run nav2_map_server map_saver -f ~/PATH_TO/created_maps
 ```
 
-The PATH_TO needs to be changed based on where your project is saved. 
+The PROJECT-NAME needs to be changed based on where your project is saved. 
