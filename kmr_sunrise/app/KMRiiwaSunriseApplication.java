@@ -1,5 +1,3 @@
-// Copyright 2019 Nina Marie Wahl og Charlotte Heggem.
-// Copyright 2019 Norwegian University of Science and Technology.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -53,7 +51,7 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 	
 	// Declare KMP
 	@Inject
-	@Named("KMR_200_1")
+	@Named("KMR_omniMove_200_1")
 	public KmpOmniMove kmp;
 	public Controller controller;
 	
@@ -98,11 +96,11 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 	public void initialize() {
 		System.out.println("Initializing Robotics API Application");
 		// Check if any of the requested ports are open
-		CheckPorts = new CheckOpenPorts();
-		if(CheckPorts.run()){
-			System.out.println("One or more of the Communication ports are open. Please restart the system by killing the process.");
+		//CheckPorts = new CheckOpenPorts();
+		//if(CheckPorts.run()){
+		//	System.out.println("One or more of the Communication ports are open. Please restart the system by killing the process.");
 //			dispose();
-		}
+		//}
 		// Configure application
 		BasicConfigurator.configure();
 		resumeFunction = getTaskFunction(IAutomaticResumeFunction.class);
@@ -119,11 +117,7 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 		// Create nodes for communication
 		kmp_commander = new KMP_commander(KMP_command_port, kmp, TCPConnection);
 		lbr_commander = new LBR_commander(LBR_command_port, lbr, TCPConnection, getApplicationData().getFrame("/DrivePos"));
-		kmp_status_reader = new KMP_status_reader(KMP_status_port, kmp,TCPConnection, controller);
-		lbr_status_reader = new LBR_status_reader(LBR_status_port, lbr,TCPConnection);
-		lbr_sensor_reader = new LBR_sensor_reader(LBR_sensor_port,lbr, TCPConnection);
-		kmp_sensor_reader = new KMP_sensor_reader(KMP_laser_port, KMP_odometry_port, TCPConnection, TCPConnection);
-		
+
 		
 		// SafetyStateListener
 		safetylistener = new SafetyStateListener(controller, lbr_commander,kmp_commander,lbr_status_reader,kmp_status_reader);
@@ -134,7 +128,6 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 		long startTime = System.currentTimeMillis();
 		int shutDownAfterMs = 7000; 
 		while(!AppRunning) {
-			
 			if(kmp_commander.isSocketConnected() || lbr_commander.isSocketConnected()){
 					AppRunning = true;
 					System.out.println("Application ready to run!");	
@@ -144,6 +137,13 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 				shutdown_application();
 				break;
 			}				
+		}
+		
+		if(AppRunning){
+			kmp_status_reader = new KMP_status_reader(KMP_status_port, kmp,TCPConnection, controller);
+			lbr_status_reader = new LBR_status_reader(LBR_status_port, lbr,TCPConnection);
+			lbr_sensor_reader = new LBR_sensor_reader(LBR_sensor_port,lbr, TCPConnection);
+			kmp_sensor_reader = new KMP_sensor_reader(KMP_laser_port, KMP_odometry_port, TCPConnection, TCPConnection);
 		}
 	}
 	
@@ -206,9 +206,7 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 	
 		while(AppRunning)
 		{    
-			if(ControlPanelIO.getAPP_GREEN() && ControlPanelIO.getAPP_RED()){
-				System.out.println("Main app running when application is paused.");
-			}
+
 			AppRunning = (!(kmp_commander.getShutdown() || lbr_commander.getShutdown()));
 		}
 		System.out.println("Shutdown message received from ROS");
