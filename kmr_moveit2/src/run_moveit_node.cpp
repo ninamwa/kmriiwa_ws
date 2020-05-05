@@ -150,15 +150,21 @@ public:
     collision_object.primitive_poses.push_back(snus_pose);
     collision_object.operation = collision_object.ADD;
 
+    ::planning_interface::MotionPlanRequest req;
+    moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
+    start_state->update();
+    moveit::core::robotStateToRobotStateMsg(*start_state, req.start_state);
+
     // Add object to planning scene
     {  // Lock PlanningScene
       planning_scene_monitor::LockedPlanningSceneRW scene(moveit_cpp_->getPlanningSceneMonitor());
+      scene->setCurrentState(*start_state);
       //scene->processCollisionObjectMsg(collision_object);
     }  // Unlock PlanningScene
   
     // Set joint state goal
-    RCLCPP_INFO(LOGGER, "Set goal");
-    //arm.setGoal("pose1");
+    // RCLCPP_INFO(LOGGER, "Set goal");
+    // arm.setGoal("pose1");
 
     geometry_msgs::msg::PoseStamped pose_msg;
     pose_msg.header.frame_id = "base_footprint";
@@ -179,9 +185,9 @@ public:
     pose.pose.orientation.w = 1.0;
 
     // arm->setGoal(pose_msg,"gripper_middle_point");
-    arm->setGoal("driveposition");
-    RunMoveIt::move();
-    rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
+    //arm->setGoal("driveposition");
+    //RunMoveIt::move();
+    //rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
     
 /* 
 
@@ -225,7 +231,7 @@ private:
 
   void goalpose_callback(geometry_msgs::msg::PoseStamped::SharedPtr msg)
   {
-    /*   ::planning_interface::MotionPlanRequest req;
+    /*   moveit::planning_interface::MotionPlanRequest req;
     moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
     start_state->update();
     moveit::core::robotStateToRobotStateMsg(*start_state, req.start_state);

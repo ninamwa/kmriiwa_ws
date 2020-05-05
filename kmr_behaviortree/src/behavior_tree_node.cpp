@@ -12,7 +12,6 @@
 #include "std_msgs/msg/string.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "kmr_behaviortree/behavior_tree_engine.hpp"
-#include "kmr_msgs/action/open_gripper.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <nav2_msgs/action/navigate_to_pose.hpp>
@@ -49,6 +48,10 @@ BehaviorTreeNode()
   declare_parameter("bt_xml_filename");
   declare_parameter("WS1.position");
   declare_parameter("WS1.orientation");
+  declare_parameter("WS2.position");
+  declare_parameter("WS2.orientation");
+  declare_parameter("WS3.position");
+  declare_parameter("WS3.orientation");
   declare_parameter("HOME.position");
   declare_parameter("HOME.orientation");
   declare_parameter("goal_list");
@@ -104,7 +107,7 @@ BehaviorTreeNode()
   float orientation;
   get_parameter("HOME.position", position);
   get_parameter("HOME.orientation", orientation);
-
+  
   std::string delimiter = ",";
   std::string x_token = position.substr(0, position.find(delimiter)); 
   position.erase(0, position.find(delimiter) + delimiter.length());
@@ -146,9 +149,11 @@ private:
       bool nav_res = send_navigation_goal(goal_pose);
       if (nav_res){
         RCLCPP_INFO(LOGGER, "Navigated successfully home!");
+        exit(0);
       }
       else{
         RCLCPP_INFO(LOGGER, "Failed to navigate back home!");
+        exit(0);
       }
     }
 
@@ -266,7 +271,8 @@ private:
     std::string delimiter = ",";
     std::string x_token = position.substr(0, position.find(delimiter)); 
     position.erase(0, position.find(delimiter) + delimiter.length());
-    std::string y_token = position.substr(0, position.find(delimiter)); 
+    std::string y_token = position.substr(0, position.find(delimiter));
+
 
     float x = std::stof(x_token); 
     float y = std::stof(y_token);
@@ -301,8 +307,6 @@ private:
   std::unique_ptr<kmr_behavior_tree::BehaviorTreeEngine> bt_;
   std::vector<std::string> plugin_lib_names_;
   std::vector<std::string> goal_list;
-
-  // A regular, non-spinning ROS node that we can use for calls to the action client
   rclcpp::Node::SharedPtr client_node_;
 };
 

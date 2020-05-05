@@ -100,7 +100,7 @@ class LbrStatusNode(Node):
                         if (split[1] == "true"):
                             msg.lbr_active_command = True
                         else:
-                            msg.lbr_has_active_command = False
+                            msg.lbr_active_command = False
                     elif (split[0] == "LBRsafetyStop"):
                         if (split[1] == "true"):
                             msg.lbr_safetystop = True
