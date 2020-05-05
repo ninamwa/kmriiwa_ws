@@ -76,12 +76,14 @@ controller_server:
     controller_frequency: 20.0
     controller_plugin_types: ["dwb_core::DWBLocalPlanner"]
     controller_plugin_ids: ["FollowPath"]
-    min_x_velocity_threshold: 0.001
-    min_y_velocity_threshold: 0.001
-    min_theta_velocity_threshold: 0.001
+    min_x_velocity_threshold: 0.0001
+    min_y_velocity_threshold: 0.0001
+    min_theta_velocity_threshold: 0.0001
 
     # DWB parameters
     FollowPath.debug_trajectory_details: True
+    FollowPath.movement_time_allowance: 20.0
+    FollowPath.required_movement_radius: 0.5
     FollowPath.min_vel_x: -0.3
     FollowPath.min_vel_y: -0.2
     FollowPath.max_vel_x: 0.3
@@ -113,13 +115,12 @@ controller_server:
     FollowPath.transform_tolerance: 0.2
     FollowPath.critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
     FollowPath.ObstacleFootprint.scale: 0.02
-    FollowPath.PathAlign.scale: 32.0
+    FollowPath.PathAlign.scale: 0.0
     FollowPath.GoalAlign.scale: 0.0
-    FollowPath.PathDist.scale: 0.0
-    FollowPath.GoalDist.scale: 0.0
-    FollowPath.RotateToGoal.scale: 0.0
-    FollowPath.RotateToGoal.slowing_factor: 5.0
-    FollowPath.RotateToGoal.lookahead_time: -1.0
+#    FollowPath.Oscillation.scale: 0.0
+    FollowPath.PathDist.scale: 32.0
+    FollowPath.GoalDist.scale: 24.0
+    FollowPath.RotateToGoal.scale: 32.0
 
 controller_server_rclcpp_node:
   ros__parameters:
@@ -139,7 +140,7 @@ local_costmap:
       width: 3
       height: 3
       resolution: 0.5
-      robot_radius: 0.54
+      robot_radius: 0.626
       inflation_layer:
         cost_scaling_factor: 1.0
         inflation_layer.inflation_radius: 0.1
@@ -193,7 +194,7 @@ global_costmap:
       use_sim_time: True
       plugin_names: ["static_layer", "obstacle_layer", "voxel_layer", "inflation_layer"]
       plugin_types: ["nav2_costmap_2d::StaticLayer", "nav2_costmap_2d::ObstacleLayer", "nav2_costmap_2d::VoxelLayer", "nav2_costmap_2d::InflationLayer"]
-      robot_radius: 0.54
+      robot_radius: 0.626
       resolution: 1.0
       obstacle_layer:
         enabled: True

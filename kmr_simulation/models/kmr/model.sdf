@@ -1,20 +1,15 @@
 <sdf version='1.6'>
   <model name='kmr'>
     <link name='base_footprint'/>
+
     <joint name="fixed" type="fixed">
         <parent>base_footprint</parent>
         <child>base_link</child>
     </joint>
+
     <link name='base_link'>
-      <pose frame=''>0 0 0 0 -0 0</pose>
-      <inertial>
-        <mass>55.04</mass>
-        <inertia>
-          <ixx> 5.383 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>7.170</iyy> <iyz>0.0</iyz> <izz>1.854</izz> 
-        </inertia>
-      </inertial>
       <collision name='base_link_collision'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose frame=''>0 0 -0.1885 0 -0 0</pose>
         <geometry>
           <box>
             <size>1.08 0.63 0.085</size>
@@ -37,12 +32,6 @@
     </joint>
 
     <link name="base_link_middle">
-      <inertial>
-        <mass>18.42</mass>
-        <inertia>
-          <ixx> 1.0866 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>1.437</iyy> <iyz>0.0</iyz> <izz>0.357</izz> 
-        </inertia>
-      </inertial>
       <collision name='base_link_middle_collision'>
         <pose frame=''>0 0 -0.122 0 -0 0</pose>
         <geometry>
@@ -67,12 +56,6 @@
     </joint>
 
     <link name="base_link_top">
-      <inertial>
-        <mass>339.96</mass>
-        <inertia>
-          <ixx> 39.1077 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>42.397</iyy> <iyz>0.0</iyz> <izz>18.238</izz> 
-        </inertia>
-      </inertial>
       <visual name='base_link_top_visual'>
         <pose frame=''>0 0 0.1645 0 -0 0</pose>
         <geometry>
@@ -85,7 +68,7 @@
         <pose frame=''>0 0 0.1645 0 -0 0</pose>
         <geometry>
           <box>
-            <size>1.08 0.63 0.5335</size>
+            <size>1.08 0.63 0.525</size>
           </box>
         </geometry>
       </collision>
@@ -100,6 +83,7 @@
         </axis>
     </joint>
 
+
     <link name="back_left_wheel_link">
       <visual name='back_left_wheel_link_visual'>
         <pose frame=''>-0.28 0.1825 -0.135 0 -0 0</pose>
@@ -111,21 +95,15 @@
         </geometry>
       </visual>
       <collision name='back_left_wheel_link_collision'>
-        <pose frame=''>-0.28 0.1825 -0.135 0 -0 0</pose>
+        <pose frame=''>-0.28 0.1825 -0.135 1.570796 -0 0</pose>
         <geometry>
           <cylinder>
-            <length>0.175</length>
+            <length>0.100</length>
             <radius>0.125</radius>
           </cylinder>
         </geometry>
       </collision>
-      <inertial>
-        <pose>0 0 0 0 0 0 </pose>
-        <mass>6.5</mass>
-        <inertia>
-          <ixx> 0.04197 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.0508</iyy> <iyz>0.0</iyz> <izz>0.04197</izz> 
-        </inertia>
-      </inertial>
+
     </link>
 
     <joint name="back_right_wheel_joint" type="revolute">
@@ -136,6 +114,7 @@
             <xyz>0 1 0</xyz>
         </axis>
     </joint>
+
 
     <link name="back_right_wheel_link">
       <visual name='back_right_wheel_link_visual'>
@@ -148,21 +127,14 @@
         </geometry>
       </visual>
       <collision name='back_right_wheel_link_collision'>
-        <pose frame=''>-0.28 -0.1825 -0.135 0 -0 0</pose>
+        <pose frame=''>-0.28 -0.1825 -0.135 1.570796 -0 0</pose>
         <geometry>
           <cylinder>
-            <length>0.175</length>
+            <length>0.100</length>
             <radius>0.125</radius>
           </cylinder>
         </geometry>
       </collision>
-      <inertial>
-          <pose>0 0 0 0 0 0 </pose>
-          <mass>6.5</mass>
-          <inertia>
-            <ixx> 0.04197 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.0508</iyy> <iyz>0.0</iyz> <izz>0.04197</izz> 
-          </inertia>
-      </inertial>
     </link>
 
    <joint name="front_left_wheel_joint" type="revolute">
@@ -176,10 +148,10 @@
 
     <link name="front_left_wheel_link">
         <collision name='front_left_wheel_link_collision'>
-            <pose frame=''>0.28 0.1825 -0.135 0 -0 0</pose>
+            <pose frame=''>0.28 0.1825 -0.135 1.570796 -0 0</pose>
             <geometry>
               <cylinder>
-                <length>0.175</length>
+                <length>0.100</length>
                 <radius>0.125</radius>
               </cylinder>
             </geometry>
@@ -193,13 +165,6 @@
               </mesh>
             </geometry>
         </visual>
-        <inertial>
-          <pose>0 0 0 0 0 0 </pose>
-          <mass>6.5</mass>
-          <inertia>
-            <ixx> 0.04197 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.0508</iyy> <iyz>0.0</iyz> <izz>0.04197</izz> 
-          </inertia>
-        </inertial>
     </link>
 
     <joint name="front_right_wheel_joint" type="revolute">
@@ -211,12 +176,13 @@
         </axis>
     </joint>
 
+
     <link name="front_right_wheel_link">
        <collision name='front_right_wheel_link_collision'>
-        <pose frame=''>0.28 -0.1825 -0.135 0 -0 0</pose>
+        <pose frame=''>0.28 -0.1825 -0.135 1.570796 -0 0</pose>
         <geometry>
           <cylinder>
-            <length>0.175</length>
+            <length>0.100</length>
             <radius>0.125</radius>
           </cylinder>
         </geometry>
@@ -230,28 +196,19 @@
               </mesh>
             </geometry>
        </visual>
-       <inertial>
-          <pose>0 0 0 0 0 0 </pose>
-          <mass>6.5</mass>
-          <inertia>
-            <ixx> 0.04197 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.0508</iyy> <iyz>0.0</iyz> <izz>0.04197</izz> 
-          </inertia>
-        </inertial>
     </link>
-
     <joint name="laser_B1_joint" type="fixed">
         <parent>base_link</parent>
         <child>laser_B1_link</child>
         <pose>0.483 -0.258 -0.112 3.1413 -0 -0.7854</pose>
     </joint>
 
+    <joint name="laser_B1_joint2" type="fixed">
+        <parent>base_link_top</parent>
+        <child>laser_B1_link</child>
+    </joint>
+
     <link name='laser_B1_link'>
-      <inertial>
-        <mass>1.2</mass>
-        <inertia>
-          <ixx> 0.002355 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.002355</iyy> <iyz>0.0</iyz> <izz>0.0002809</izz> 
-        </inertia>
-      </inertial>
       <visual name='laser_B1_link_visual'>
         <pose frame=''>0.483 -0.258 -0.112 3.1413 -0 -0.7854</pose>
         <geometry>
@@ -311,13 +268,13 @@
         <pose>-0.483 0.258 -0.112 0 3.1413 5.4977</pose>
     </joint>
 
+    <joint name="laser_B4_joint2" type="fixed">
+        <parent>base_link_top</parent>
+        <child>laser_B4_link</child>
+    </joint>
+
+
     <link name='laser_B4_link'>
-      <inertial>
-        <mass>1.2</mass>
-        <inertia>
-          <ixx> 0.002355 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.002355</iyy> <iyz>0.0</iyz> <izz>0.0002809</izz> 
-        </inertia>
-      </inertial>
       <collision name='laser_B4_link_collision'>
         <pose frame=''>-0.483 0.258 -0.112 0 3.1413 5.4977</pose>
         <geometry>
@@ -396,13 +353,6 @@
               </mesh>
             </geometry>
          </collision>
-         <inertial>
-            <pose>-0.1 0 0.07 0 0 0 </pose>
-            <mass>5.0</mass>
-            <inertia>
-              <ixx> 0.05 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.06</iyy> <iyz>0.0</iyz> <izz>0.03</izz> 
-            </inertia>
-         </inertial>
     </link>
 
     <joint name="joint_a1" type="fixed">
@@ -435,14 +385,6 @@
               </mesh>
             </geometry>
           </visual>
-
-          <inertial>
-            <pose>0 -0.03 0.12 0 0 0 </pose>
-            <mass>4.0</mass>
-            <inertia>
-              <ixx> 0.1 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.09</iyy> <iyz>0.0</iyz> <izz>0.02</izz> 
-            </inertia>
-          </inertial>
     </link>
 
     <joint name="joint_a2" type="fixed">
@@ -473,13 +415,6 @@
           </mesh>
         </geometry>
       </visual>
-      <inertial>
-        <pose>0.0003 0.059 0.042 0 0 0 </pose>
-        <mass>4.0</mass>
-        <inertia>
-          <ixx> 0.05 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.018</iyy> <iyz>0.0</iyz> <izz>0.044</izz> 
-        </inertia>
-      </inertial>
     </link>
 
     <joint name="joint_a3" type="fixed">
@@ -511,14 +446,6 @@
           </mesh>
         </geometry>
       </collision>
-      <inertial>
-        <pose>0 0.03 0.13 0 0 0 </pose>
-        <mass>3.0</mass>
-        <inertia>
-          <ixx> 0.08 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.075</iyy> <iyz>0.0</iyz> <izz>0.01</izz> 
-        </inertia>
-      </inertial>
-      
     </link>
 
     <joint name="joint_a4" type="fixed">
@@ -549,13 +476,6 @@
           </mesh>
         </geometry>
       </visual>
-      <inertial>
-        <pose>0 0.067 0.034 0 0 0 </pose>
-        <mass>2.7</mass>
-        <inertia>
-          <ixx> 0.03 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.01</iyy> <iyz>0.0</iyz> <izz>0.029</izz> 
-        </inertia>
-      </inertial>
     </link>
 
     <joint name="joint_a5" type="fixed">
@@ -588,13 +508,6 @@
           </mesh>
         </geometry>
       </visual>
-      <inertial>
-        <pose>0.0001 0.021 0.076 0 0 0 </pose>
-        <mass>1.7</mass>
-        <inertia>
-          <ixx> 0.02 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.018</iyy> <iyz>0.0</iyz> <izz>0.005</izz> 
-        </inertia>
-      </inertial>
     </link>
 
     <joint name="joint_a6" type="fixed">
@@ -625,14 +538,6 @@
           </mesh>
         </geometry>
       </visual>
-      <inertial>
-        <pose>0 0.0006 0.0004 0 0 0 </pose>
-        <mass>1.8</mass>
-        <inertia>
-          <ixx> 0.005 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.036</iyy> <iyz>0.0</iyz> <izz>0.0047</izz> 
-        </inertia>
-      </inertial>
-      
     </link>
 
     <joint name="joint_a7" type="fixed">
@@ -663,13 +568,6 @@
           </mesh>
         </geometry>
       </visual>
-      <inertial>
-        <pose>0 0.0 0.02 0 0 0 </pose>
-        <mass>0.3</mass>
-        <inertia>
-          <ixx> 0.001 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.001</iyy> <iyz>0.0</iyz> <izz>0.001</izz> 
-        </inertia>
-      </inertial>
     </link>
 
     <joint name="joint_tool0" type="fixed">
@@ -685,7 +583,7 @@
     <joint name="d435_joint" type="fixed">
         <parent>base_link_top</parent>
         <child>d435_link</child>
-        <pose>0.0149 0.0 0.0125 1.570796 0 1.570796</pose>
+        <pose>0.0149 0.0 0.5 1.570796 0 1.570796</pose>
         <axis>
             <xyz>0 0 0</xyz>
         </axis>
@@ -693,7 +591,7 @@
 
     <link name="d435_link">
       <collision name='d435_link_collision'>
-        <pose frame=''>0.0149 0.0 0.0125 1.570796 0 1.570796</pose>
+        <pose frame=''>0.0149 0.0 0.5 1.570796 0 1.570796</pose>
         <geometry>
           <box>
             <size>0.02505 0.090 0.025</size>
@@ -701,7 +599,7 @@
         </geometry>
       </collision>
       <visual name='d435_link_visual'>
-        <pose frame=''>0.0149 0.0 0.0125 1.570796 0 1.570796</pose>
+        <pose frame=''>0.0149 0.0 0.5 1.570796 0 1.570796</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
@@ -709,13 +607,6 @@
           </mesh>
         </geometry>
       </visual>
-      <inertial>
-        <pose>0 0.0 0.0 0 0 0 </pose>
-        <mass>0.564</mass>
-        <inertia>
-          <ixx> 0.003881243 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.000498940</iyy> <iyz>0.0</iyz> <izz>0.003879257</izz> 
-        </inertia>
-      </inertial>
       <sensor name="camera" type="depth">
         <always_on>true</always_on>
         <visualize>true</visualize>
