@@ -26,9 +26,11 @@ import argparse
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from kmr_msgs.msg import LbrStatusdata
 from kmr_msgs.action import MoveManipulator
-#from tcpSocket import TCPSocket
-#from udpSocket import UDPSocket
+from tcpSocket import TCPSocket
+from udpSocket import UDPSocket
 from rclpy.action import ActionServer, GoalResponse
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
 
 
 
@@ -51,28 +53,30 @@ class LbrCommandsNode(Node):
         else:
             ip=None
 
-        #if connection_type == 'TCP':
-        #    self.soc = TCPSocket(ip,port,self.name)
-        #elif connection_type == 'UDP':
-        #    self.soc=UDPSocket(ip,port,self.name)
-        #else:
-        #    self.soc=None
-        self.soc=None
+        if connection_type == 'TCP':
+            self.soc = TCPSocket(ip,port,self.name)
+        elif connection_type == 'UDP':
+            self.soc=UDPSocket(ip,port,self.name)
+        else:
+            self.soc=None
 
+
+        self.callback_group = ReentrantCallbackGroup()
+        
 
         # Make a listener for relevant topics
         # Denne første skal nok fjernes (ble brukt før vi la på actions)
         # sub_pathplanning = self.create_subscription(JointTrajectory, '/fake_joint_trajectory_controller/joint_trajectory', self.path_callback, qos_profile_sensor_data)
         sub_manipulator_vel = self.create_subscription(String, 'manipulator_vel', self.manipulatorVel_callback, qos_profile_sensor_data)
         sub_shutdown = self.create_subscription(String, 'shutdown', self.shutdown_callback, qos_profile_sensor_data)
-        sub_statusdata=self.create_subscription(LbrStatusdata, 'lbr_statusdata', self.status_callback, qos_profile_sensor_data)
-        self.path_server = ActionServer(self,MoveManipulator,'move_manipulator', self.move_manipulator_callback)
+        sub_statusdata=self.create_subscription(LbrStatusdata, 'lbr_statusdata', self.status_callback, qos_profile_sensor_data,callback_group=self.callback_group)
+        self.path_server = ActionServer(self,MoveManipulator,'move_manipulator', self.move_manipulator_callback,callback_group=self.callback_group)
 
         self.isLBRMoving=False
 
-        #while not self.soc.isconnected:
-        #    pass
-        #self.get_logger().info('Node is ready')
+        while not self.soc.isconnected:
+            pass
+        self.get_logger().info('Node is ready')
 
     def status_callback(self,data):
         if data.is_lbr_moving != self.isLBRMoving:
@@ -83,7 +87,7 @@ class LbrCommandsNode(Node):
         print(data)
         msg = "shutdown"
         self.soc.send(msg)
-        #self.udp_soc.isconnected = False
+        self.soc.isconnected = False
 
     def manipulatorVel_callback(self, data):
         msg = 'setLBRmotion ' + data.data
@@ -92,6 +96,7 @@ class LbrCommandsNode(Node):
     def move_manipulator_callback(self, goal_handle):
         self.get_logger().info('Executing goal...')
         self.isLBRMoving = True
+        print(goal_handle.request.path)
         self.path_callback(goal_handle.request.path)
         while (self.isLBRMoving):
             pass
@@ -126,10 +131,12 @@ def main(argv=sys.argv[1:]):
     rclpy.init(args=argv)
     lbr_commands_node = LbrCommandsNode(args.connection,args.robot)
 
-    rclpy.spin(lbr_commands_node)
+    executor = MultiThreadedExecutor()
+    rclpy.spin(lbr_commands_node, executor)
 
-    #while rclpy.ok():
-    #    rclpy.spin_once(odometry_node)
+
+    #rclpy.spin(lbr_commands_node)
+
     try:
         lbr_commands_node.destroy_node()
         rclpy.shutdown()
