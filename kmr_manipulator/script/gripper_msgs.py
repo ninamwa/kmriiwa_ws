@@ -24,8 +24,9 @@ class GripperMsg(Enum):
     CloseRequest = b"\x09\x10\x03\xE8\x00\x03\x06\x09\x00\x00\xFF\x7F\x7F\x22\x49"
     OpenRequest = b"\x09\x10\x03\xE8\x00\x03\x06\x09\x00\x00\x00\xFF\xFF\x72\x19"
 
-    ACTIVATIONCOMPLETE = 3
+    ACTIVATIONCOMPLETE = 3 
     ACTIVATIONINPROGRESS = 1
+
 
     NOTMOVING = -1
     MOVING = 0
