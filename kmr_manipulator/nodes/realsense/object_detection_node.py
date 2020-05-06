@@ -26,6 +26,8 @@ from geometry_msgs.msg import Point, Pose, Quaternion, Twist
 from builtin_interfaces.msg import Time
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.action import ActionServer, GoalResponse
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
 from kmr_msgs.action import ObjectSearch
 from pipeline_srv_msgs.srv import PipelineSrv
 from pipeline_srv_msgs.msg import PipelineRequest
@@ -34,6 +36,7 @@ from object_analytics_msgs.msg import ObjectInBox3D
 from object_msgs.msg import Object
 from geometry_msgs.msg import Point32
 from geometry_msgs.msg import PoseStamped
+
 
 
 def cl_red(msge): return '\033[31m' + msge + '\033[0m'
@@ -58,50 +61,66 @@ class ObjectDetectionNode(Node):
     def __init__(self):
         super().__init__('object_detection_node')
         self.name='object_detection_node'
-        self.detection_threshold = 0.95
+        self.detection_threshold = 0.72 # must be tuned
         self.detected_object_pose = None
-        self.pipelinename = "object"
 
-        self.object_detection_action_server = ActionServer(self,ObjectSearch,'object_search',self.object_search_callback)
+        self.pipelinename = "object"
+        self.callback_group = ReentrantCallbackGroup() 
+
+        self.object_detection_action_server = ActionServer(self,ObjectSearch,'object_search',self.object_search_callback, callback_group=self.callback_group)
 
         self.client = self.create_client(PipelineSrv, '/openvino_toolkit/pipeline_service')
         self.request = PipelineSrv.Request()
 
+
         while not self.client.wait_for_service(timeout_sec=10.0):
            self.get_logger(        ).info('Waiting for service')
 
-        sub_LocalizedObject = self.create_subscription(ObjectsInBoxes3D, '/object_analytics/localization', self.detectedObject_callback, qos_profile_sensor_data)
+        sub_LocalizedObject = self.create_subscription(ObjectsInBoxes3D, '/object_analytics/localization', self.detectedObject_callback, qos_profile_sensor_data, callback_group=self.callback_group)
+        time.sleep(2)
         self.endSearch()
 
 
-
     def detectedObject_callback(self, ObjectsInBoxes):
-        for instance in ObjectsInBoxes.objects_in_boxes:
-            probability = instance.object.probability
-            #print(probability)
-            if(probability>=self.detection_threshold and self.isSearching):
-                self.detected_object_pose = self.getBoundingBoxMidPoint(instance.min, instance.max)
-                self.endSearch()
+            for instance in ObjectsInBoxes.objects_in_boxes:
+                probability = instance.object.probability
+                print(probability)
+                if(probability>=self.detection_threshold and self.isSearching):
+                      self.detected_object_pose = self.getBoundingBoxMidPoint(instance.min, instance.max)
+                      print("OBJECT DETECTED")
+                      self.endSearch()
 
     def object_search_callback(self, goal_handle):
         self.startSearch()
+        starttime = time.time()
         self.get_logger().info('Executing goal...')
-        while (self.isSearching):
+        elapsed = 0
+        while (self.isSearching and elapsed<10):
+            elapsed = time.time() - starttime
             pass
+        print("done searching")
+        if self.isSearching:
+           self.endSearch()
         result = ObjectSearch.Result()
         if self.detected_object_pose != None:
             result.success = True
             result.pose = self.detected_object_pose
+            print(result)
+            print(result.pose.pose.position.x)
+            print(result.pose.pose.position.y)
+            print(result.pose.pose.position.z)
             self.detected_object_pose = None
-        if result.success == True:
-           goal_handle.succeed()
-        else:
+        if result.success != True:
+           print("aborting goal")
            goal_handle.abort()
-        return result
+        else:
+           goal_handle.succeed()
+           return result
 
     def startSearch(self):
-        self.send_pipeline_request("RUN_PIPELINE")
         self.isSearching = True
+        self.send_pipeline_request("RUN_PIPELINE")
+
 
     def endSearch(self):
         self.isSearching = False
@@ -113,6 +132,7 @@ class ObjectDetectionNode(Node):
         midpoint.pose.position.x = min.x - (min.x-max.x)/2
         midpoint.pose.position.y = min.y - (min.y-max.y)/2
         midpoint.pose.position.z = min.z - (min.z-max.z)/2
+        midpoint.header.frame_id = "camera_color_optical_frame"
         return midpoint
 
 
@@ -129,8 +149,8 @@ class ObjectDetectionNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     object_detection_node = ObjectDetectionNode()
-
-    rclpy.spin(object_detection_node)
+    executor = MultiThreadedExecutor()
+    rclpy.spin(object_detection_node,executor)
     try:
         object_detection_node.destroy_node()
         rclpy.shutdown()

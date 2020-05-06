@@ -102,7 +102,7 @@ class GripperNode(Node):
         # Not Moving
         if(gOBJ==GripperMsg.NOTMOVING.value):
             result=False
-            print("Not moving")
+            print("Not Moving")
         # Moving
         if(gOBJ==GripperMsg.MOVING.value):
             result=True
@@ -138,8 +138,8 @@ class GripperNode(Node):
         return result
 
     def response_to_gSTA(self,data_string):
-        binascii = str(binascii.hexlify(response))
-        gSTA = list(binascii)[6] # eller 8 hvis b og ' kommer med
+        binascii_data = str(binascii.hexlify(data_string))
+        gSTA = list(binascii_data)[8] 
         return int(gSTA)
 
     def response_to_gOBJ(self,data_string):

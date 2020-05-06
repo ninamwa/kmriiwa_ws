@@ -12,10 +12,13 @@ def generate_launch_description():
     object_param = os.path.join(get_package_share_directory('kmr_manipulator'), 'param', 'object_detection.yaml')
     object_model = os.path.join(get_package_share_directory('kmr_manipulator'), 'model', 'circbox.xml')
 
-    camera_base_frame_id = LaunchConfiguration('base_frame_id', default='ManipulatorCamera_link')
-    camera_serial_no = LaunchConfiguration('serial_no', default='831612070671')
+    camera_base_frame_id = LaunchConfiguration('base_frame_id', default='d435_manipulator_link')
+
+    #camera_serial_no = LaunchConfiguration('serial_no', default='831612070671') Mounted on gripper
+    camera_serial_no = LaunchConfiguration('serial_no', default='831612071154') 
 
     default_rviz = os.path.join(get_package_share_directory('object_analytics_node'), 'launch', 'rviz/default.rviz')
+    #default_rviz = os.path.join(get_package_share_directory('kmr_manipulator'), 'launch', 'rviz/default.rviz')
 
     # Realsense Node
     realsensenode = Node(
@@ -24,14 +27,15 @@ def generate_launch_description():
     node_name='realsense_node',
     node_namespace="/ManipulatorCamera",
     output='screen',
-    parameters=[{'serial_no':camera_serial_no, 
-		 #'base_frame_id': camera_base_frame_id,
-		 'color0.enabled': True,
+    remappings=[('camera_depth_optical_frame', 'heii')],
+    parameters=[{'serial_no':camera_serial_no,
+		 'base_frame_id': camera_base_frame_id,
+         'color0.enabled': True,
 		 'depth0.enabled': True,
 		 'align_depth': True,
 		 'enable_pointcloud': True,
 		 'infra1.enabled': False,
-		 'infra2.enabled': False}])
+		 'infra2.enabled': False,}])
 
     # OpenVINO Node
     openvinonode = Node(
@@ -54,8 +58,9 @@ def generate_launch_description():
 
     # Object Search Node
     searchnode = Node(
-    package='kmr_manipulator', node_executable='object_search_node.py', node_name='object_search_node',
-    output='screen')
+    package='kmr_manipulator', node_executable='object_detection_node.py', node_name='object_detection_node',
+    output='screen',
+    emulate_tty=True)
 
     # object_analytics_rviz, add to launch description if desired
     oarviz = Node(
@@ -71,4 +76,4 @@ def generate_launch_description():
     package='rviz2', node_executable='rviz2', output='screen',
     arguments=['--display-config', default_rviz])
 
-    return launch.LaunchDescription([realsensenode,openvinonode,oanode,searchnode])
+    return launch.LaunchDescription([realsensenode,openvinonode,oanode,searchnode,oarviz,oarviz2,rviz])
