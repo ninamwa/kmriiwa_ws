@@ -25,9 +25,10 @@ import API_ROS2_Sunrise.UDPSocket;
 import com.kuka.roboticsAPI.deviceModel.LBR;
 
 
-public class LBR_sensor_reader extends Node{
+public class LBR_sensor_reader extends Thread{
 	
 	// Runtime variables
+	public volatile boolean closed = false;
 	Boolean LBR_sensor_requested;
 
 	// Robot
@@ -43,10 +44,12 @@ public class LBR_sensor_reader extends Node{
 	String ConnectionType;
 	
 	
-	public LBR_sensor_reader(int port, LBR robot, String ConnectionType) {
-		super(port, ConnectionType);
+	public LBR_sensor_reader(int UDPport, LBR robot, String ConnectionType) {
+		this.port = UDPport;
 		this.lbr = robot;
 		LBR_sensor_requested = false;
+		this.ConnectionType = ConnectionType;
+		createSocket();
 		
 		if(!(isSocketConnected())){
 			Thread monitorLBRsensorConnections = new MonitorSensorConnectionThread();
@@ -57,6 +60,15 @@ public class LBR_sensor_reader extends Node{
 
 	}
 	
+	public void createSocket(){
+		if (this.ConnectionType == "TCP") {
+			 socket = new TCPSocket(this.port);
+		}
+		
+		else {
+			socket = new UDPSocket(this.port);
+		}
+	}
 		
 	public class MonitorSensorConnectionThread extends Thread {
 		int timeout = 3000;
@@ -80,10 +92,13 @@ public class LBR_sensor_reader extends Node{
 				}	
 		}
 	}
-
-	@Override
+	
+	public void runmainthread(){
+		this.run();
+	}
+	
 	public void run() {
-		while(isNodeRunning())
+		while(isSocketConnected() && (!(closed)))
 		{	
 			//FIND OUT HOW MUCH TO SLEEP. SAMME RATE SOM ODOMETRY?
 			updateMeasuredTorque();
@@ -96,7 +111,6 @@ public class LBR_sensor_reader extends Node{
 			try {
 				TimeUnit.MILLISECONDS.sleep(30);
 			} catch (InterruptedException e) {
-				System.out.println("LBR sensor thread could not sleep");
 			}
 		}
 	}
@@ -115,17 +129,18 @@ public class LBR_sensor_reader extends Node{
 
 	private String generateSensorString() {
 		return 	">lbr_sensordata ,"  + System.nanoTime() +  
-				",JointPosition:" + JointPosition[0]+"," + JointPosition[1]+"," + JointPosition[2]+"," + JointPosition[3]+"," + JointPosition[4]+"," + JointPosition[5]+"," + JointPosition[6]+
-				",MeasuredTorque:" + MeasuredTorque[0] +","+ MeasuredTorque[1] +","+MeasuredTorque[2] +","+MeasuredTorque[3] +","+MeasuredTorque[4] +","+MeasuredTorque[5] +","+MeasuredTorque[6] ;
+				",JointPosition:" + JointPosition[0]+ ","+ JointPosition[1] + ","+ JointPosition[2] +","+  JointPosition[3]  + ","+ JointPosition[4]+","+  JointPosition[5] +","+  JointPosition[6] +  
+				",MeasuredTorque:" + MeasuredTorque[0]+ ","+ MeasuredTorque[1] + ","+ MeasuredTorque[2] +","+  MeasuredTorque[3]  + ","+ MeasuredTorque[4]+","+  MeasuredTorque[5] +","+  MeasuredTorque[6] 
+;
 	}
 	
 	public void sendStatus() {
 		String sensorString = generateSensorString();
-		if(isNodeRunning()){
+		if(isSocketConnected() && (!(closed))){
 			try{
 				this.socket.send_message(sensorString);
 				if(closed){
-					System.out.println("LBR sensor sender selv om han ikke f�r lov");
+					System.out.println("LBR sensor sender selv om han ikke får lov");
 				}
 			}catch(Exception e){
 				System.out.println("Could not send Operation mode to ROS: " + e);
@@ -133,12 +148,20 @@ public class LBR_sensor_reader extends Node{
 		}
 	}
 	
-	@Override
 	public void close() {
 		closed = true;
 		socket.close();
 		System.out.println("LBR sensor closed!");
 
 	}
+	
+	public boolean isSocketConnected() {
+		return socket.isConnected();
+	}
+	
+	public boolean isRequested() {
+		return (LBR_sensor_requested); 
+	}
+
 	
 }
