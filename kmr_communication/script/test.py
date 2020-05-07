@@ -23,30 +23,45 @@ from rclpy.utilities import remove_ros_args
 import argparse
 from tcpSocket import TCPSocket
 from nodes.test2 import Test2
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.qos import qos_profile_sensor_data
 
 
 class Test(Node):
-    def __init__(self,connection_type,ip):
+    def __init__(self):
         super().__init__('test')
-        #kmp_odometry_node = rclpy.create_node('test')
-        #hh = kmp_odometry_node.get_parameter('connection')
-        #print(hh)
-        self.get_logger().info('HEI')
-        print(TCPSocket)
-        #tt = Test2(1234)
+       
+        self.callback_group = ReentrantCallbackGroup()
+        sub_1=self.create_subscription(String, 'topic1', self.callback1, qos_profile_sensor_data,callback_group=self.callback_group)
+        sub_2=self.create_subscription(String, 'topic2', self.callback2, qos_profile_sensor_data,callback_group=self.callback_group)
 
+        self.isMoving = False
 
+    
+    def callback1(self, data):
+        self.get_logger().info('callback1')
+        self.isMoving = True
+        while (self.isMoving):
+            print("ismoving")
+            pass
+        self.get_logger().info('UTE AV CALLBACK 1')
+        
+    
+    def callback2(self,data):
+        self.get_logger().info('callback2')
+        if (data.data=="OK"):
+            self.isMoving=False
+            print("OK")
+        
+        
 
-def main(argv=sys.argv[1:]):
-
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-c', '--connection')
-    parser.add_argument('-i', '--ip')
-    print(argv)
-    args = parser.parse_args(remove_ros_args(args=argv))
+def main(argv=None):
     rclpy.init(args=argv)
-    node = Test(args.connection,args.ip)
-    rclpy.spin(node)
+    node = Test()
+    executor = MultiThreadedExecutor()
+    rclpy.spin(node, executor)
+    
     node.destroy_node()
     rclpy.shutdown()
 

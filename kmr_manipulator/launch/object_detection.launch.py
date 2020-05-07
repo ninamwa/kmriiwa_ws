@@ -15,7 +15,7 @@ def generate_launch_description():
     camera_base_frame_id = LaunchConfiguration('base_frame_id', default='d435_manipulator_link')
 
     #camera_serial_no = LaunchConfiguration('serial_no', default='831612070671') Mounted on gripper
-    camera_serial_no = LaunchConfiguration('serial_no', default='831612071154') 
+    camera_serial_no = LaunchConfiguration('serial_no', default='831612071154')
 
     default_rviz = os.path.join(get_package_share_directory('object_analytics_node'), 'launch', 'rviz/default.rviz')
     #default_rviz = os.path.join(get_package_share_directory('kmr_manipulator'), 'launch', 'rviz/default.rviz')

@@ -96,11 +96,11 @@ class LbrStatusNode(Node):
                         else:
                             msg.is_lbr_moving = False
                             self.soc.is_lbr_moving = False
-                    elif (split[0] == "LBRhasActiveCommand"):
+                    elif (split[0] == "PathFinished"):
                         if (split[1] == "true"):
-                            msg.lbr_active_command = True
+                            msg.path_finished = True
                         else:
-                            msg.lbr_active_command = False
+                            msg.path_finished = False
                     elif (split[0] == "LBRsafetyStop"):
                         if (split[1] == "true"):
                             msg.lbr_safetystop = True

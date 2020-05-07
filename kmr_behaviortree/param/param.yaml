@@ -4,8 +4,6 @@ behavior_tree_node:
     use_sim_time: True
     goal_list: 
     - WS1
-    - WS2
-    - WS3
     WS1:
         position: 1.81,-0.57
         orientation: 1.0
@@ -17,7 +15,7 @@ behavior_tree_node:
         position: -3.0,0.0
         orientation: 1.0
     HOME: 
-        postion: -2.0,0.0
+        position: -2.0,0.0
         orientation: 1.0
     plugin_lib_names:
     - move_gripper_action_bt_node

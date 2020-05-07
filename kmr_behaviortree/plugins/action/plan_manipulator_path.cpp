@@ -24,17 +24,10 @@ public:
       return;
     }
     goal_.frame = plan_to_frame;
+    RCLCPP_INFO(node_->get_logger(),"Start planning to %s", plan_to_frame.c_str());
     if (plan_to_frame == "object"){
-      getInput("object_pose", goal_.pose);
       geometry_msgs::msg::PoseStamped pose_msg;
-      pose_msg.header.frame_id = "base_footprint";
-      pose_msg.pose.position.x = -0.2;
-      pose_msg.pose.position.y = 0.0;
-      pose_msg.pose.position.z = 0.75;
-      pose_msg.pose.orientation.w = 0.0;
-      pose_msg.pose.orientation.x = 1.0;
-      pose_msg.pose.orientation.y= 0.0;
-      pose_msg.pose.orientation.z = 0.0;
+      getInput("object_pose",pose_msg);
       goal_.pose = pose_msg;
     }
   }

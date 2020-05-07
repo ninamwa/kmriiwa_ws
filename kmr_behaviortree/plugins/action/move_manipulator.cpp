@@ -18,13 +18,17 @@ public:
 
   void on_tick() override
   {
+    
     getInput("path", goal_.path);
     getInput("move_to_frame", current_frame);
+    RCLCPP_INFO(node_->get_logger(),"Start moving to %s", current_frame.c_str());
   }
 
   BT::NodeStatus on_success() override
   {
+
     config().blackboard->set("current_frame", current_frame);
+    RCLCPP_INFO(node_->get_logger(),"Done moving to %s", current_frame.c_str());
     return BT::NodeStatus::SUCCESS;
   }
 

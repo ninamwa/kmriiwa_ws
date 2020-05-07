@@ -68,10 +68,11 @@ class LbrSensordataNode(Node):
 
 
         self.last_data_timestamp = 0
+        self.prev_time=0
 
 
         # Make Publishers for relevant data
-        self.pub_lbr_sensordata = self.create_publisher(JointState, '/joint_states', qos_profile_sensor_data)
+        self.pub_lbr_sensordata = self.create_publisher(JointState, 'joint_states', 20)
         self.joint_names = ["joint_a1","joint_a2","joint_a3","joint_a4","joint_a5","joint_a6","joint_a7"]
 
         while not self.soc.isconnected:
@@ -98,6 +99,9 @@ class LbrSensordataNode(Node):
             msg.position = position
             msg.effort = effort
             publisher.publish(msg)
+            #if (time.time()-self.prev_time>0.3):
+            #   publisher.publish(msg)
+            #   self.prev_time = time.time()
 
     def getTimestamp(self,nano):
         t = nano * 10 ** -9

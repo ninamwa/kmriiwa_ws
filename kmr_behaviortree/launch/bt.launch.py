@@ -9,8 +9,7 @@ from launch.substitutions import LaunchConfiguration
 
 
 def generate_launch_description():
-
-    gripper_node_launch_file_dir = os.path.join(get_package_share_directory('kmr_manipulator'),'launch')
+    
     moveit_launch_file_dir = os.path.join(get_package_share_directory('kmr_moveit2'), 'launch')
     navigation_launch_file_dir = os.path.join(get_package_share_directory('kmr_navigation2'), 'launch')
     
@@ -38,10 +37,6 @@ def generate_launch_description():
             'bringup.yaml'))
 
     return LaunchDescription([
-
-        #IncludeLaunchDescription(
-        #       PythonLaunchDescriptionSource([gripper_node_launch_file_dir, '/gripper_node.launch.py']),
-        #),
 
         #IncludeLaunchDescription(
         #    PythonLaunchDescriptionSource([moveit_launch_file_dir, '/moveit.launch.py']),
@@ -77,16 +72,6 @@ def generate_launch_description():
              emulate_tty=True,
              arguments=['-c', connection_type_TCP, '-ro', robot],
              parameters=[param_dir]),
-
-
-
-        # Node(
-        #     package="kmr_manipulator",
-        #     node_executable="object_search_node.py",
-        #     node_name="object_search_node",
-        #     output="screen",
-        #     emulate_tty=True,
-        #     ),
 
 
         Node(

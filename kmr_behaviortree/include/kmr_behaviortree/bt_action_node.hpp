@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <string>
+#include <iostream>
 
 #include "behaviortree_cpp_v3/action_node.h"
 #include "kmr_behaviortree/node_utils.hpp"
@@ -156,7 +157,6 @@ public:
         return BT::NodeStatus::RUNNING;
       }
     }
-
     switch (result_.code) {
       case rclcpp_action::ResultCode::SUCCEEDED:
         return on_success();
@@ -218,12 +218,13 @@ protected:
     auto send_goal_options = typename rclcpp_action::Client<ActionT>::SendGoalOptions();
     send_goal_options.result_callback =
       [this](const typename rclcpp_action::ClientGoalHandle<ActionT>::WrappedResult & result) {
-        if (result.code != rclcpp_action::ResultCode::ABORTED) {
-          goal_result_available_ = true;
-          result_ = result;
-        }
+        //if (result.code != rclcpp_action::ResultCode::ABORTED) {
+        //  goal_result_available_ = true;
+        //  result_ = result;
+        //}
+        goal_result_available_ = true;
+        result_ = result;
       };
-
     auto future_goal_handle = action_client_->async_send_goal(goal_, send_goal_options);
 
     if (rclcpp::spin_until_future_complete(node_, future_goal_handle) !=

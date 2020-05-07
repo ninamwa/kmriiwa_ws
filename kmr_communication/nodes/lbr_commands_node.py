@@ -72,15 +72,18 @@ class LbrCommandsNode(Node):
         sub_statusdata=self.create_subscription(LbrStatusdata, 'lbr_statusdata', self.status_callback, qos_profile_sensor_data,callback_group=self.callback_group)
         self.path_server = ActionServer(self,MoveManipulator,'move_manipulator', self.move_manipulator_callback,callback_group=self.callback_group)
 
-        self.isLBRMoving=False
+        self.done_moving=False
+        self.last_path_variable = False
 
         while not self.soc.isconnected:
             pass
         self.get_logger().info('Node is ready')
 
     def status_callback(self,data):
-        if data.is_lbr_moving != self.isLBRMoving:
-            self.isLBRMoving = data.is_lbr_moving
+        if (self.last_path_variable==False and data.path_finished == True):
+            self.done_moving = True
+            print("done_moving set to true")
+        self.last_path_variable = data.path_finished
 
 
     def shutdown_callback(self, data):
@@ -94,11 +97,10 @@ class LbrCommandsNode(Node):
         self.soc.send(msg)
 
     def move_manipulator_callback(self, goal_handle):
-        self.get_logger().info('Executing goal...')
-        self.isLBRMoving = True
-        print(goal_handle.request.path)
+        #print(goal_handle.request.path)
         self.path_callback(goal_handle.request.path)
-        while (self.isLBRMoving):
+        self.done_moving = False
+        while (not self.done_moving):
             pass
         result = MoveManipulator.Result()
         result.success = True

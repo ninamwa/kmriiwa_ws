@@ -171,12 +171,14 @@ private:
     switch (rc) {
       case kmr_behavior_tree::BtStatus::SUCCEEDED:
         RCLCPP_INFO(get_logger(), "Object found and handled - succeeded");
-        start_bt();
+        //start_bt();
+        exit(0);
         break;
 
       case kmr_behavior_tree::BtStatus::FAILED:
         RCLCPP_ERROR(get_logger(), "Object found and handled - failed");
-        start_bt();
+        //start_bt();
+        exit(0);
         break;
 
       case kmr_behavior_tree::BtStatus::CANCELED:

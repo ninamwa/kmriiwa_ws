@@ -57,6 +57,7 @@
 #include <std_msgs/msg/string.hpp>
 #include <kmr_msgs/action/plan_to_frame.hpp>
 #include "rclcpp_action/rclcpp_action.hpp"
+#include "iostream"
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_cpp_demo");
 
@@ -231,7 +232,7 @@ private:
 
   void goalpose_callback(geometry_msgs::msg::PoseStamped::SharedPtr msg)
   {
-    /*   moveit::planning_interface::MotionPlanRequest req;
+    /*   ::planning_interface::MotionPlanRequest req;
     moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
     start_state->update();
     moveit::core::robotStateToRobotStateMsg(*start_state, req.start_state);
@@ -239,8 +240,11 @@ private:
       planning_scene_monitor::LockedPlanningSceneRW scene(moveit_cpp_->getPlanningSceneMonitor());
       scene->setCurrentState(*start_state);
     } */
-    RCLCPP_INFO(LOGGER, "GoalPose Received: %f, %f, %f", msg->pose.position.x,msg->pose.position.y,msg->pose.position.z);
-    arm->setGoal(*msg,"tool0");
+    RCLCPP_INFO(LOGGER, "GoalPose Received:");
+    std::cout << msg->pose.position.x << std::endl;
+    std::cout << msg->pose.position.y << std::endl;
+    std::cout << msg->pose.position.z << std::endl;
+    arm->setGoal(*msg,"gripper_middle_point");
     move();
     
   }
@@ -296,8 +300,12 @@ private:
     auto result = std::make_shared<kmr_msgs::action::PlanToFrame::Result>();
 
     if (goal->frame == "object"){
-      RCLCPP_INFO(LOGGER, "GoalPose Received: %f, %f, %f", goal->pose.pose.position.x,goal->pose.pose.position.y,goal->pose.pose.position.z);
-      arm->setGoal(goal->pose,"gripper_base_link");
+        RCLCPP_INFO(LOGGER, "GoalPose Received:");
+        std::cout << goal->pose.pose.position.x << std::endl;
+        std::cout << goal->pose.pose.position.y << std::endl;
+        std::cout << goal->pose.pose.position.z << std::endl;
+        std::cout << goal->pose.header.frame_id << std::endl;
+        arm->setGoal(goal->pose,"gripper_middle_point");
     }else{
         RCLCPP_INFO(LOGGER, "GoalFrame Received: %s", (goal->frame).c_str());
         arm->setGoal(goal->frame);
