@@ -30,12 +30,7 @@ import com.kuka.generated.ioAccess.ScannerSignalsIOGroup;
 import com.kuka.roboticsAPI.deviceModel.OperationMode;
 import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
 //TODO: importere alle klasser fra SunriseOmniMoveMobilePlatform, scannerIO
-public class KMP_status_reader extends Thread{
-
-	// Runtime variables
-	public volatile boolean closed = false;
-	private volatile boolean KMP_is_Moving = false;
-	private volatile boolean KMPemergencyStop = false;
+public class KMP_status_reader extends Node{
 
 	// Robot
 	KmpOmniMove kmp;
@@ -43,39 +38,24 @@ public class KMP_status_reader extends Thread{
 	// Status variables
 	private OperationMode operation_mode = null;
 	private Object isReadyToMove = null; 
-	ScannerSignalsIOGroup scannerIOGroup;
 	private volatile boolean WarningField = false;
 	private volatile boolean ProtectionField = false;
 
-	// Socket
-	int port;
-	ISocket socket;
-	String ConnectionType;
-	
-	public KMP_status_reader(int UDPport, KmpOmniMove robot,String ConnectionType, Controller controller) {
-		this.port = UDPport;
+	public KMP_status_reader(int port, KmpOmniMove robot,String ConnectionType, Controller controller) {
+		super(port, ConnectionType,"KMP status reader");
+
 		this.kmp = robot;
-		this.ConnectionType = ConnectionType;
-		createSocket();
-		this.scannerIOGroup = new ScannerSignalsIOGroup(controller);
 		
 		if (!(isSocketConnected())) {
-			System.out.println("Starting thread to connect KMP status node....");
+			//System.out.println("Starting thread to connect KMP status node....");
 			Thread monitorKMPStatusConnections = new MonitorKMPStatusConnectionsThread();
 			monitorKMPStatusConnections.start();
 			}
 	}
 	
-	public void createSocket(){
-		if (this.ConnectionType == "TCP") {
-			 this.socket = new TCPSocket(this.port);
-		}
-		else {
-			this.socket = new UDPSocket(this.port);
-		}
-	}
+	@Override
 	public void run() {
-		while(isSocketConnected() && (!(closed)))
+		while(isNodeRunning())
 		{	
 // TODO: FIND OUT HOW MUCH TO SLEEP. SAMME RATE SOM ODOMETRY?
 			updateOperationMode();
@@ -90,6 +70,7 @@ public class KMP_status_reader extends Thread{
 			try {
 				TimeUnit.MILLISECONDS.sleep(30);
 			} catch (InterruptedException e) {
+				System.out.println("KMP status thread could not sleep");
 			}
 		}
  }
@@ -133,21 +114,21 @@ public class KMP_status_reader extends Thread{
 				",ReadyToMove:" + this.isReadyToMove + 
 				",WarningField:" + !this.WarningField + 
 				",ProtectionField:" + !this.ProtectionField + 
-				",isKMPmoving:" + KMP_is_Moving +
-				",KMPsafetyStop:" + KMPemergencyStop;
+				",isKMPmoving:" + getisKMPMoving() +
+				",KMPsafetyStop:" + getEmergencyStop();
 	
 	}
 	
 	public void sendStatus() {
 		String toSend = this.generateStatusString();
-		if(isSocketConnected() && (!(closed))){
+		if(isNodeRunning()){
 			try{
 				this.socket.send_message(toSend);
 				if(closed){
-					System.out.println("KMP status sender selv om han ikke får lov");
+					System.out.println("KMP status sender selv om han ikke faar lov");
 				}
 			}catch(Exception e){
-				System.out.println("Could not send Operation mode to ROS: " + e);
+				System.out.println("Could not send KMP status message to ROS: " + e);
 			}
 		}
 	}
@@ -161,7 +142,7 @@ public class KMP_status_reader extends Thread{
 					break;
 				}
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(connection_timeout);
 				} catch (InterruptedException e) {
 					System.out.println("");
 				}
@@ -174,30 +155,14 @@ public class KMP_status_reader extends Thread{
 		}
 	}
 	
-	public void runmainthread(){
-		this.run();
-	}
 	
-	public void setKMPisMoving(boolean moving){
-		KMP_is_Moving = moving;
-	}
-	
-	public void setKMPemergencyStop(boolean stop){
-		KMPemergencyStop  = stop;
-	}
-
+	@Override
 	public void close() {
 		closed = true;
 		socket.close();
 		System.out.println("KMP status closed!");
 
 	}
-	
-	public boolean isSocketConnected() {
-		return socket.isConnected();
-	}
-	public boolean isSocketCreated() {
-		return !(socket==null);
-	}
+
 
 }
