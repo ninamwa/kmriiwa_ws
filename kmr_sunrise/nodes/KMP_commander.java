@@ -13,7 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 package API_ROS2_Sunrise;
 
 // Implemented classes
@@ -30,8 +29,13 @@ import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
 import com.kuka.roboticsAPI.executionModel.ICommandContainer;
 
 
-public class KMP_commander extends Node{
+public class KMP_commander extends Thread{
 	
+	// Runtime variables
+	public volatile boolean shutdown = false;
+	public volatile boolean closed = false;
+	public volatile boolean EmergencyStop = false;
+	boolean isLBRConnected;
 
 	// Robot
 	KmpOmniMove kmp;
@@ -42,34 +46,47 @@ public class KMP_commander extends Node{
 	KMPjogger kmp_jogger;
 	public volatile boolean KMP_is_Moving = false;
 
+	// Socket
+	int port;
+	ISocket socket;
+	String ConnectionType;
 	
 	public KMP_commander(int port, KmpOmniMove robot, String ConnectionType) {
-		super(port,ConnectionType);
+		this.port = port;
 		this.kmp = robot;
 		this.kmp_jogger = new KMPjogger((ICartesianJoggingSupport)kmp);
+		this.ConnectionType = ConnectionType;
+		
+		createSocket();
 		
 		if (!(isSocketConnected())) {
 			System.out.println("Starting thread to connect KMP command node....");
 			Thread monitorKMPCommandConnections = new MonitorKMPCommandConnectionsThread();
 			monitorKMPCommandConnections.start();
-			}else {
-			setisKMPConnected(true);
-		}
+			}
 	}
 
-	@Override
+	public void createSocket(){
+		if (this.ConnectionType == "TCP") {
+			 socket = new TCPSocket(port);
+		}
+		else {
+			 socket = new UDPSocket(port);
+		}
+	}
+	
 	public void run() {
 		Thread emergencyStopThread = new MonitorEmergencyStopThread();
 		emergencyStopThread.start();
 		
-		while(isNodeRunning())
+		while(isSocketConnected() && (!(closed)))
 		{
 			String Commandstr = socket.receive_message(); 
 	    	String []splt = Commandstr.split(" ");
 	    
 	    	if ((splt[0]).equals("shutdown")){
 	    		System.out.println("KMP received shutdown");
-				setShutdown(true);	
+				shutdown = true;	
 				break;
 				}
 	    	
@@ -82,7 +99,7 @@ public class KMP_commander extends Node{
 	
 	public class MonitorEmergencyStopThread extends Thread {
 		public void run(){
-			while(isNodeRunning()) {
+			while((isSocketConnected()) && (!(closed))) {
 				if (getEmergencyStop()){
 					setNewVelocity("vel 0 0 0");
 					}
@@ -122,12 +139,11 @@ public class KMP_commander extends Node{
 		int timeout = 3000;
 		public void run(){
 			while(!(isSocketConnected()) && (!(closed))) {
-				if(getisLBRConnected()) {
+				if(isLBRConnected) {
 					timeout = 5000;
 				}
 				createSocket();
 				if (isSocketConnected()){
-					setisKMPConnected(true);
 					break;
 				}
 				try {
@@ -144,15 +160,30 @@ public class KMP_commander extends Node{
 	}
 	
 	
-
+	
+	public void setEmergencyStop(boolean stop){
+		this.EmergencyStop = stop;
+	}
+	
+	public boolean getEmergencyStop(){
+		return this.EmergencyStop;
+	}
+	
+	public void runmainthread(){
+		this.run();
+	}
+	
 	public boolean isKMPmoving() {
 		return KMP_is_Moving;
 	}
 	
-	@Override
+	public boolean getShutdown() {
+		return this.shutdown;
+	}
+	
 	public void close() {
 		closed = true;
-		setShutdown(true);
+		shutdown = true;
 		try{
 			setNewVelocity("vel 0 0 0");
 		}catch(Exception e){
@@ -166,4 +197,15 @@ public class KMP_commander extends Node{
 		System.out.println("KMP commander closed!");
  	}
 	
+	public boolean isSocketConnected() {
+		return this.socket.isConnected();
+	}
+	
+	public boolean isSocketCreated() {
+		return !(this.socket==null);
+	}
+	
+	public void setLBRConnected(boolean LBRConnected) {
+		this.isLBRConnected = LBRConnected;
+	}
 }
