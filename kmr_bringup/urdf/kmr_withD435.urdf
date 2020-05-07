@@ -970,13 +970,13 @@
     <!--  -->
 
     <!-- camera body, with origin at bottom screw mount -->
-    <joint name="d435_1_joint" type="fixed">
-      <origin xyz="0.483 0.0 0.2625" rpy="0 0 0"/>
+    <joint name="d435_base_front_joint" type="fixed">
+      <origin xyz="0.52 0.0 0.2625" rpy="0 0 0"/>
       <parent link="base_link_top"/>
-      <child link="d435_1_link" />
+      <child link="d435_base_front_link" />
     </joint>
 
-    <link name="d435_1_link">
+    <link name="d435_base_front_link">
       <visual>
       <origin xyz="0.0149 0.0 0.0125" rpy="1.570796 0 1.570796"/>
         <geometry>
@@ -999,64 +999,169 @@
     </link>
    
     <!-- camera depth joints and links -->
-    <joint name="camera1_depth_joint" type="fixed">
+    <joint name="d435_base_front_depth_joint" type="fixed">
       <origin xyz="0.0149 -0.0075 0.0125" rpy="0 0 0"/>
-      <parent link="d435_1_link"/>
-      <child link="camera1_depth_frame" />
+      <parent link="d435_base_front_link"/>
+      <child link="d435_base_front_depth_frame" />
     </joint>
-    <link name="camera1_depth_frame"/>
+    <link name="d435_base_front_depth_frame"/>
 
-    <joint name="camera1_depth_optical_joint" type="fixed">
+    <joint name="d435_base_front_depth_optical_joint" type="fixed">
       <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-      <parent link= "camera1_depth_frame" />
-      <child link="camera1_depth_optical_frame" />
+      <parent link= "d435_base_front_depth_frame" />
+      <child link="d435_base_front_depth_optical_frame" />
     </joint>
-    <link name="camera1_depth_optical_frame"/>
+    <link name="d435_base_front_depth_optical_frame"/>
       
     <!-- camera left IR joints and links -->
-    <joint name="camera1_left_ir_joint" type="fixed">
+    <joint name="d435_base_front_left_ir_joint" type="fixed">
       <origin xyz="0 -0.025 0" rpy="0 0 0" />
-      <parent link="camera1_depth_frame" />
-      <child link="camera1_left_ir_frame" />
+      <parent link="d435_base_front_depth_frame" />
+      <child link="d435_base_front_left_ir_frame" />
     </joint>
-    <link name="camera1_left_ir_frame"/>
+    <link name="d435_base_front_left_ir_frame"/>
 
-    <joint name="camera1_left_ir_optical_joint" type="fixed">
+    <joint name="d435_base_front_left_ir_optical_joint" type="fixed">
       <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-      <parent link="camera1_left_ir_frame" />
-      <child link="camera1_left_ir_optical_frame" />
+      <parent link="d435_base_front_left_ir_frame" />
+      <child link="d435_base_front_left_ir_optical_frame" />
     </joint>
-    <link name="camera1_left_ir_optical_frame"/>
+    <link name="d435_base_front_left_ir_optical_frame"/>
 
     <!-- camera right IR joints and links -->
-    <joint name="camera1_right_ir_joint" type="fixed">
+    <joint name="d435_base_front_right_ir_joint" type="fixed">
       <origin xyz="0 0.025 0" rpy="0 0 0" />
-      <parent link="camera1_depth_frame" />
-      <child link="camera1_right_ir_frame" />
+      <parent link="d435_base_front_depth_frame" />
+      <child link="d435_base_front_right_ir_frame" />
     </joint>
-    <link name="camera1_right_ir_frame"/>
+    <link name="d435_base_front_right_ir_frame"/>
 
-    <joint name="camera1_right_ir_optical_joint" type="fixed">
+    <joint name="d435_base_front_right_ir_optical_joint" type="fixed">
       <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-      <parent link="camera1_right_ir_frame" />
-      <child link="camera1_right_ir_optical_frame" />
+      <parent link="d435_base_front_right_ir_frame" />
+      <child link="d435_base_front_right_ir_optical_frame" />
     </joint>
-    <link name="camera1_right_ir_optical_frame"/>
+    <link name="d435_base_front_right_ir_optical_frame"/>
 
     <!-- camera fisheye joints and links -->
-    <joint name="camera1_fisheye_joint" type="fixed">
+    <joint name="d435_base_front_fisheye_joint" type="fixed">
       <origin xyz="0 0.040 0" rpy="0 0 0" />
-      <parent link="camera1_depth_frame" />
-      <child link="camera1_fisheye_frame" />
+      <parent link="d435_base_front_depth_frame" />
+      <child link="d435_base_front_fisheye_frame" />
     </joint>
-    <link name="camera1_fisheye_frame"/>
+    <link name="d435_base_front_fisheye_frame"/>
 
-    <joint name="camera1_fisheye_optical_joint" type="fixed">
+    <joint name="d435_base_front_fisheye_optical_joint" type="fixed">
       <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-      <parent link="camera1_fisheye_frame" />
-      <child link="camera1_fisheye_optical_frame" />
+      <parent link="d435_base_front_fisheye_frame" />
+      <child link="d435_base_front_fisheye_optical_frame" />
     </joint>
-    <link name="camera1_fisheye_optical_frame"/>
+    <link name="d435_base_front_fisheye_optical_frame"/>
 
 
+    <joint name="metall_plate_left_joint" type="fixed">
+      <origin xyz="-0.08 0.28 0.2675" rpy="0 0 0"/>
+      <parent link="base_link_top"/>
+      <child link="metall_plate_left_link" />
+    </joint>
+
+    <link name="metall_plate_left_link">
+      <visual>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0 "/>
+          <geometry>
+            <box size="0.2 0.04 0.01"/>
+          </geometry>
+          <material name="aluminum"/>
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0 "/>
+          <geometry>
+            <box size="0.2 0.04 0.01"/>
+          </geometry>
+      </collision>
+    </link>
+
+
+  <!-- D435 camera on the base - left side, with origin at bottom screw mount -->
+    <joint name="d435_base_left_joint" type="fixed">
+      <origin xyz="0.0 0.0 0.005" rpy="0 0.0 1.570796"/>
+      <parent link="metall_plate_left_link"/>
+      <child link="d435_base_left_link" />
+    </joint>
+
+    <link name="d435_base_left_link">
+      <visual>
+      <origin xyz="0.0149 0.0 0.0125" rpy="1.570796 0 1.570796 "/>
+        <geometry>
+	        <mesh filename="package://kmr_bringup/meshes/sensors/visual/d435.dae" />
+        </geometry>
+        <material name="aluminum"/>
+      </visual>
+      <collision>
+        <origin xyz="0.0149 0.0 0.0125" rpy="3.1415 1.570796 0 "/>
+        <geometry>
+        <box size="0.02505 0.090 0.025"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <!-- The following are not reliable values, and should not be used for modeling -->
+        <mass value="0.564" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.003881243" ixy="0.0" ixz="0.0" iyy="0.000498940" iyz="0.0" izz="0.003879257" />
+      </inertial>
+    </link>
+    <!--  -->
+
+    <joint name="metall_plate_right_joint" type="fixed">
+      <origin xyz="-0.08 -0.28 0.2675" rpy="0 0 0"/>
+      <parent link="base_link_top"/>
+      <child link="metall_plate_right_link" />
+    </joint>
+
+    <link name="metall_plate_right_link">
+      <visual>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0 "/>
+          <geometry>
+            <box size="0.2 0.04 0.01"/>
+          </geometry>
+          <material name="aluminum"/>
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0 "/>
+          <geometry>
+            <box size="0.2 0.04 0.01"/>
+          </geometry>
+      </collision>
+    </link>
+
+
+  <!-- D435 camera on the base - right side, with origin at bottom screw mount -->
+    <joint name="d435_base_right_joint" type="fixed">
+      <origin xyz="0.0 0.0 0.005" rpy="0 0 -1.570796"/>
+      <parent link="metall_plate_right_link"/>
+      <child link="d435_base_right_link" />
+    </joint>
+
+    <link name="d435_base_right_link">
+      <visual>
+      <origin xyz="0.0149 0.0 0.0125" rpy="1.570796 0 1.570796 "/>
+        <geometry>
+	        <mesh filename="package://kmr_bringup/meshes/sensors/visual/d435.dae" />
+        </geometry>
+        <material name="aluminum"/>
+      </visual>
+      <collision>
+        <origin xyz="0.0149 0.0 0.0125" rpy="3.1415 1.570796 0 "/>
+        <geometry>
+          <box size="0.02505 0.090 0.025"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <!-- The following are not reliable values, and should not be used for modeling -->
+        <mass value="0.564" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.003881243" ixy="0.0" ixz="0.0" iyy="0.000498940" iyz="0.0" izz="0.003879257" />
+      </inertial>
+    </link>
+    <!--  -->
 </robot>
