@@ -78,7 +78,7 @@ public class SafetyStateListener implements ISunriseControllerStateListener{
 	public void onSafetyStateChanged(Device device, SunriseSafetyState safetyState) {
 		if(safetyState.getSafetyStopSignal()==SunriseSafetyState.SafetyStopType.STOP1){
 			System.out.println("EMERGENCY STOP IN LISTENER: " + device);
-			Node.setEmergencyStop(false);
+			Node.setEmergencyStop(true);
 
 			//lbr_commander.setEmergencyStop(true);
 			//kmp_commander.setEmergencyStop(true);
