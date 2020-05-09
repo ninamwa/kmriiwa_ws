@@ -17,10 +17,10 @@ As of now, the launch file is not correctly launching the cartographer nodes, an
 
 You need four terminals where you are running the commands: 
 ```
-$ ros2 launch kmr_cartographer cartographer.launch.py
+$ ros2 launch kmr_slam cartographer.launch.py
 ```
 ```
-$ ros2 run cartographer_ros cartographer_node -configuration_directory $HOME/PROJECT-NAME/src/kmr_cartographer/config -configuration_basename kmr_2d.lua
+$ ros2 run cartographer_ros cartographer_node -configuration_directory $HOME/PROJECT-NAME/src/kmr_slam/config -configuration_basename kmr_2d_cartographer.lua
 ```
 ```
 $ ros2 run cartographer_ros occupancy_grid_node
