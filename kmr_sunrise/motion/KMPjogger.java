@@ -28,6 +28,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
+
+
+
 public class KMPjogger
 {
 
@@ -83,7 +86,7 @@ public class KMPjogger
       this._velocities[i] = 0.0D;
     }
     try{
-    this._joggableDevice.jog(this._velocities);
+    	this._joggableDevice.jog(this._velocities);
     }catch(Exception e){
     	System.out.println("Could not stop jogging device in KMPJogger");
     }
@@ -129,5 +132,3 @@ public class KMPjogger
   
   
 }
-
-

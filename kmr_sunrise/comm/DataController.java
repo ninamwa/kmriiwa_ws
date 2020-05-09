@@ -62,7 +62,7 @@ public class DataController implements DataListener, DataConnectionListener{
 			try{
 				this.laser_socket.send_message(scan_data);
 			}catch(Exception e){
-				System.out.println("Could not send laserdata to ROS: " + e);
+				System.out.println("Could not send KMP laserdata to ROS: " + e);
 		}
 		}
 	}
@@ -74,7 +74,7 @@ public class DataController implements DataListener, DataConnectionListener{
 				String odom_data = ">odometry " + odom.getTimestamp() + " " + odom.getPose().toString() + " " + odom.getVelocity().toString();
 				this.odometry_socket.send_message(odom_data);
 			}catch(Exception e){
-				System.out.println("Could not send odometry data to ROS: " + e);
+				System.out.println("Could not send KMP odometry data to ROS: " + e);
 			}
 	}
 	}

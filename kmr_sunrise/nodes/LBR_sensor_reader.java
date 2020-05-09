@@ -27,8 +27,6 @@ import com.kuka.roboticsAPI.deviceModel.LBR;
 
 public class LBR_sensor_reader extends Node{
 	
-	// Runtime variables
-	Boolean LBR_sensor_requested;
 
 	// Robot
 	LBR lbr;
@@ -39,27 +37,22 @@ public class LBR_sensor_reader extends Node{
 	
 	// Socket
 	int port;
-	ISocket socket;
 	String ConnectionType;
 	
 	
 	public LBR_sensor_reader(int port, LBR robot, String ConnectionType) {
-		super(port, ConnectionType);
+		super(port, ConnectionType, "LBR sensor reader");
 		this.lbr = robot;
-		LBR_sensor_requested = false;
 		
 		if(!(isSocketConnected())){
 			Thread monitorLBRsensorConnections = new MonitorSensorConnectionThread();
 			monitorLBRsensorConnections.start();
-		}else {
-			LBR_sensor_requested=true;
 		}
 
 	}
 	
 		
 	public class MonitorSensorConnectionThread extends Thread {
-		int timeout = 3000;
 		public void run(){
 			while(!(isSocketConnected()) && (!(closed))) {
 
@@ -68,13 +61,12 @@ public class LBR_sensor_reader extends Node{
 					break;
 				}
 				try {
-					Thread.sleep(timeout);
+					Thread.sleep(connection_timeout);
 				} catch (InterruptedException e) {
 					System.out.println("Waiting for connection to LBR commander node ..");
 				}
 			}
 			if(!closed){
-				LBR_sensor_requested=true;
 				System.out.println("Connection with KMP Command Node OK!");
 				runmainthread();
 				}	
@@ -125,10 +117,10 @@ public class LBR_sensor_reader extends Node{
 			try{
 				this.socket.send_message(sensorString);
 				if(closed){
-					System.out.println("LBR sensor sender selv om han ikke f�r lov");
+					System.out.println("LBR sensor sender selv om han ikke fï¿½r lov");
 				}
 			}catch(Exception e){
-				System.out.println("Could not send Operation mode to ROS: " + e);
+				System.out.println("Could not send LBR sensormessage to ROS: " + e);
 			}
 		}
 	}

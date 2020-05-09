@@ -12,53 +12,68 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 package API_ROS2_Sunrise;
+
+
+import API_ROS2_Sunrise.ISocket;
+import API_ROS2_Sunrise.TCPSocket;
+import API_ROS2_Sunrise.UDPSocket;
+
 
 public abstract class Node extends Thread{
 	
 	// Runtime Variables
-	public volatile static boolean shutdown = false;
+	private volatile static boolean shutdown;
 	public volatile boolean closed = false;
-	public volatile boolean EmergencyStop = false;
+	private static volatile boolean EmergencyStop;
 	
-	public volatile static boolean isPathFinished;
+	private volatile static boolean PathFinished;
 	
-	public volatile static boolean isKMPmoving;
-	public volatile static boolean isLBRmoving;
+	private volatile static boolean isKMPmoving;
+	private volatile static boolean isLBRmoving;
 
-	public volatile static boolean isKMPconnected;
-	public volatile static boolean isLBRconnected;
+	private volatile static boolean isKMPconnected;
+	private volatile static boolean isLBRconnected;
+
+	public static int connection_timeout = 5000;
 
 	// Socket
-	ISocket socket;
-	String ConnectionType;
-	String CommandStr;
-	int port;
+	protected ISocket socket;
+	private String ConnectionType;
+	private String CommandStr;
+	private int port;
 	
 	// For KMP sensor reader:
-	ISocket laser_socket;
-	ISocket odometry_socket;
-	int KMP_laser_port;
-	int KMP_odometry_port;
-	String LaserConnectionType;
-	String OdometryConnectionType;
+	protected ISocket laser_socket;
+	protected ISocket odometry_socket;
+	private int KMP_laser_port;
+	private int KMP_odometry_port;
+	private String LaserConnectionType;
+	private String OdometryConnectionType;
 	
+	protected String node_name;
+// TODO: LEGGE INN NAVN PÅ NODER SOM PRINTES I TCP SOCKET! orker ikke mer porter	
 	
-	public Node(int port1, String Conn1, int port2, String Conn2){
+	public Node(int port1, String Conn1, int port2, String Conn2, String nodeName){
 		this.KMP_laser_port = port1;
 		this.KMP_odometry_port = port2;
 		this.LaserConnectionType = Conn1;
 		this.OdometryConnectionType = Conn2;
+		this.node_name = nodeName;
+		setShutdown(false);
+		setEmergencyStop(false);
 		
 		createSocket("Laser");
 		createSocket("Odom");
 		
 	}
 	
-	public Node(int port, String Conn) {
+	public Node(int port, String Conn, String nodeName) {
 		this.ConnectionType=Conn;
 		this.port = port;
+		this.node_name = nodeName;
+		setShutdown(false);
+		setEmergencyStop(false);
 		
 		createSocket();
 		
@@ -66,41 +81,40 @@ public abstract class Node extends Thread{
 	
 	public void createSocket(){
 		if (this.ConnectionType == "TCP") {
-			 socket = new TCPSocket(this.port);
+			 this.socket = new TCPSocket(this.port);
 		}
 		else {
-			socket = new UDPSocket(this.port);
+			this.socket = new UDPSocket(this.port);
 		}
 	}
 	
 	public void createSocket(String Type){
 		if (Type=="Laser"){
 			if(LaserConnectionType == "TCP") {
-				laser_socket = new TCPSocket(KMP_laser_port);
-	
+				this.laser_socket = new TCPSocket(KMP_laser_port);
 			}else {
-				laser_socket = new UDPSocket(KMP_laser_port);
+				this.laser_socket = new UDPSocket(KMP_laser_port);
 			}
 		}else if(Type=="Odom") {
 			if(OdometryConnectionType == "TCP") {
-				odometry_socket = new TCPSocket(KMP_odometry_port);
+				this.odometry_socket = new TCPSocket(KMP_odometry_port);
 
 			}else {
-				odometry_socket = new UDPSocket(KMP_odometry_port);
+				this.odometry_socket = new UDPSocket(KMP_odometry_port);
 			}
 		}
 	}
 	
 	public boolean isSocketConnected() {
-		return socket.isConnected();
+			return this.socket.isConnected();
 	}
 	
 	public boolean isNodeRunning() {
-		return isSocketConnected() && (!(closed) && !shutdown);
+		return this.isSocketConnected() && (!(closed) && !shutdown);
 	}
 	
-	public void setEmergencyStop(boolean es){
-		this.EmergencyStop = es;
+	public static void setEmergencyStop(boolean es){
+		EmergencyStop = es;
 	}
 	
 	public boolean getEmergencyStop(){
@@ -116,6 +130,7 @@ public abstract class Node extends Thread{
 	}
 	
 	public void setShutdown(boolean in) {
+		System.out.println("shutdown set by " + this.node_name + " to " + in);
 		shutdown=in;
 	}
 	
@@ -124,11 +139,11 @@ public abstract class Node extends Thread{
 	public abstract void close();
 	
 	public boolean getisPathFinished() {
-		return isPathFinished;
+		return PathFinished;
 	}
 	
 	public void setisPathFinished(boolean in) {
-		isPathFinished = in;
+		PathFinished = in;
 	}
 	
 	public boolean getisLBRMoving() {

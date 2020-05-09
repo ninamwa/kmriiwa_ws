@@ -32,13 +32,11 @@ public class LBR_status_reader extends Node{
 	
 	// LBR status variables
 	private Object isReadyToMove = null;
-	private volatile boolean LBR_is_Moving= false;
-	private volatile boolean LBRemergencyStop = false;
 	private boolean hasActiveCommand;
 
 	
 	public LBR_status_reader(int port, LBR robot, String ConnectionType) {
-		super(port,ConnectionType);
+		super(port,ConnectionType, "LBR status reader");
 		this.lbr = robot;
 
 		if (!(isSocketConnected())) {
@@ -50,24 +48,18 @@ public class LBR_status_reader extends Node{
 	
 	@Override
 	public void run() {
-		while(isSocketConnected() && (!(closed)))
+		while( isNodeRunning())
 		{	
-			//FIND OUT HOW MUCH TO SLEEP. SAMME RATE SOM ODOMETRY?
-			updateReadyToMove();
-			updateActiveCommand();
-			if(!isSocketConnected() || (closed)){
-				break;
-			}
 			sendStatus();
 			try {
-				TimeUnit.MILLISECONDS.sleep(30);
+				TimeUnit.MILLISECONDS.sleep(10);
 			} catch (InterruptedException e) {
-				System.out.println("LBR status thread could not sleep");
+				System.out.println(this.node_name + " thread could not sleep");
 			}
 		}
 	}
-	private void updateReadyToMove() {
-		this.isReadyToMove = lbr.isReadyToMove();
+	private boolean getReadyToMove() {
+		return lbr.isReadyToMove();
 	}
 	
 	private void updateActiveCommand(){
@@ -78,25 +70,26 @@ public class LBR_status_reader extends Node{
 	
 	
 	private String generateStatusString() {
-		return 	">lbr_statusdata ,"  + System.nanoTime() + 
-				",ReadyToMove:" + this.isReadyToMove + 
-				",isLBRmoving:" + LBR_is_Moving + 
-				",LBRhasActiveCommand:" + hasActiveCommand +
-				",LBRsafetyStop:" + LBRemergencyStop+
-				",isPathFinished:" + isPathFinished
+
+		String toSend= 	">lbr_statusdata ,"  + System.nanoTime() + 
+				",ReadyToMove:" + getReadyToMove() + 
+				",isLBRmoving:" + getisLBRMoving() + 
+				",LBRsafetyStop:" + getEmergencyStop()+
+				",PathFinished:" + getisPathFinished()
 				; 
+	return toSend;
 	}
 	
 	public void sendStatus() {
 		String statusString = generateStatusString();
-		if(isSocketConnected() && (!(closed))){
+		if(isNodeRunning()){
 			try{
 				this.socket.send_message(statusString);
 				if(closed){
-					System.out.println("LBR status sender selv om han ikke f�r lov");
+					System.out.println(this.node_name +" tried to send a message when application was closed");
 				}
 			}catch(Exception e){
-				System.out.println("Could not send Operation mode to ROS: " + e);
+				System.out.println("Could not send "+ this.node_name + " message to ROS: " + e);
 			}
 		}
 	}
@@ -110,7 +103,7 @@ public class LBR_status_reader extends Node{
 					break;
 				}
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(connection_timeout);
 				} catch (InterruptedException e) {
 					System.out.println("");
 				}
@@ -123,12 +116,9 @@ public class LBR_status_reader extends Node{
 		}
 	}
 	
-	public void setLBRisMoving(boolean moving){
-		LBR_is_Moving = moving;
-	}
 	
 	public void setLBRemergencyStop(boolean stop){
-		LBRemergencyStop  = stop;
+		setEmergencyStop(stop);
 	}
 
 	@Override

@@ -1,3 +1,5 @@
+// Copyright 2019 Nina Marie Wahl og Charlotte Heggem.
+// Copyright 2019 Norwegian University of Science and Technology.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +17,9 @@
 package API_ROS2_Sunrise;
 
 // Configuration
+import static com.kuka.roboticsAPI.motionModel.BasicMotions.ptp;
+import static com.kuka.roboticsAPI.motionModel.BasicMotions.ptpHome;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -41,7 +46,7 @@ import com.kuka.roboticsAPI.deviceModel.LBR;
 import com.kuka.generated.ioAccess.ControlPanelIOGroup;
 
 // AUT MODE: 3s, T1/T2/CRR: 2s
-@ResumeAfterPauseEvent(delay = 0, afterRepositioning = false)
+@ResumeAfterPauseEvent(delay = 0, afterRepositioning = true)
 public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 	
 	// Runtime Variables
@@ -109,8 +114,10 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 		controller = getController("KUKA_Sunrise_Cabinet_1");
 		kmp = getContext().getDeviceFromType(KmpOmniMove.class);		
 		lbr = getContext().getDeviceFromType(LBR.class);
-		//tool.attachTo(lbr.getFlange());
-		
+
+		//lbr.moveAsync(ptpHome().setJointVelocityRel(0.5));
+        lbr.move(ptp(getApplicationData().getFrame("/DrivePos")).setJointVelocityRel(0.5));
+
 		// ControlPanelIO:
 		ControlPanelIO = new ControlPanelIOGroup(controller);
 
@@ -138,7 +145,6 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 				break;
 			}				
 		}
-		
 		if(AppRunning){
 			kmp_status_reader = new KMP_status_reader(KMP_status_port, kmp,TCPConnection, controller);
 			lbr_status_reader = new LBR_status_reader(LBR_status_port, lbr,TCPConnection);
@@ -202,14 +208,11 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 			kmp_sensor_reader.start();
 		}
 
-		
-	
 		while(AppRunning)
 		{    
-
 			AppRunning = (!(kmp_commander.getShutdown() || lbr_commander.getShutdown()));
 		}
-		System.out.println("Shutdown message received from ROS");
+		System.out.println("Shutdown message received in main application");
 		shutdown_application();
 	}
 	

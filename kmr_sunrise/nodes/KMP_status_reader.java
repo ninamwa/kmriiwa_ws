@@ -32,10 +32,6 @@ import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
 //TODO: importere alle klasser fra SunriseOmniMoveMobilePlatform, scannerIO
 public class KMP_status_reader extends Node{
 
-	// Runtime variables
-	// TODO: Gjør om denne til node
-	private volatile boolean KMP_is_Moving = false;
-
 	// Robot
 	KmpOmniMove kmp;
 	
@@ -46,12 +42,12 @@ public class KMP_status_reader extends Node{
 	private volatile boolean ProtectionField = false;
 
 	public KMP_status_reader(int port, KmpOmniMove robot,String ConnectionType, Controller controller) {
-		super(port, ConnectionType);
+		super(port, ConnectionType,"KMP status reader");
 
 		this.kmp = robot;
 		
 		if (!(isSocketConnected())) {
-			System.out.println("Starting thread to connect KMP status node....");
+			//System.out.println("Starting thread to connect KMP status node....");
 			Thread monitorKMPStatusConnections = new MonitorKMPStatusConnectionsThread();
 			monitorKMPStatusConnections.start();
 			}
@@ -118,8 +114,8 @@ public class KMP_status_reader extends Node{
 				",ReadyToMove:" + this.isReadyToMove + 
 				",WarningField:" + !this.WarningField + 
 				",ProtectionField:" + !this.ProtectionField + 
-				",isKMPmoving:" + KMP_is_Moving +
-				",KMPsafetyStop:" + EmergencyStop;
+				",isKMPmoving:" + getisKMPMoving() +
+				",KMPsafetyStop:" + getEmergencyStop();
 	
 	}
 	
@@ -129,10 +125,10 @@ public class KMP_status_reader extends Node{
 			try{
 				this.socket.send_message(toSend);
 				if(closed){
-					System.out.println("KMP status sender selv om han ikke f�r lov");
+					System.out.println("KMP status sender selv om han ikke faar lov");
 				}
 			}catch(Exception e){
-				System.out.println("Could not send Operation mode to ROS: " + e);
+				System.out.println("Could not send KMP status message to ROS: " + e);
 			}
 		}
 	}
@@ -146,7 +142,7 @@ public class KMP_status_reader extends Node{
 					break;
 				}
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(connection_timeout);
 				} catch (InterruptedException e) {
 					System.out.println("");
 				}
@@ -158,14 +154,7 @@ public class KMP_status_reader extends Node{
 				}	
 		}
 	}
-
-	public void setKMPisMoving(boolean moving){
-		KMP_is_Moving = moving;
-	}
 	
-	public void setKMPemergencyStop(boolean stop){
-		EmergencyStop  = stop;
-	}
 	
 	@Override
 	public void close() {

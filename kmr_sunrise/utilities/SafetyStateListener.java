@@ -24,7 +24,7 @@ import com.kuka.roboticsAPI.controllerModel.sunrise.SunriseSafetyState;
 import com.kuka.roboticsAPI.deviceModel.Device;
 import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
 
-public class SafetyStateListener {
+public class SafetyStateListener implements ISunriseControllerStateListener{
 	Controller controller;
 	LBR_commander lbr_commander;
 	KMP_commander kmp_commander;
@@ -40,69 +40,53 @@ public class SafetyStateListener {
 		
 	}
 	public void startSafetyStateListener() {
-		controller.addControllerListener( new ISunriseControllerStateListener(){
+		controller.addControllerListener(this);
+	}
+	@Override
+	public void onFieldBusDeviceConfigurationChangeReceived(String arg0,
+			DispatchedEventData arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onFieldBusDeviceIdentificationRequestReceived(String arg0,
+			DispatchedEventData arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onIsReadyToMoveChanged(Device arg0, boolean arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onShutdown(Controller arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onStatePortChangeReceived(Controller arg0, StatePortData arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onConnectionLost(Controller arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onSafetyStateChanged(Device device, SunriseSafetyState safetyState) {
+		if(safetyState.getSafetyStopSignal()==SunriseSafetyState.SafetyStopType.STOP1){
+			System.out.println("EMERGENCY STOP IN LISTENER: " + device);
+			Node.setEmergencyStop(true);
 
-			@Override
-			public void onSafetyStateChanged(Device device,
-					SunriseSafetyState safetyState) {
-				if(safetyState.getSafetyStopSignal()==SunriseSafetyState.SafetyStopType.STOP1){
-					kmp_commander.setEmergencyStop(true);
-					lbr_commander.setEmergencyStop(true);
-					lbr_status_reader.setLBRemergencyStop(true);
-					kmp_status_reader.setKMPemergencyStop(true);
-					// TODO: Add status listener if this works!
-				}else if(safetyState.getSafetyStopSignal()==SunriseSafetyState.SafetyStopType.NOSTOP) {
+			//lbr_commander.setEmergencyStop(true);
+			//kmp_commander.setEmergencyStop(true);
+			//lbr_status_reader.setEmergencyStop(true);
+			//kmp_status_reader.setEmergencyStop(true);
+		}else if(safetyState.getSafetyStopSignal()==SunriseSafetyState.SafetyStopType.NOSTOP) {
+			Node.setEmergencyStop(false);
 
-					kmp_commander.setEmergencyStop(false);
-					lbr_commander.setEmergencyStop(false);
-					lbr_status_reader.setLBRemergencyStop(false);
-					kmp_status_reader.setKMPemergencyStop(false);
-				}
-			
-			}
-
-			@Override
-			public void onFieldBusDeviceConfigurationChangeReceived(
-					String controllerName, DispatchedEventData dispatchedEvent) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onFieldBusDeviceIdentificationRequestReceived(
-					String controllerName, DispatchedEventData dispatchedEvent) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onIsReadyToMoveChanged(Device device,
-					boolean isReadyToMove) {
-				if(device.getClass()==KmpOmniMove.class){
-					System.out.println("KMP IS READY TO MOVE: " + isReadyToMove);
-				}
-			}
-
-			@Override
-			public void onShutdown(Controller controller) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onStatePortChangeReceived(Controller controller,
-					StatePortData statePort) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onConnectionLost(Controller controller) {
-				// TODO Auto-generated method stub
-				
-			}
-
-
-		});
+		}		
 	}
 }

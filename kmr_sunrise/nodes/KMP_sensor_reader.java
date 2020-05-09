@@ -43,17 +43,17 @@ public class KMP_sensor_reader extends Node{
 
 	
 	public KMP_sensor_reader(int laserport, int odomport, String LaserConnectionType, String OdometryConnectionType) {
-		super(laserport, LaserConnectionType, odomport, OdometryConnectionType);
+		super(laserport, LaserConnectionType, odomport, OdometryConnectionType, "KMP sensor reader");
 
 		
 		if (!(isLaserSocketConnected())) {
-			System.out.println("Starting thread to connect laser node....");
+			//System.out.println("Starting thread to connect laser node....");
 			Thread monitorLaserConnections = new MonitorLaserConnectionThread();
 			monitorLaserConnections.start();
 			}
 				
 		if (!(isOdometrySocketConnected())) {
-			System.out.println("Starting thread to connect odometry node....");
+			//System.out.println("Starting thread to connect odometry node....");
 			Thread monitorOdometryConnections = new MonitorOdometryConnectionThread();
 			monitorOdometryConnections.start();
 			}
@@ -83,7 +83,7 @@ public class KMP_sensor_reader extends Node{
 					break;
 				}	
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(connection_timeout);
 				} catch (InterruptedException e) {
 					System.out.println("");
 				}
@@ -109,7 +109,7 @@ public class KMP_sensor_reader extends Node{
 					break;
 				}
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(connection_timeout);
 				} catch (InterruptedException e) {
 					System.out.println("");
 				}

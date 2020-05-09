@@ -31,7 +31,6 @@ import com.kuka.roboticsAPI.executionModel.ICommandContainer;
 
 
 public class KMP_commander extends Node{
-	
 
 	// Robot
 	KmpOmniMove kmp;
@@ -40,20 +39,19 @@ public class KMP_commander extends Node{
 	ICommandContainer KMP_currentMotion;
 	double[] velocities = {0.0,0.0,0.0};
 	KMPjogger kmp_jogger;
-	public volatile boolean KMP_is_Moving = false;
 
 	
 	public KMP_commander(int port, KmpOmniMove robot, String ConnectionType) {
-		super(port,ConnectionType);
+		super(port,ConnectionType, "KMP commander");
 		this.kmp = robot;
 		this.kmp_jogger = new KMPjogger((ICartesianJoggingSupport)kmp);
 		
 		if (!(isSocketConnected())) {
-			System.out.println("Starting thread to connect KMP command node....");
+			//System.out.println("Starting thread to connect KMP command node....");
 			Thread monitorKMPCommandConnections = new MonitorKMPCommandConnectionsThread();
 			monitorKMPCommandConnections.start();
 			}else {
-			setisKMPConnected(true);
+				setisKMPConnected(true);
 		}
 	}
 
@@ -64,7 +62,7 @@ public class KMP_commander extends Node{
 		
 		while(isNodeRunning())
 		{
-			String Commandstr = socket.receive_message(); 
+			String Commandstr = this.socket.receive_message(); 
 	    	String []splt = Commandstr.split(" ");
 	    
 	    	if ((splt[0]).equals("shutdown")){
@@ -101,19 +99,21 @@ public class KMP_commander extends Node{
 				this.velocities[2] = Double.parseDouble(lineSplt[3]);  // theta
 				
 				if(velocities[0] !=0 ||velocities[1] !=0 ||velocities[2] !=0 ) {
-					  if(KMP_is_Moving) {
+					  if(getisKMPMoving()) {
+						  System.out.println("update jogging with " + this.velocities[0]);
 						  this.kmp_jogger.updateVelocities(this.velocities);
 					  }
 					  else {
+						  System.out.println("start jogging with " + this.velocities[0]);
 						  this.kmp_jogger.updateVelocities(this.velocities);
 						  this.kmp_jogger.startJoggingExecution();
-						  KMP_is_Moving = true;
+						  setisKMPMoving(true);
 					  }
 				  }else {
-					  if(KMP_is_Moving) {
+					  if(getisKMPMoving()) {
+						  System.out.println("Stop moving KMP");
 						  this.kmp_jogger.killJoggingExecution();
-						  KMP_is_Moving=false;
-					  }
+						  setisKMPMoving(false);					  }
 				  }
 		}
 	}
@@ -133,7 +133,7 @@ public class KMP_commander extends Node{
 				try {
 					Thread.sleep(timeout);
 				} catch (InterruptedException e) {
-					System.out.println("Waiting for connection to KMP commander node ..");
+					System.out.println(node_name + " connection thread could not sleep");
 				}
 			}
 			if(!closed){
@@ -143,12 +143,7 @@ public class KMP_commander extends Node{
 		}
 	}
 	
-	
 
-	public boolean isKMPmoving() {
-		return KMP_is_Moving;
-	}
-	
 	@Override
 	public void close() {
 		closed = true;
