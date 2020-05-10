@@ -971,14 +971,14 @@
 
     <!-- camera body, with origin at bottom screw mount -->
     <joint name="d435_base_front_joint" type="fixed">
-      <origin xyz="0.52 0.0 0.2625" rpy="0 0 0"/>
+      <origin xyz="0.52 0.0 0.2625" rpy="-1.570796 0 -1.570796 "/>
       <parent link="base_link_top"/>
       <child link="d435_base_front_link" />
     </joint>
 
     <link name="d435_base_front_link">
       <visual>
-      <origin xyz="0.0149 0.0 0.0125" rpy="1.570796 0 1.570796"/>
+      <origin xyz="0 -0.0125 0.0149" rpy="0 0 3.1415"/>
         <geometry>
 	        <mesh filename="package://kmr_bringup/meshes/sensors/visual/d435.dae" />
         </geometry>
@@ -996,67 +996,7 @@
         <origin xyz="0 0 0" />
         <inertia ixx="0.003881243" ixy="0.0" ixz="0.0" iyy="0.000498940" iyz="0.0" izz="0.003879257" />
       </inertial>
-    </link>
-   
-    <!-- camera depth joints and links -->
-    <joint name="d435_base_front_depth_joint" type="fixed">
-      <origin xyz="0.0149 -0.0075 0.0125" rpy="0 0 0"/>
-      <parent link="d435_base_front_link"/>
-      <child link="d435_base_front_depth_frame" />
-    </joint>
-    <link name="d435_base_front_depth_frame"/>
-
-    <joint name="d435_base_front_depth_optical_joint" type="fixed">
-      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-      <parent link= "d435_base_front_depth_frame" />
-      <child link="d435_base_front_depth_optical_frame" />
-    </joint>
-    <link name="d435_base_front_depth_optical_frame"/>
-      
-    <!-- camera left IR joints and links -->
-    <joint name="d435_base_front_left_ir_joint" type="fixed">
-      <origin xyz="0 -0.025 0" rpy="0 0 0" />
-      <parent link="d435_base_front_depth_frame" />
-      <child link="d435_base_front_left_ir_frame" />
-    </joint>
-    <link name="d435_base_front_left_ir_frame"/>
-
-    <joint name="d435_base_front_left_ir_optical_joint" type="fixed">
-      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-      <parent link="d435_base_front_left_ir_frame" />
-      <child link="d435_base_front_left_ir_optical_frame" />
-    </joint>
-    <link name="d435_base_front_left_ir_optical_frame"/>
-
-    <!-- camera right IR joints and links -->
-    <joint name="d435_base_front_right_ir_joint" type="fixed">
-      <origin xyz="0 0.025 0" rpy="0 0 0" />
-      <parent link="d435_base_front_depth_frame" />
-      <child link="d435_base_front_right_ir_frame" />
-    </joint>
-    <link name="d435_base_front_right_ir_frame"/>
-
-    <joint name="d435_base_front_right_ir_optical_joint" type="fixed">
-      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-      <parent link="d435_base_front_right_ir_frame" />
-      <child link="d435_base_front_right_ir_optical_frame" />
-    </joint>
-    <link name="d435_base_front_right_ir_optical_frame"/>
-
-    <!-- camera fisheye joints and links -->
-    <joint name="d435_base_front_fisheye_joint" type="fixed">
-      <origin xyz="0 0.040 0" rpy="0 0 0" />
-      <parent link="d435_base_front_depth_frame" />
-      <child link="d435_base_front_fisheye_frame" />
-    </joint>
-    <link name="d435_base_front_fisheye_frame"/>
-
-    <joint name="d435_base_front_fisheye_optical_joint" type="fixed">
-      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-      <parent link="d435_base_front_fisheye_frame" />
-      <child link="d435_base_front_fisheye_optical_frame" />
-    </joint>
-    <link name="d435_base_front_fisheye_optical_frame"/>
+    </link>  
 
 
     <joint name="metall_plate_left_joint" type="fixed">
@@ -1084,14 +1024,14 @@
 
   <!-- D435 camera on the base - left side, with origin at bottom screw mount -->
     <joint name="d435_base_left_joint" type="fixed">
-      <origin xyz="0.0 0.0 0.005" rpy="0 0.0 1.570796"/>
+      <origin xyz="0.0 0.0 0.005" rpy="-1.570796 0 0"/>
       <parent link="metall_plate_left_link"/>
       <child link="d435_base_left_link" />
     </joint>
 
     <link name="d435_base_left_link">
       <visual>
-      <origin xyz="0.0149 0.0 0.0125" rpy="1.570796 0 1.570796 "/>
+      <origin xyz="0 -0.0125 0.0149" rpy="0 0 3.1415"/>
         <geometry>
 	        <mesh filename="package://kmr_bringup/meshes/sensors/visual/d435.dae" />
         </geometry>
@@ -1137,14 +1077,14 @@
 
   <!-- D435 camera on the base - right side, with origin at bottom screw mount -->
     <joint name="d435_base_right_joint" type="fixed">
-      <origin xyz="0.0 0.0 0.005" rpy="0 0 -1.570796"/>
+      <origin xyz="0.0 0.0 0.005" rpy="-1.570796 0 3.1415"/>
       <parent link="metall_plate_right_link"/>
       <child link="d435_base_right_link" />
     </joint>
 
     <link name="d435_base_right_link">
       <visual>
-      <origin xyz="0.0149 0.0 0.0125" rpy="1.570796 0 1.570796 "/>
+      <origin xyz="0 -0.0125 0.0149" rpy="0 0 3.1415"/>
         <geometry>
 	        <mesh filename="package://kmr_bringup/meshes/sensors/visual/d435.dae" />
         </geometry>
