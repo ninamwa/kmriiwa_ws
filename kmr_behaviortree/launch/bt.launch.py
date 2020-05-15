@@ -46,32 +46,32 @@ def generate_launch_description():
         #    PythonLaunchDescriptionSource([navigation_launch_file_dir, '/navigation2.launch.py']),
         #),
 
-        Node(
-             package="kmr_communication",
-             node_executable="lbr_commands_node.py",
-             node_name="lbr_commands_node",
-             output="screen",
-             emulate_tty=True,
-             arguments=['-c', connection_type_TCP, '-ro', robot],
-             parameters=[param_dir]),
+        # Node(
+        #      package="kmr_communication",
+        #      node_executable="lbr_commands_node.py",
+        #      node_name="lbr_commands_node",
+        #      output="screen",
+        #      emulate_tty=True,
+        #      arguments=['-c', connection_type_TCP, '-ro', robot],
+        #      parameters=[param_dir]),
 
-        Node(
-             package="kmr_communication",
-             node_executable="lbr_statusdata_node.py",
-             node_name="lbr_statusdata_node",
-             output="screen",
-             emulate_tty=True,
-             arguments=['-c', connection_type_TCP, '-ro', robot],
-             parameters=[param_dir]),
+        # Node(
+        #      package="kmr_communication",
+        #      node_executable="lbr_statusdata_node.py",
+        #      node_name="lbr_statusdata_node",
+        #      output="screen",
+        #      emulate_tty=True,
+        #      arguments=['-c', connection_type_TCP, '-ro', robot],
+        #      parameters=[param_dir]),
 
-        Node(
-             package="kmr_communication",
-             node_executable="lbr_sensordata_node.py",
-             node_name="lbr_sensordata_node",
-             output="screen",
-             emulate_tty=True,
-             arguments=['-c', connection_type_TCP, '-ro', robot],
-             parameters=[param_dir]),
+        # Node(
+        #      package="kmr_communication",
+        #      node_executable="lbr_sensordata_node.py",
+        #      node_name="lbr_sensordata_node",
+        #      output="screen",
+        #      emulate_tty=True,
+        #      arguments=['-c', connection_type_TCP, '-ro', robot],
+        #      parameters=[param_dir]),
 
 
         Node(

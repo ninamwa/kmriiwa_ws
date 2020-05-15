@@ -24,13 +24,13 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 def generate_launch_description():
-    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
+    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
     map_dir = LaunchConfiguration(
         'map',
         default=os.path.join(
             get_package_share_directory('kmr_navigation2'),
             'map',
-            'playpen_map.yaml'))
+            'carto_map.yaml'))
 
     param_dir = LaunchConfiguration(
         'params_file',
@@ -55,7 +55,7 @@ def generate_launch_description():
 
         DeclareLaunchArgument(
             'use_sim_time',
-            default_value='true',
+            default_value='false',
             description='Use simulation (Gazebo) clock if true'),
 
         IncludeLaunchDescription(
@@ -82,5 +82,6 @@ def generate_launch_description():
             node_name='rviz2',
             arguments=['-d', rviz_config_dir],
             parameters=[{'use_sim_time': use_sim_time}],
-            output='screen'),
+            #output='screen'
+            ),
     ])

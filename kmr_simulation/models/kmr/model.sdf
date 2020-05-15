@@ -254,7 +254,7 @@
         </ray>
         <plugin name="gazebo_sensor_B1_controller" filename="libgazebo_ros_ray_sensor.so">
           <ros>
-            <argument>~/out:=scan_1</argument>
+            <argument>~/out:=scan</argument>
           </ros>
           <output_type>sensor_msgs/LaserScan</output_type>
           <frame_name>laser_B1_link</frame_name>
@@ -580,37 +580,51 @@
 
     <link name="tool0"/>
 
-    <joint name="d435_joint" type="fixed">
+  
+
+    <!-- camera depth joints and links -->
+
+
+    <joint name="d435_base_front_joint" type="fixed">
         <parent>base_link_top</parent>
-        <child>d435_link</child>
-        <pose>0.483 0.0 0.427 1.570796 0 1.570796</pose>
+        <child>d435_base_front_link</child>
+        <pose>0.486 0.065 0.436 1.570796 0 1.570796</pose>
         <axis>
             <xyz>0 0 0</xyz>
         </axis>
-    </joint>
+    </joint> 
 
-    <link name="d435_link">
+    <link name="d435_base_front_link">
       <collision name='d435_link_collision'>
-        <pose frame=''>0.483 0.0 0.427 1.570796 0 1.570796</pose>
+        <pose frame=''>0.486 0.065 0.436 1.570796 0 1.570796</pose>
         <geometry>
           <box>
             <size>0.02505 0.090 0.025</size>
           </box>
         </geometry>
       </collision>
-      <visual name='d435_link_visual'>
-        <pose frame=''>0.483 0.0 0.427 1.570796 0 1.570796</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://kmr/meshes/sensors/visual/d435.dae</uri>
-          </mesh>
-        </geometry>
-      </visual>
+    </link>
+
+     <joint name="d435_base_front_depth_joint" type="fixed">
+      <pose>0.02 -0.0075 0.9 0 0 0 </pose>
+      <parent> d435_base_front_link </parent>
+      <child> d435_base_front_depth_frame </child>
+    </joint>
+    <link name="d435_base_front_depth_frame"/>
+
+
+    <joint name="d435_base_front_depth_optical_joint" type="fixed">
+      <origin>0 0 0 -1.570796 0 -1.570796 </origin>
+      <parent>d435_base_front_depth_frame </parent>
+      <child> d435_base_front_depth_optical_frame</child>
+    </joint>
+
+    <link name="d435_base_front_depth_optical_frame">
+      <pose>0.02 -0.0075 0.9 0 0 0 </pose>
       <sensor name="camera" type="depth">
         <always_on>true</always_on>
         <visualize>true</visualize>
-        <pose frame=''>0.0149 -0.0075 0.0125 0 -0 0</pose>
+        <pose frame=''>0.02 -0.0075 0.9 0 -0 0</pose>
         <update_rate>30</update_rate>
         <camera name="intel_realsense_d435">
           <horizontal_fov>1.02974</horizontal_fov>
@@ -623,7 +637,7 @@
             <output>depths</output>
           </depth_camera>
           <clip>
-              <near>0.1</near>
+              <near>0.01</near>
               <far>300</far>
           </clip>
           <noise>
@@ -640,8 +654,8 @@
               <!-- topics need to be prefixed with camera_name for remapping -->
               <remapping>mycamera/image_raw:=mycamera/image_demo</remapping>
               <remapping>mycamera/depth/image_raw:=mycamera/depth_demo</remapping>
-              <remapping>mycamera/camera_info:=mycamera/raw_cam_info_demo</remapping>
-              <remapping>mycamera/depth/camera_info:=mycamera/depth_cam_info_demo</remapping>
+              <remapping>mycamera/camera_info:=mycamera/image_demo/camera_info</remapping>
+              <remapping>mycamera/depth/camera_info:=mycamera/depth_demo/camera_info</remapping>
               <remapping>mycamera/points:=points2</remapping>
             </ros>
 
@@ -654,6 +668,11 @@
           </plugin>
       </sensor>
     </link>
+
+    
+
+
+    
 
     <plugin name='planar_move' filename='libgazebo_ros_planar_move.so'>
         <ros>

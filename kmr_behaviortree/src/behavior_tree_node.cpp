@@ -15,6 +15,8 @@
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <nav2_msgs/action/navigate_to_pose.hpp>
+#include "geometry_msgs/msg/quaternion.hpp"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("behavior_tree_node");
@@ -121,10 +123,8 @@ BehaviorTreeNode()
   geometry_msgs::msg::Point point;
   point.x = x;  
   point.y =y;
-  geometry_msgs::msg::Quaternion quat;
-  quat.w = orientation;
   initial.pose.pose.position = point;
-  initial.pose.pose.orientation = quat;
+  initial.pose.pose.orientation = orientationAroundZAxis(orientation);
 
   initial_publisher_->publish(initial);
   RCLCPP_INFO(LOGGER, "Initial pose published");
@@ -262,6 +262,12 @@ private:
           return false;
       }
   }
+
+  geometry_msgs::msg::Quaternion orientationAroundZAxis(double angle){
+  tf2::Quaternion q;
+  q.setRPY(0, 0, angle);
+  return tf2::toMsg(q);
+  }
   
   geometry_msgs::msg::PoseStamped create_pose(std::string goal_station){
     std::string position;
@@ -281,20 +287,13 @@ private:
     
     geometry_msgs::msg::PoseStamped p;
     geometry_msgs::msg::Point point;
-    geometry_msgs::msg::Quaternion quat;
     p.header.frame_id = "map";
         
     point.x = x;
     point.y = y;
     point.z = 0.0;
-
-    quat.x = 0.0;
-    quat.y = 0.0;
-    quat.z = 0.0;
-    quat.w = orientation;
-
     p.pose.position = point;
-    p.pose.orientation = quat;
+    p.pose.orientation = orientationAroundZAxis(orientation);
     return p;
   }
        

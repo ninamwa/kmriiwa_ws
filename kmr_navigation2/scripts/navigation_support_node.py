@@ -25,6 +25,7 @@ import threading
 from rclpy.node import Node
 from builtin_interfaces.msg import Time
 from rclpy.qos import qos_profile_sensor_data
+import numpy as np
 
 from rclpy.action import ActionClient
 from nav2_msgs.action import NavigateToPose, FollowWaypoints
@@ -32,7 +33,7 @@ from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, Transform
 from rcl_interfaces.srv import SetParameters
 from rcl_interfaces.msg import Parameter
 from rcl_interfaces.msg import ParameterValue
-from kmr_communication.msg import KmpStatusdata
+from kmr_msgs.msg import KmpStatusdata
 
 def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 
@@ -46,13 +47,13 @@ class NavigationSupportNode(Node):
         self.warning_field_clear = True
         self.protection_field_clear = True
         self.bool=True
+        self.bool=True
 
         #Speed given as max_vel_x, max_vel_y, max_vel_theta, max_vel_xy
-        #self.highspeed = [0.5, 0.28, 0.5, 0.28]
-        #self.lowspeed = [0.13, 0.1, 0.2, 0.1]
-        self.highspeed = [0.26, 0.0, 1.0, 0.26]
-        self.lowspeed = [0.1, 0.0, 0.5, 0.1]
-        self.highestspeed = [0.5, 0.0, 1.5, 0.5]
+        self.highspeed = [0.3, 0.3, 0.15, 0.28]
+        self.lowspeed = [0.1, 0.1, 0.1, 0.1]
+        self.speed = np.array([0.5, 0.28, 0.5, 0.28])
+        self.scaling_factor=1
         self.last_update_time = 0
 
         #self.action_client = ActionClient(self, NavigateToPose, '/navigate_to_pose')
@@ -72,36 +73,15 @@ class NavigationSupportNode(Node):
         sub_status = self.create_subscription(KmpStatusdata, 'kmp_statusdata', self.status_callback, qos_profile_sensor_data)
         sub_status = self.create_subscription(Bool, 'clear', self.status2_callback, qos_profile_sensor_data)
 
+
+        print("OK")
         st=0
-        while(True):
+        while(False):
             time.sleep(0.1)
-            if (st == 25):
-                initial = PoseWithCovarianceStamped()
-                initial.header.frame_id = "map"
-                initial.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
-
-                point = Point()
-                point.x = -2.0
-                point.y = 0.0
-                point.z = 0.0
-
-                quat = Quaternion()
-                quat.x = 0.0
-                quat.y = 0.0
-                quat.z = 0.0
-                quat.w = 0.1
-
-                initial.pose.pose.position = point
-                initial.pose.pose.orientation = quat
-
-                initial_pub.publish(initial)
-
             if (st == 80):
                 t=0
-                self.send_goal()
+                #self.send_goal()
                 #self.send_waypoint_goal()
-
-            #print(st
             st=st+1
 
     def create_pose(self,x,y,th):
@@ -192,11 +172,16 @@ class NavigationSupportNode(Node):
 
 
     def status_callback(self,data):
-        if (data.warning_field_clear != self.warning_field_clear and self.get_clock().now().seconds_nanoseconds()[0]-self.last_update_time > 5.0):
+        if (data.warning_field_clear != self.warning_field_clear and self.get_clock().now().seconds_nanoseconds()[0]-self.last_update_time > 3.0):
             if (data.warning_field_clear == True):
+                #scaling_factor=scaling_factor+0.1
+                #new_speed = self.speed*scaling_factor
+                #self.send_velocity_request(new_speed)
                 self.send_velocity_request(self.highspeed)
             if (data.warning_field_clear == False):
-                #threading.Thread(target=self.send_velocity_request).start()
+                #scaling_factor=scaling_factor-0.1
+                #new_speed = self.speed*scaling_factor
+                #self.send_velocity_request(new_speed)
                 self.send_velocity_request(self.lowspeed)
             self.warning_field_clear = data.warning_field_clear
             print(self.warning_field_clear)
@@ -211,7 +196,18 @@ class NavigationSupportNode(Node):
                 self.send_velocity_request(self.lowspeed)
             self.bool = data.data
 
-
+    def status3_callback(self,data):
+        if (data.warning_field_clear == False):
+            scaling_factor=scaling_factor-0.1
+            new_speed = self.speed*scaling_factor
+            self.send_velocity_request(new_speed)
+        if (data.warning_field_clear == True):
+            scaling_factor=scaling_factor+0.1
+            new_speed = self.speed*scaling_factor
+            self.send_velocity_request(new_speed)
+        self.warning_field_clear = data.warning_field_clear
+        print(self.warning_field_clear)
+        self.last_update_time = self.get_clock().now().seconds_nanoseconds()[0]
 
     def getTimestamp(self,nano):
         t = nano * 10 ** -9

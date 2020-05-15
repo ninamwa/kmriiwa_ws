@@ -1,5 +1,5 @@
 
-<root main_tree_to_execute="TestTree">
+<root main_tree_to_execute="TestNav">
 
     <BehaviorTree ID="Test2">
         <Sequence name="main_sequence">
@@ -13,6 +13,14 @@
         <Sequence name="main_sequence">
             <MoveGripper action="close"/>
             <MoveGripper action="open"/>
+        </Sequence>
+    </BehaviorTree> 
+
+    <BehaviorTree ID="TestNav">
+        <Sequence name="main_sequence">
+            <NavigateVehicle/>
+            <PlanManipulatorPath plan_to_frame="search2" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
         </Sequence>
     </BehaviorTree> 
 

@@ -431,49 +431,49 @@
   </link>
   <link name="tool0"/>
 
-  <joint name="joint_a1" type="revolute">
+  <joint name="joint_a1" type="fixed">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <parent link="base_iiwa"/>
       <child link="link_1"/>
       <axis xyz="0 0 1"/>
       <limit effort="0" lower="-2.9668" upper="2.9668" velocity="1.4834"/>
   </joint>
-  <joint name="joint_a2" type="revolute">
+  <joint name="joint_a2" type="fixed">
       <origin rpy="0 0 0" xyz="-0.00043624 0 0.36"/>
       <parent link="link_1"/>
       <child link="link_2"/>
       <axis xyz="0 1 0"/>
       <limit effort="0" lower="-2.0942" upper="2.0942" velocity="1.4834"/>
   </joint>
-  <joint name="joint_a3" type="revolute">
+  <joint name="joint_a3" type="fixed">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <parent link="link_2"/>
       <child link="link_3"/>
       <axis xyz="0 0 1"/>
       <limit effort="0" lower="-2.9668" upper="2.9668" velocity="1.7452"/>
   </joint>
-  <joint name="joint_a4" type="revolute">
+  <joint name="joint_a4" type="fixed">
       <origin rpy="0 0 0" xyz="0.00043624 0 0.42"/>
       <parent link="link_3"/>
       <child link="link_4"/>
       <axis xyz="0 -1 0"/>
       <limit effort="0" lower="-2.0942" upper="2.0942" velocity="1.3089"/>
   </joint>
-  <joint name="joint_a5" type="revolute">
+  <joint name="joint_a5" type="fixed">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <parent link="link_4"/>
       <child link="link_5"/>
       <axis xyz="0 0 1"/>
       <limit effort="0" lower="-2.9668" upper="2.9668" velocity="2.2688"/>
   </joint>
-  <joint name="joint_a6" type="revolute">
+  <joint name="joint_a6" type="fixed">
       <origin rpy="0 0 0" xyz="0 0 0.4"/>
       <parent link="link_5"/>
       <child link="link_6"/>
       <axis xyz="0 1 0"/>
       <limit effort="0" lower="-2.0942" upper="2.0942" velocity="2.356"/>
   </joint>
-  <joint name="joint_a7" type="revolute">
+  <joint name="joint_a7" type="fixed">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <parent link="link_6"/>
       <child link="link_7"/>
@@ -997,6 +997,14 @@
         <inertia ixx="0.003881243" ixy="0.0" ixz="0.0" iyy="0.000498940" iyz="0.0" izz="0.003879257" />
       </inertial>
     </link>  
+
+  <!-- Brukes forelopig i Gazebo -->
+    <joint name="d435_base_front_depth_joint" type="fixed">
+      <origin xyz="0.0149 -0.0075 0.0125" rpy="0 0 0"/>
+      <parent link="d435_base_front_link"/>
+      <child link="d435_base_front_depth_frame" />
+    </joint>
+    <link name="d435_base_front_depth_frame"/>
 
 
     <joint name="metall_plate_left_joint" type="fixed">

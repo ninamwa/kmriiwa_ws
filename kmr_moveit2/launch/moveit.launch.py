@@ -32,7 +32,7 @@ def generate_launch_description():
     moveit_cpp_yaml_file_name = get_package_share_directory('kmr_moveit2') + "/config/moveit_cpp.yaml"
 
     # Component yaml files are grouped in separate namespaces
-    robot_description_config = load_file('kmr_bringup', 'urdf/kmr_withD435.urdf')
+    robot_description_config = load_file('kmr_bringup', 'urdf/kmriiwa.urdf')
     robot_description = {'robot_description' : robot_description_config}
 
     robot_description_semantic_config = load_file('kmr_moveit2', 'config/iiwa14.srdf')
@@ -94,7 +94,7 @@ def generate_launch_description():
                                   )
 
     return LaunchDescription([ static_tf,rviz_node,run_moveit_node,
-     IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([state_publisher_launch_file_dir, '/state_publisher.launch.py']),
-        ),
+     #IncludeLaunchDescription(
+     #       PythonLaunchDescriptionSource([state_publisher_launch_file_dir, '/state_publisher.launch.py']),
+     #   ),
         ])
