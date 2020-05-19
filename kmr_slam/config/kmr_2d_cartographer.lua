@@ -46,14 +46,15 @@ options = {
 
 MAP_BUILDER.use_trajectory_builder_2d = true
 
---TRAJECTORY_BUILDER_2D.min_range = 0.1
---TRAJECTORY_BUILDER_2D.max_range = 25
+
 TRAJECTORY_BUILDER_2D.min_range = 0.1
-TRAJECTORY_BUILDER_2D.max_range = 3.
---TRAJECTORY_BUILDER_2D.min_z = 0.0
---TRAJECTORY_BUILDER_2D.max_z = 3.
-TRAJECTORY_BUILDER_2D.missing_data_ray_length = 3. --was 25. when not set, lasers are not used.
+TRAJECTORY_BUILDER_2D.max_range = 3.5 
+TRAJECTORY_BUILDER_2D.missing_data_ray_length = 2.0 
 TRAJECTORY_BUILDER_2D.use_imu_data = false
+
+TRAJECTORY_BUILDER_2D.min_z = 0.0
+TRAJECTORY_BUILDER_2D.max_z = 2.0
+
 TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = false -- true: initial guess for scan matcher is based on S2M match instead of extrapolated pose.
 TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(0.1)
 TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight=10.0

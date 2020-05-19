@@ -34,7 +34,7 @@ def generate_launch_description():
     camera1_optical_frame_id = LaunchConfiguration('optical_frame_id', default='camera1_color_optical_frame_link')
 
     camera2_base_frame_id = LaunchConfiguration('base_frame_id', default='d435_base_right_link')
-    camera3_serial_no = LaunchConfiguration('serial_no', default="'011422070886'")
+    camera2_serial_no = LaunchConfiguration('serial_no', default="'011422070886'")
     camera2_optical_frame_id = LaunchConfiguration('optical_frame_id', default='camera2_color_optical_frame_link')
 
 
@@ -50,11 +50,15 @@ def generate_launch_description():
         output='screen',
         emulate_tty=True,
         remappings=[('/camera1/camera/pointcloud','/points2_1')],
-        parameters=[{'serial_no':camera1_serial_no,
+        parameters=[{'serial_no':"'011422072245'",
 		                'optical_frame_id': camera1_optical_frame_id,
                         'base_frame_id': camera1_base_frame_id,
+                        'enable_pointcloud': True,
+                        'dense_pointcloud': True,
+                        'color0.enabled': True,
+                        'depth0.enabled': True,
                         'infra1.enabled': False,
-    		            'infra2.enabled': False}]
+                        'infra2.enabled': False}]
 
         )
     camera2_node = Node(
@@ -67,6 +71,10 @@ def generate_launch_description():
         parameters=[{'serial_no': "'011422070886'", 
   	 	             'optical_frame_id': camera2_optical_frame_id,
                      'base_frame_id': camera2_base_frame_id,
+                     'enable_pointcloud': True,
+                     'dense_pointcloud': True,
+                     'color0.enabled': True,
+                     'depth0.enabled': True,
                      'infra1.enabled': False,
 		             'infra2.enabled': False}]
         )
@@ -80,8 +88,12 @@ def generate_launch_description():
         parameters=[{'serial_no':camera3_serial_no,
                      'optical_frame_id': camera3_optical_frame_id,
                      'base_frame_id': camera3_base_frame_id,
+                     'enable_pointcloud': True,
+                     'dense_pointcloud': True,
+                     'color0.enabled': True,
+                     'depth0.enabled': True,
                      'infra1.enabled': False,
 		             'infra2.enabled': False}]
         )
     #camera1_node
-    return launch.LaunchDescription([camera2_node,camera3_node])
+    return launch.LaunchDescription([camera1_node,camera2_node,camera3_node])
