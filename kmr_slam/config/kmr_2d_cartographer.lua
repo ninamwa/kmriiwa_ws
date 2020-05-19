@@ -29,10 +29,10 @@ options = {
   use_odometry = true,
   use_nav_sat = false,
   use_landmarks = false,
-  num_laser_scans = 3,
+  num_laser_scans = 2,
   num_multi_echo_laser_scans = 0,
   num_subdivisions_per_laser_scan = 1,
-  num_point_clouds = 0,
+  num_point_clouds = 3,
   lookup_transform_timeout_sec = 0.2,
   submap_publish_period_sec = 0.3,
   pose_publish_period_sec = 5e-3,
@@ -46,15 +46,20 @@ options = {
 
 MAP_BUILDER.use_trajectory_builder_2d = true
 
+--TRAJECTORY_BUILDER_2D.min_range = 0.1
+--TRAJECTORY_BUILDER_2D.max_range = 25
 TRAJECTORY_BUILDER_2D.min_range = 0.1
-TRAJECTORY_BUILDER_2D.max_range = 25
-TRAJECTORY_BUILDER_2D.missing_data_ray_length = 25.
+TRAJECTORY_BUILDER_2D.max_range = 3.
+--TRAJECTORY_BUILDER_2D.min_z = 0.0
+--TRAJECTORY_BUILDER_2D.max_z = 3.
+TRAJECTORY_BUILDER_2D.missing_data_ray_length = 3. --was 25. when not set, lasers are not used.
 TRAJECTORY_BUILDER_2D.use_imu_data = false
-TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = true
+TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = false -- true: initial guess for scan matcher is based on S2M match instead of extrapolated pose.
 TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(0.1)
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight=1.0
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight=50.
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight=50.
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight=10.0
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight=300.
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight=150.
+TRAJECTORY_BUILDER_2D.submaps.grid_options_2d.resolution = 0.05
 
 POSE_GRAPH.constraint_builder.min_score = 0.65
 POSE_GRAPH.constraint_builder.global_localization_min_score = 0.7
@@ -64,6 +69,19 @@ POSE_GRAPH.constraint_builder.global_localization_min_score = 0.7
 -- POSE_GRAPH.optimization_problem.odometry_translation_weight
 -- POSE_GRAPH.optimization_problem.odometry_rotation_weight
 
-POSE_GRAPH.optimize_every_n_nodes = 0 -- was 1
+-- FRA RS_CARTOGRAPHER:
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 300
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 150
+
+TRAJECTORY_BUILDER_2D.submaps.num_range_data = 350
+--POSE_GRAPH.constraint_builder.sampling_ratio = 0.9
+
+--POSE_GRAPH.optimization_problem.huber_scale = 1
+--POSE_GRAPH.constraint_builder.min_score = 0.7
+
+--POSE_GRAPH.constraint_builder.global_localization_min_score = 0.8
+--POSE_GRAPH.constraint_builder.loop_closure_translation_weight = 300 
+--POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 50
+POSE_GRAPH.optimize_every_n_nodes = 0
 
 return options

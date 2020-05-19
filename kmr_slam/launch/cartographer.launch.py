@@ -25,7 +25,7 @@ from launch.substitutions import ThisLaunchFileDir
 
 
 def generate_launch_description():
-    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     resolution = LaunchConfiguration('resolution', default='0.05')
     publish_period_sec = LaunchConfiguration('publish_period_sec', default='1.0')
 
@@ -61,66 +61,66 @@ def generate_launch_description():
             default_value=publish_period_sec,
             description='OccupancyGrid publishing period'),
 
-        # launch_ros.actions.Node(
-        #     package='cartographer_ros',
-        #     node_executable='cartographer_node',
-        #     node_name='cartographer_node',
-        #     parameters=[{'use_sim_time': use_sim_time}],
-        #     arguments=['-configuration_directory', cartographer_config_dir, '-configuration_basename',configuration_basename],
-        #     output='screen'),
+        launch_ros.actions.Node(
+            package='cartographer_ros',
+            node_executable='cartographer_node',
+            node_name='cartographer_node',
+            parameters=[{'use_sim_time': use_sim_time}],
+            arguments=['-configuration_directory', cartographer_config_dir, '-configuration_basename',configuration_basename],
+            output='screen'),
 
-        # launch_ros.actions.Node(
-        #         package='cartographer_ros',
-        #         node_executable='occupancy_grid_node',
-        #         node_name='occupancy_grid_node',
-        #         output='screen',
-        #         parameters=[{'use_sim_time': use_sim_time}],
-        #         arguments=['-resolution', resolution, '-publish_period_sec', publish_period_sec]),
+        launch_ros.actions.Node(
+                package='cartographer_ros',
+                node_executable='occupancy_grid_node',
+                node_name='occupancy_grid_node',
+                output='screen',
+                parameters=[{'use_sim_time': use_sim_time}],
+                arguments=['-resolution', resolution, '-publish_period_sec', publish_period_sec]),
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([state_publisher_launch_file_dir, '/state_publisher.launch.py']),
         ),
 
+        launch_ros.actions.Node(
+            package='rviz2',
+            node_executable='rviz2',
+            node_name='rviz2',
+            arguments=['-d', rviz_config_dir3],
+ 	        parameters=[{'use_sim_time': use_sim_time}],
+            output='screen'),
+
         # launch_ros.actions.Node(
-        #     package='rviz2',
-        #     node_executable='rviz2',
-        #     node_name='rviz2',
-        #     arguments=['-d', rviz_config_dir3],
- 	    #     parameters=[{'use_sim_time': use_sim_time}],
-        #     output='screen'),
+        #    package='depthimage_to_laserscan',
+        #    node_executable='depthimage_to_laserscan_node',
+        #    node_name='depthimage_to_laserscan1',
+        #    output='screen',
+        #    parameters=[{'output_frame':'d435_base_front_link'},{'use_sim_time': use_sim_time},{'range_max':8.0},{'scan_height':150}],
+        #    remappings=[('depth','/camera1/camera/depth/image_rect_raw'),
+        #                ('depth_camera_info', '/camera1/camera/depth/camera_info'),
+        #                ('scan', 'scan_3')],
+        #    ),
 
-        launch_ros.actions.Node(
-           package='depthimage_to_laserscan',
-           node_executable='depthimage_to_laserscan_node',
-           node_name='depthimage_to_laserscan1',
-           output='screen',
-           parameters=[{'output_frame':'d435_base_front_link'},{'use_sim_time': use_sim_time},{'range_max':8.0},{'scan_height':150}],
-           remappings=[('depth','/camera1/camera/depth/image_rect_raw'),
-                       ('depth_camera_info', '/camera1/camera/depth/camera_info'),
-                       ('scan', 'scan_3')],
-           ),
-
-        launch_ros.actions.Node(
-           package='depthimage_to_laserscan',
-           node_executable='depthimage_to_laserscan_node',
-           node_name='depthimage_to_laserscan2',
-           output='screen',
-           parameters=[{'output_frame':'d435_base_right_link'},{'use_sim_time': use_sim_time},{'range_max':8.0},{'scan_height':150}],
-           remappings=[('depth','/camera2/camera/depth/image_rect_raw'),
-                       ('depth_camera_info', '/camera2/camera/depth/camera_info'),
-                       ('scan', 'scan_4')],
-           ),
-        launch_ros.actions.Node(
-            package='depthimage_to_laserscan',
-            node_executable='depthimage_to_laserscan_node',
-            node_name='depthimage_to_laserscan2',
-            output='screen',
-            parameters=[{'output_frame': 'd435_base_left_link'}, {'use_sim_time': use_sim_time}, {'range_max': 8.0},
-                        {'scan_height': 150}],
-            remappings=[('depth', '/camera3/camera/depth/image_rect_raw'),
-                        ('depth_camera_info', '/camera3/camera/depth/camera_info'),
-                        ('scan', 'scan_5')],
-        ),
+        # launch_ros.actions.Node(
+        #    package='depthimage_to_laserscan',
+        #    node_executable='depthimage_to_laserscan_node',
+        #    node_name='depthimage_to_laserscan2',
+        #    output='screen',
+        #    parameters=[{'output_frame':'d435_base_right_link'},{'use_sim_time': use_sim_time},{'range_max':8.0},{'scan_height':150}],
+        #    remappings=[('depth','/camera2/camera/depth/image_rect_raw'),
+        #                ('depth_camera_info', '/camera2/camera/depth/camera_info'),
+        #                ('scan', 'scan_4')],
+        #    ),
+        # launch_ros.actions.Node(
+        #     package='depthimage_to_laserscan',
+        #     node_executable='depthimage_to_laserscan_node',
+        #     node_name='depthimage_to_laserscan2',
+        #     output='screen',
+        #     parameters=[{'output_frame': 'd435_base_left_link'}, {'use_sim_time': use_sim_time}, {'range_max': 8.0},
+        #                 {'scan_height': 150}],
+        #     remappings=[('depth', '/camera3/camera/depth/image_rect_raw'),
+        #                 ('depth_camera_info', '/camera3/camera/depth/camera_info'),
+        #                 ('scan', 'scan_5')],
+        #  ),
         # launch_ros.actions.Node(
         #    package='pointcloud_to_laserscan',
         #    node_executable='pointcloud_to_laserscan_node',
