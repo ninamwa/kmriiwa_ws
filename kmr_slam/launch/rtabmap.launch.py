@@ -19,9 +19,9 @@ def generate_launch_description():
         'config_paht':'', #Path of a config files containing RTAB-Map's parameters. 
         'approx_sync':True,
         'queue_size':20,
-        'rgbd_cameras':1,
+        'rgbd_cameras':3,
 
-        #'Grid/FromDepth':'False',
+        'Grid/FromDepth':'False',
         'Grid/RayTracing':'True',
         'Grid/3D':'True',
 
@@ -29,7 +29,7 @@ def generate_launch_description():
         'Grid/NoiseFilteringMinNeighbors':'6',
 
         'Grid/RangeMax':'3.5',
-        'Vis/MaxDepth':'8.0',
+        'Vis/MaxDepth':'5.0',
         'Grid/MaxObstacleHeight':'2.0',
 
 
@@ -49,7 +49,7 @@ def generate_launch_description():
     remappings1=[
           ('rgb/image', '/camera1/camera/color/image_raw'),
           ('rgb/camera_info', '/camera1/camera/color/camera_info'),
-          #('rgbd_image','/rgbd_image0'),
+          ('rgbd_image','/rgbd_image0'),
           ('depth/image', '/camera1/camera/depth/image_rect_raw')]
 
     remappings2=[
@@ -92,17 +92,17 @@ def generate_launch_description():
         # Nodes to launch
         Node(
             package='rtabmap_ros', node_name='sync1', node_executable='rgbd_sync', output='screen',
-            parameters=[{'approx_sync':True, 'use_sim_time':use_sim_time}],
+            parameters=[{'approx_sync':False, 'use_sim_time':use_sim_time}],
             remappings=remappings1,
             emulate_tty=True),
         Node(
            package='rtabmap_ros', node_name='sync2', node_executable='rgbd_sync', output='screen',
-           parameters=[{'approx_sync':True, 'use_sim_time':use_sim_time}],
+           parameters=[{'approx_sync':False, 'use_sim_time':use_sim_time}],
            remappings=remappings2,
            emulate_tty=True),
         Node(
            package='rtabmap_ros', node_name='sync3', node_executable='rgbd_sync', output='screen',
-           parameters=[{'approx_sync':True, 'use_sim_time':use_sim_time}],
+           parameters=[{'approx_sync':False, 'use_sim_time':use_sim_time}],
            remappings=remappings3,
            emulate_tty=True),
 
@@ -119,28 +119,28 @@ def generate_launch_description():
 	        remappings=remappings_scancloud,
             emulate_tty=True),
 
-        # Node(
-        #    package='pointcloud_to_laserscan',
-        #    node_executable='laserscan_to_pointcloud_node',
-        #    node_name='laserscan_to_pointcloud1',
-        #    output='screen',
-        #    parameters=[{'use_sim_time': use_sim_time}],
-        #    remappings=[('scan_in', 'scan_1'),
-        #                ('cloud', 'cloud1')],
-        #    ),
-        # Node(
-        #    package='pointcloud_to_laserscan',
-        #    node_executable='laserscan_to_pointcloud_node',
-        #    node_name='laserscan_to_pointcloud2',
-        #    output='screen',
-        #    parameters=[{'use_sim_time': use_sim_time}],
-        #    remappings=[('scan_in', 'scan_2'),
-        #                ('cloud', 'cloud2')],
-        #    ),
-
         Node(
-            package='rtabmap_ros', node_executable='point_cloud_aggregator', output='screen',
-            remappings=[('cloud1','points2_1'),('cloud2','points2_2'),('cloud3','points2_3')],
-            parameters=[{'count': 3}],
-            emulate_tty=True,),
+           package='pointcloud_to_laserscan',
+           node_executable='laserscan_to_pointcloud_node',
+           node_name='laserscan_to_pointcloud1',
+           output='screen',
+           parameters=[{'use_sim_time': use_sim_time}],
+           remappings=[('scan_in', 'scan_1'),
+                       ('cloud', 'cloud1')],
+           ),
+        Node(
+           package='pointcloud_to_laserscan',
+           node_executable='laserscan_to_pointcloud_node',
+           node_name='laserscan_to_pointcloud2',
+           output='screen',
+           parameters=[{'use_sim_time': use_sim_time}],
+           remappings=[('scan_in', 'scan_2'),
+                       ('cloud', 'cloud2')],
+           ),
+
+         Node(
+             package='rtabmap_ros', node_executable='point_cloud_aggregator', output='screen',
+             #remappings=[('cloud1','points2_1'),('cloud2','points2_2'),('cloud3','points2_3')],
+             parameters=[{'count': 2},{'approx_sync':True}],
+             emulate_tty=True,),
     ])
