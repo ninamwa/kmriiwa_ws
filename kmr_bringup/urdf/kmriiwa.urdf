@@ -104,6 +104,8 @@
   </link>
 
 
+
+
   <joint name="laser_B1_joint" type="fixed">
           <parent link="base_link" />
           <child link="laser_B1_link" />
@@ -968,7 +970,7 @@
       </inertial>
     </link>
     <!--  -->
-
+    
     <!-- camera body, with origin at bottom screw mount -->
     <joint name="d435_base_front_joint" type="fixed">
       <origin xyz="0.52 0.0 0.2625" rpy="0 0 0"/>
@@ -1004,6 +1006,7 @@
       <parent link="d435_base_front_link"/>
       <child link="d435_base_front_depth_frame" />
     </joint>
+
     <link name="d435_base_front_depth_frame"/>
 
     <joint name="d435_base_front_depth_optical_joint" type="fixed">
@@ -1011,52 +1014,9 @@
       <parent link= "d435_base_front_depth_frame" />
       <child link="d435_base_front_depth_optical_frame" />
     </joint>
+
     <link name="d435_base_front_depth_optical_frame"/>
-      
-    <!-- camera left IR joints and links -->
-    <joint name="d435_base_front_left_ir_joint" type="fixed">
-      <origin xyz="0 -0.025 0" rpy="0 0 0" />
-      <parent link="d435_base_front_depth_frame" />
-      <child link="d435_base_front_left_ir_frame" />
-    </joint>
-    <link name="d435_base_front_left_ir_frame"/>
 
-    <joint name="d435_base_front_left_ir_optical_joint" type="fixed">
-      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-      <parent link="d435_base_front_left_ir_frame" />
-      <child link="d435_base_front_left_ir_optical_frame" />
-    </joint>
-    <link name="d435_base_front_left_ir_optical_frame"/>
-
-    <!-- camera right IR joints and links -->
-    <joint name="d435_base_front_right_ir_joint" type="fixed">
-      <origin xyz="0 0.025 0" rpy="0 0 0" />
-      <parent link="d435_base_front_depth_frame" />
-      <child link="d435_base_front_right_ir_frame" />
-    </joint>
-    <link name="d435_base_front_right_ir_frame"/>
-
-    <joint name="d435_base_front_right_ir_optical_joint" type="fixed">
-      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-      <parent link="d435_base_front_right_ir_frame" />
-      <child link="d435_base_front_right_ir_optical_frame" />
-    </joint>
-    <link name="d435_base_front_right_ir_optical_frame"/>
-
-    <!-- camera fisheye joints and links -->
-    <joint name="d435_base_front_fisheye_joint" type="fixed">
-      <origin xyz="0 0.040 0" rpy="0 0 0" />
-      <parent link="d435_base_front_depth_frame" />
-      <child link="d435_base_front_fisheye_frame" />
-    </joint>
-    <link name="d435_base_front_fisheye_frame"/>
-
-    <joint name="d435_base_front_fisheye_optical_joint" type="fixed">
-      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-      <parent link="d435_base_front_fisheye_frame" />
-      <child link="d435_base_front_fisheye_optical_frame" />
-    </joint>
-    <link name="d435_base_front_fisheye_optical_frame"/>
 
 
     <joint name="metall_plate_left_joint" type="fixed">

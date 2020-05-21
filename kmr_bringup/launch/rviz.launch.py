@@ -56,7 +56,7 @@ def generate_launch_description():
             output='screen'),
 
 
-        launch_ros.actions.Node(package='kmr_bringup', node_executable='dummy_joint_states', output='screen'),
+       # launch_ros.actions.Node(package='kmr_bringup', node_executable='dummy_joint_states', output='screen'),
         #launch_ros.actions.Node(
         #    package='joint_state_publisher',
         #    node_executable='joint_state_publisher',

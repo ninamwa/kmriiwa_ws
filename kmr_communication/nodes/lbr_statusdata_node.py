@@ -61,7 +61,7 @@ class LbrStatusNode(Node):
 
 
         # Make Publisher for statusdata
-        self.pub_lbr_statusdata = self.create_publisher(LbrStatusdata, 'lbr_statusdata', qos_profile_sensor_data)
+        self.pub_lbr_statusdata = self.create_publisher(LbrStatusdata, 'lbr_statusdata', 10)
 
         while not self.soc.isconnected:
             pass
