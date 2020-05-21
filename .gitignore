@@ -27,6 +27,7 @@
 *.exe
 *.out
 *.app
+kmr_communication/param/bringup.yaml
 
 # user setting
 *.*~

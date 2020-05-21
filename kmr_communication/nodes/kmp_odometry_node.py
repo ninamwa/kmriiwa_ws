@@ -62,7 +62,7 @@ class KmpOdometryNode(Node):
         self.last_odom_timestamp = 0
 
         # Make Publisher for odometry
-        self.pub_odometry = self.create_publisher(Odometry, 'odom', qos_profile_sensor_data)
+        self.pub_odometry = self.create_publisher(Odometry, 'odom', 10)
 
         # Create tf broadcaster
         self.tf_broadcaster = TransformBroadcaster(self)

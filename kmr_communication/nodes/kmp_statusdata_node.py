@@ -59,7 +59,7 @@ class KmpStatusNode(Node):
             self.soc=None
 
         # Make Publisher for statusdata
-        self.pub_kmp_statusdata = self.create_publisher(KmpStatusdata, 'kmp_statusdata', qos_profile_sensor_data)
+        self.pub_kmp_statusdata = self.create_publisher(KmpStatusdata, 'kmp_statusdata', 10)
 
 
         while not self.soc.isconnected:
