@@ -254,8 +254,8 @@ private:
 
     default_parameters.planning_attempts = 1;
     default_parameters.planning_time = 5.0;
-    default_parameters.max_velocity_scaling_factor = 0.4;
-    default_parameters.max_acceleration_scaling_factor = 0.4;
+    default_parameters.max_velocity_scaling_factor = 1.0;
+    default_parameters.max_acceleration_scaling_factor = 1.0;
 
     planning_pipeline_names = moveit_cpp_->getPlanningPipelineNames("manipulator");
     if (!planning_pipeline_names.empty())
@@ -313,8 +313,8 @@ private:
 
     default_parameters.planning_attempts = 1;
     default_parameters.planning_time = 5.0;
-    default_parameters.max_velocity_scaling_factor = 0.4;
-    default_parameters.max_acceleration_scaling_factor = 0.4;
+    default_parameters.max_velocity_scaling_factor = 1.0;
+    default_parameters.max_acceleration_scaling_factor = 1.0;
 
     planning_pipeline_names = moveit_cpp_->getPlanningPipelineNames("manipulator");
     if (!planning_pipeline_names.empty())
