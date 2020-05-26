@@ -29,7 +29,7 @@ options = {
   use_odometry = true,
   use_nav_sat = false,
   use_landmarks = false,
-  num_laser_scans = 5,
+  num_laser_scans = 2,
   num_multi_echo_laser_scans = 0,
   num_subdivisions_per_laser_scan = 1,
   num_point_clouds = 0,
@@ -46,29 +46,29 @@ options = {
 
 MAP_BUILDER.use_trajectory_builder_2d = true
 
-
+TRAJECTORY_BUILDER_2D.num_accumulated_range_data = 2-- absolutely    need    to    adapt    to    the    needs    of    yourbag:
 TRAJECTORY_BUILDER_2D.min_range = 0.1
-TRAJECTORY_BUILDER_2D.max_range = 3.5 
-TRAJECTORY_BUILDER_2D.missing_data_ray_length = 2.0 
-TRAJECTORY_BUILDER_2D.use_imu_data = false
 
-TRAJECTORY_BUILDER_2D.min_z = 0.0
-TRAJECTORY_BUILDER_2D.max_z = 2.0
+TRAJECTORY_BUILDER_2D.max_range = 15.0 --2/5xlaser: 15.0,  og 2xlaser + 3xPC: 4.0
+TRAJECTORY_BUILDER_2D.missing_data_ray_length = 17.0 --2xlaser: 17.0,  2xlaser + 3xPC: 5.0
+TRAJECTORY_BUILDER_2D.use_imu_data = false
+TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.hit_probability=0.58
+
+TRAJECTORY_BUILDER_2D.min_z = 0.1
+TRAJECTORY_BUILDER_2D.max_z = 2.5
 
 TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = false -- true: initial guess for scan matcher is based on S2M match instead of extrapolated pose.
-TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(0.1)
+
+--TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(0.01)
 TRAJECTORY_BUILDER_2D.submaps.grid_options_2d.resolution = 0.05
 
 
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight=10.0
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight=60.
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight=60.
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight= 10.0
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight= 60.
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight= 60.
 
 TRAJECTORY_BUILDER_2D.submaps.num_range_data = 350
-
-POSE_GRAPH.optimize_every_n_nodes =0
---[[ POSE_GRAPH = {
-  optimize_every_n_nodes = 0, --90
+POSE_GRAPH = {
   constraint_builder = {
     sampling_ratio = 0.3,
     max_constraint_distance = 15.,
@@ -137,6 +137,19 @@ POSE_GRAPH.optimize_every_n_nodes =0
   global_sampling_ratio = 0.003,
   log_residual_histograms = true,
   global_constraint_search_after_n_seconds = 10.,
-} ]]
+}
+ 
+
+
+-- REAL SENSE --
+--[[ POSE_GRAPH.constraint_builder.sampling_ratio = 0.9
+
+POSE_GRAPH.optimization_problem.huber_scale = 1
+POSE_GRAPH.constraint_builder.min_score = 0.7
+
+POSE_GRAPH.constraint_builder.global_localization_min_score = 0.8
+POSE_GRAPH.constraint_builder.loop_closure_translation_weight = 300 
+POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 50 ]]
+
 
 return options

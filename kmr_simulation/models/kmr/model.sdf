@@ -614,7 +614,7 @@
 
 
     <joint name="d435_base_front_depth_optical_joint" type="fixed">
-      <origin>0 0 0 -1.570796 0 -1.570796 </origin>
+      <pose>0 0 0 -1.570796 0 -1.570796 </pose>
       <parent>d435_base_front_depth_frame </parent>
       <child> d435_base_front_depth_optical_frame</child>
     </joint>

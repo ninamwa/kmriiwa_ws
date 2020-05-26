@@ -30,7 +30,7 @@ amcl:
     save_pose_rate: 0.5
     sigma_hit: 0.2
     tf_broadcast: true
-    transform_tolerance: 0.2
+    transform_tolerance: 1.0
     update_min_a: 0.2
     update_min_d: 0.25
     z_hit: 0.5
@@ -73,50 +73,61 @@ bt_navigator_rclcpp_node:
 controller_server:
   ros__parameters:
     use_sim_time: False
-    controller_frequency: 18.0
+    controller_frequency: 5.0
     controller_plugin_types: ["dwb_core::DWBLocalPlanner"]
     controller_plugin_ids: ["FollowPath"]
-    min_x_velocity_threshold: 0.001
-    min_y_velocity_threshold: 0.5
-    min_theta_velocity_threshold: 0.001
+    min_x_velocity_threshold: 0.01
+    min_y_velocity_threshold: 0.01
+    min_theta_velocity_threshold: 0.01
 
     # DWB parameters
-    FollowPath.debug_trajectory_details: True
-    FollowPath.min_vel_x: -0.3
-    FollowPath.min_vel_y: -0.2
-    FollowPath.max_vel_x: 0.3
-    FollowPath.max_vel_y: 0.2
-    FollowPath.max_vel_theta: 0.15
-    FollowPath.min_speed_xy: -0.2
-    FollowPath.max_speed_xy: 0.2
-    FollowPath.min_speed_theta: -0.15
+    debug_trajectory_details: True
+    min_vel_x: -0.5
+    min_vel_y: -0.5
+    max_vel_x: 0.5
+    max_vel_y: 0.5
+    max_vel_theta: 0.5
+    min_speed_xy: -0.3
+    max_speed_xy: 0.5
+    min_speed_theta: -0.5
+    min_x_velocity_threshold: 0.01
     # Add high threshold velocity for turtlebot 3 issue.
     # https://github.com/ROBOTIS-GIT/turtlebot3_simulations/issues/75
-    FollowPath.acc_lim_x: 0.2
-    FollowPath.acc_lim_y: 0.2
-    FollowPath.acc_lim_theta: 0.2
-    FollowPath.decel_lim_y: -1.0
-    FollowPath.decel_lim_theta: -1.0
-    FollowPath.vx_samples: 20
-    FollowPath.vy_samples: 20
-    FollowPath.vtheta_samples: 40
-    FollowPath.sim_time: 1.7
-    FollowPath.linear_granularity: 0.05
-    FollowPath.angular_granularity: 0.025
-    FollowPath.time_granularity: 0.05
-    FollowPath.xy_goal_tolerance: 0.25
-    FollowPath.transform_tolerance: 0.5
-    FollowPath.critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
-    FollowPath.BaseObstacle.scale: 0.02
-    FollowPath.PathAlign.scale: 10.0
-    FollowPath.GoalAlign.scale: 10.0
-    FollowPath.PathDist.scale: 3.0
-    FollowPath.GoalDist.scale: 4.0
-    FollowPath.RotateToGoal.scale: 2.0
+    min_y_velocity_threshold: 0.01
+    min_theta_velocity_threshold: 0.01
+    acc_lim_x: 1.0
+    acc_lim_y: 1.0
+    acc_lim_theta: 1.0
+    decel_lim_x: -1.0
+    decel_lim_y: -1.0
+    decel_lim_theta: -1.0
+    vx_samples: 20
+    vy_samples: 20
+    vtheta_samples: 20
+    sim_time: 5.0
+    linear_granularity: 0.2
+    angular_granularity: 0.2
+    time_granularity: 0.05
+    xy_goal_tolerance: 0.2
+    yaw_goal_tolerance: 0.3
+    transform_tolerance: 0.85
+    critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist", "Twirling"]
+    ObstacleFootprint.scale: 10.0
+    PathAlign.scale: 0.0
+    GoalAlign.scale: 0.0
+    Oscillation.scale: 0.0
+    PathDist.scale: 32.0
+    GoalDist.scale: 24.0
+    RotateToGoal.scale: 32.0
+    RotateToGoal.xy_goal_tolerance: 0.2
+    BaseObstacle.scale: 10.0
+    Twirling.scale: 40.0
 
 controller_server_rclcpp_node:
   ros__parameters:
     use_sim_time: False
+    movement_time_allowance: 30.0
+    required_movement_radius: 0.2
 
 local_costmap:
   local_costmap:
@@ -129,17 +140,24 @@ local_costmap:
       plugin_names: ["obstacle_layer", "voxel_layer", "inflation_layer"]
       plugin_types: ["nav2_costmap_2d::ObstacleLayer", "nav2_costmap_2d::VoxelLayer", "nav2_costmap_2d::InflationLayer"]
       rolling_window: true
-      width: 3
-      height: 3
+      width: 4
+      height: 4
       resolution: 0.05
-      robot_radius: 0.54
+      robot_radius: 0.626
       inflation_layer:
-        cost_scaling_factor: 3.0
+        cost_scaling_factor: 1.0
+        inflation_radius: 0.8
       obstacle_layer:
         enabled: True
-        observation_sources: scan
-        scan:
+        observation_sources: scan_1 scan_2
+        scan_1:
           topic: /scan
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+        scan_2:
+          topic: /scan_2
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -152,9 +170,9 @@ local_costmap:
         z_voxels: 10
         max_obstacle_height: 2.0
         mark_threshold: 0
-        observation_sources: pointcloud
-        pointcloud:
-          topic: /intel_realsense_r200_depth/points
+        observation_sources: points2
+        points2:
+          topic: /points2
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -179,12 +197,19 @@ global_costmap:
       use_sim_time: False
       plugin_names: ["static_layer", "obstacle_layer", "voxel_layer", "inflation_layer"]
       plugin_types: ["nav2_costmap_2d::StaticLayer", "nav2_costmap_2d::ObstacleLayer", "nav2_costmap_2d::VoxelLayer", "nav2_costmap_2d::InflationLayer"]
-      robot_radius: 0.54
+      robot_radius: 0.626
+      resolution: 0.05
       obstacle_layer:
         enabled: True
-        observation_sources: scan
-        scan:
+        observation_sources: scan_1 scan_2
+        scan_1:
           topic: /scan
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+        scan_2:
+          topic: /scan_2
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -197,9 +222,9 @@ global_costmap:
         z_voxels: 10
         max_obstacle_height: 2.0
         mark_threshold: 0
-        observation_sources: pointcloud
-        pointcloud:
-          topic: /intel_realsense_r200_depth/points
+        observation_sources:
+        points2:
+          topic: /points2
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -224,7 +249,7 @@ planner_server:
     planner_plugin_types: ["nav2_navfn_planner/NavfnPlanner"]
     planner_plugin_ids: ["GridBased"]
     use_sim_time: False
-    GridBased.tolerance: 2.0
+    GridBased.tolerance: 1.0
     GridBased.use_astar: false
     GridBased.allow_unknown: true
 

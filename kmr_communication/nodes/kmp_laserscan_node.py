@@ -103,7 +103,7 @@ class KmpLaserScanNode(Node):
             scan.angle_min = (-135*math.pi)/180
             scan.angle_max = (135*math.pi)/180
             scan.range_min = 0.12 # disse må finnes ut av
-            scan.range_max = 3.5 # finn ut
+            scan.range_max = 15.0 
             try:
                 scan.ranges = [float(s) for s in values[3].split(',') if len(s)>0]
             except ValueError as e:
