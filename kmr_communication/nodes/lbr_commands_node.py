@@ -97,7 +97,7 @@ class LbrCommandsNode(Node):
         self.soc.send(msg)
 
     def move_manipulator_callback(self, goal_handle):
-        #print(goal_handle.request.path)
+        print(goal_handle.request.path)
         self.path_callback(goal_handle.request.path)
         self.done_moving = False
         while (not self.done_moving):

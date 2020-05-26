@@ -1,11 +1,20 @@
 
-<root main_tree_to_execute="TestNav">
+<root main_tree_to_execute="Test2">
 
     <BehaviorTree ID="Test2">
         <Sequence name="main_sequence">
+            <PlanManipulatorPath plan_to_frame="driveposition" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
             <PlanManipulatorPath plan_to_frame="search1" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
             <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
-            <ObjectSearch/>
+            <PlanManipulatorPath plan_to_frame="search2" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <PlanManipulatorPath plan_to_frame="search3" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <PlanManipulatorPath plan_to_frame="carryarea1" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <PlanManipulatorPath plan_to_frame="driveposition" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
         </Sequence>
     </BehaviorTree>
 

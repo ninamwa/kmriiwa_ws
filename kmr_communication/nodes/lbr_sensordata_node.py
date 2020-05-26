@@ -117,7 +117,6 @@ def main(argv=sys.argv[1:]):
     parser.add_argument('-c', '--connection')
     parser.add_argument('-ro', '--robot')
     args = parser.parse_args(remove_ros_args(args=argv))
-    print(args)
     rclpy.init(args=argv)
     lbr_sensordata_node = LbrSensordataNode(args.connection,args.robot)
 
