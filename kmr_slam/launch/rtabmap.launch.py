@@ -6,32 +6,46 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time')
+    icp_param=[{
+            'approx_sync':True,
+            'frame_id':'base_footprint',
+            'queue_size':20,
 
+            'Icp/RangeMax':'15.0',
+            'Icp/PointToPlane':'True',
+            'scan_normal_k':5,
+            'scan_normal_radius':0.0,
+            'publish_null_when_lost':False,
+
+            'OdomF2M/BundleAdjustment':'0',
+            'OdomF2M/MaxSize':'1000',
+        }]
 
     rtabmap_parameters=[{
         'frame_id':'base_footprint',
         'use_sim_time':use_sim_time,
-        'subscribe_rgbd':False,
+        'subscribe_rgbd':True,
         'subscribe_rgb':False,
         'subscribe_scan':False,
         'subscribe_depth':False,
-        'subscribe_scan_cloud':True,
-        'config_paht':'', #Path of a config files containing RTAB-Map's parameters. 
+        'subscribe_scan_cloud':False,
         'approx_sync':True,
         'queue_size':20,
         'rgbd_cameras':3,
 
-        'Grid/FromDepth':'False',
+        'Grid/FromDepth':'True',
         'Grid/RayTracing':'True',
-        'Grid/3D':'True',
+        'Grid/3D':'False',
 
         'Grid/NoiseFilteringRadius':'0',
         'Grid/NoiseFilteringMinNeighbors':'6',
 
         'Grid/RangeMax':'3.5',
+        #'Grid/RangeMax':'15.0',
         'Vis/MaxDepth':'5.0',
         'Grid/MaxObstacleHeight':'2.0',
-
+        
+        'Kp/MaxFeatures':'-1.0',
 
         'Grid/NormalSegmentation':'False',
         
@@ -92,17 +106,17 @@ def generate_launch_description():
         # Nodes to launch
         Node(
             package='rtabmap_ros', node_name='sync1', node_executable='rgbd_sync', output='screen',
-            parameters=[{'approx_sync':False, 'use_sim_time':use_sim_time}],
+            parameters=[{'approx_sync':True, 'use_sim_time':use_sim_time}],
             remappings=remappings1,
             emulate_tty=True),
         Node(
            package='rtabmap_ros', node_name='sync2', node_executable='rgbd_sync', output='screen',
-           parameters=[{'approx_sync':False, 'use_sim_time':use_sim_time}],
+           parameters=[{'approx_sync':True, 'use_sim_time':use_sim_time}],
            remappings=remappings2,
            emulate_tty=True),
         Node(
            package='rtabmap_ros', node_name='sync3', node_executable='rgbd_sync', output='screen',
-           parameters=[{'approx_sync':False, 'use_sim_time':use_sim_time}],
+           parameters=[{'approx_sync':True, 'use_sim_time':use_sim_time}],
            remappings=remappings3,
            emulate_tty=True),
 
@@ -125,7 +139,7 @@ def generate_launch_description():
            node_name='laserscan_to_pointcloud1',
            output='screen',
            parameters=[{'use_sim_time': use_sim_time}],
-           remappings=[('scan_in', 'scan_1'),
+           remappings=[('scan_in', 'scan'),
                        ('cloud', 'cloud1')],
            ),
         Node(
@@ -143,4 +157,52 @@ def generate_launch_description():
              #remappings=[('cloud1','points2_1'),('cloud2','points2_2'),('cloud3','points2_3')],
              parameters=[{'count': 2},{'approx_sync':True}],
              emulate_tty=True,),
+
+        # Node(
+        #      package='rtabmap_ros', node_executable='icp_odometry', output='screen',
+        #      parameters=icp_param,
+        #      remappings=remappings_scancloud,
+        #      emulate_tty=True),
+
+
+        # Node(
+        #    package='depthimage_to_laserscan',
+        #    node_executable='depthimage_to_laserscan_node',
+        #    node_name='depthimage_to_laserscan2',
+        #    output='screen',
+        #    parameters=[{'output_frame':'d435_base_right_link'},{'use_sim_time': use_sim_time},{'range_max':4.0},{'scan_height':150}],
+        #    remappings=[('depth','/camera2/camera/depth/image_rect_raw'),
+        #                ('depth_camera_info', '/camera2/camera/depth/camera_info'),
+        #                ('scan', 'scan_4')],
+        #    ),
+        # Node(
+        #     package='depthimage_to_laserscan',
+        #     node_executable='depthimage_to_laserscan_node',
+        #     node_name='depthimage_to_laserscan2',
+        #     output='screen',
+        #     parameters=[{'output_frame': 'd435_base_left_link'}, {'use_sim_time': use_sim_time}, {'range_max': 4.0},
+        #                 {'scan_height': 150}],
+        #     remappings=[('depth', '/camera3/camera/depth/image_rect_raw'),
+        #                 ('depth_camera_info', '/camera3/camera/depth/camera_info'),
+        #                 ('scan', 'scan_5')],
+        #   ),
+
+        #   Node(
+        #    package='pointcloud_to_laserscan',
+        #    node_executable='laserscan_to_pointcloud_node',
+        #    node_name='laserscan_to_pointcloud3',
+        #    output='screen',
+        #    parameters=[{'use_sim_time': use_sim_time}],
+        #    remappings=[('scan_in', 'scan_4'),
+        #                ('cloud', 'cloud3')],
+        #    ),
+        # Node(
+        #    package='pointcloud_to_laserscan',
+        #    node_executable='laserscan_to_pointcloud_node',
+        #    node_name='laserscan_to_pointcloud4',
+        #    output='screen',
+        #    parameters=[{'use_sim_time': use_sim_time}],
+        #    remappings=[('scan_in', 'scan_5'),
+        #                ('cloud', 'cloud4')],
+        #    ),
     ])

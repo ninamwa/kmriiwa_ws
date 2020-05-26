@@ -1,6 +1,6 @@
 amcl:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: False
     alpha1: 0.2
     alpha2: 0.2
     alpha3: 0.2
@@ -40,15 +40,15 @@ amcl:
 
 amcl_map_client:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: False
 
 amcl_rclcpp_node:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: False
 
 bt_navigator:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: False
     bt_xml_filename: "navigate_w_replanning.xml"
     plugin_lib_names:
     - nav2_compute_path_to_pose_action_bt_node
@@ -67,69 +67,96 @@ bt_navigator:
 
 bt_navigator_rclcpp_node:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: False
+
 
 controller_server:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: False
+    controller_frequency: 5.0
+    controller_plugin_types: ["dwb_core::DWBLocalPlanner"]
+    controller_plugin_ids: ["FollowPath"]
+    min_x_velocity_threshold: 0.01
+    min_y_velocity_threshold: 0.01
+    min_theta_velocity_threshold: 0.01
+
+    # DWB parameters
     debug_trajectory_details: True
+    movement_time_allowance: 30.0
+    required_movement_radius: 0.2
     min_vel_x: -0.5
-    min_vel_y: -0.28
+    min_vel_y: -0.5
     max_vel_x: 0.5
-    max_vel_y: 0.28
-    max_vel_theta: 0.25
-    min_speed_xy: -0.28
-    max_speed_xy: 0.28
-    min_speed_theta: -0.25
-    min_x_velocity_threshold: 0.001
+    max_vel_y: 0.5
+    max_vel_theta: 0.5
+    min_speed_xy: -0.3
+    max_speed_xy: 0.5
+    min_speed_theta: -0.5
+    min_x_velocity_threshold: 0.01
     # Add high threshold velocity for turtlebot 3 issue.
     # https://github.com/ROBOTIS-GIT/turtlebot3_simulations/issues/75
-    min_y_velocity_threshold: 0.001
-    min_theta_velocity_threshold: 0.001
-    acc_lim_x: 0.2
-    acc_lim_y: 0.2
-    acc_lim_theta: 0.2
+    min_y_velocity_threshold: 0.01
+    min_theta_velocity_threshold: 0.01
+    acc_lim_x: 1.0
+    acc_lim_y: 1.0
+    acc_lim_theta: 1.0
     decel_lim_x: -1.0
     decel_lim_y: -1.0
     decel_lim_theta: -1.0
     vx_samples: 20
     vy_samples: 20
-    vtheta_samples: 20
-    sim_time: 1.7
-    linear_granularity: 0.05
-    xy_goal_tolerance: 0.25
-    transform_tolerance: 0.2
-    critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
-    BaseObstacle.scale: 0.02
+    vtheta_samples: 10
+    sim_time: 5.0
+    linear_granularity: 0.6
+    angular_granularity: 0.3
+    time_granularity: 0.05
+    xy_goal_tolerance: 0.2
+    yaw_goal_tolerance: 0.3
+    transform_tolerance: 1.0
+    critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist", "Twirling"]
+    ObstacleFootprint.scale: 10.0
     PathAlign.scale: 0.0
-    GoalAlign.scale: 0.0
+    GoalAlign.scale: 32.0
+    Oscillation.scale: 0.0
     PathDist.scale: 32.0
     GoalDist.scale: 24.0
     RotateToGoal.scale: 32.0
+    BaseObstacle.scale: 10.0
+    Twirling.scale: 40.0
 
 controller_server_rclcpp_node:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: False
 
 local_costmap:
   local_costmap:
     ros__parameters:
-      use_sim_time: True
+      update_frequency: 5.0
+      publish_frequency: 2.0
+      robot_base_frame: base_link
+      use_sim_time: False
       global_frame: odom
       plugin_names: ["obstacle_layer", "voxel_layer", "inflation_layer"]
       plugin_types: ["nav2_costmap_2d::ObstacleLayer", "nav2_costmap_2d::VoxelLayer", "nav2_costmap_2d::InflationLayer"]
       rolling_window: true
-      width: 3
-      height: 3
+      width: 4
+      height: 4
       resolution: 0.05
-      robot_radius: 0.54
+      robot_radius: 0.626
       inflation_layer:
-        cost_scaling_factor: 3.0
+        cost_scaling_factor: 15.0
+        inflation_radius: 0.4
       obstacle_layer:
         enabled: True
-        observation_sources: scan
-        scan:
+        observation_sources: scan_1 scan_2
+        scan_1:
           topic: /scan
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+        scan_2:
+          topic: /scan_2
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -142,9 +169,9 @@ local_costmap:
         z_voxels: 10
         max_obstacle_height: 2.0
         mark_threshold: 0
-        observation_sources: pointcloud
-        pointcloud:
-          topic: /intel_realsense_r200_depth/points
+        observation_sources: points2
+        points2:
+          topic: /points2
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -154,23 +181,34 @@ local_costmap:
       always_send_full_costmap: True
   local_costmap_client:
     ros__parameters:
-      use_sim_time: True
+      use_sim_time: False
   local_costmap_rclcpp_node:
     ros__parameters:
-      use_sim_time: True
+      use_sim_time: False
 
 global_costmap:
   global_costmap:
     ros__parameters:
-      use_sim_time: True
+      update_frequency: 1.0
+      publish_frequency: 1.0
+      robot_base_frame: base_link
+      global_frame: map
+      use_sim_time: False
       plugin_names: ["static_layer", "obstacle_layer", "voxel_layer", "inflation_layer"]
       plugin_types: ["nav2_costmap_2d::StaticLayer", "nav2_costmap_2d::ObstacleLayer", "nav2_costmap_2d::VoxelLayer", "nav2_costmap_2d::InflationLayer"]
-      robot_radius: 0.54
+      robot_radius: 0.626
+      resolution: 0.05
       obstacle_layer:
         enabled: True
-        observation_sources: scan
-        scan:
+        observation_sources: scan_1 scan_2
+        scan_1:
           topic: /scan
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+        scan_2:
+          topic: /scan_2
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -183,9 +221,9 @@ global_costmap:
         z_voxels: 10
         max_obstacle_height: 2.0
         mark_threshold: 0
-        observation_sources: pointcloud
-        pointcloud:
-          topic: /intel_realsense_r200_depth/points
+        observation_sources: points2
+        points2:
+          topic: /points2
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -195,26 +233,48 @@ global_costmap:
       always_send_full_costmap: True
   global_costmap_client:
     ros__parameters:
-      use_sim_time: True
+      use_sim_time: False
   global_costmap_rclcpp_node:
     ros__parameters:
-      use_sim_time: True
+      use_sim_time: False
 
 map_server:
   ros__parameters:
-    use_sim_time: True
-    yaml_filename: "turtlebot3_world.yaml"
+    use_sim_time: False
+    yaml_filename: "carto_map.yaml"
 
 planner_server:
   ros__parameters:
-    use_sim_time: True
-    tolerance: 0.0
-    use_astar: false
+    planner_plugin_types: ["nav2_navfn_planner/NavfnPlanner"]
+    planner_plugin_ids: ["GridBased"]
+    use_sim_time: False
+    GridBased.tolerance: 1.0
+    GridBased.use_astar: false
+    GridBased.allow_unknown: true
 
 planner_server_rclcpp_node:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: False
 
 robot_state_publisher:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: False
+
+recoveries_server:
+  ros__parameters:
+    costmap_topic: local_costmap/costmap_raw
+    cycle_frequency: 10.0
+    footprint_topic: local_costmap/published_footprint
+    max_rotational_vel: 0.1
+    min_rotational_vel: 0.05
+    plugin_names:
+    - Spin
+    - BackUp
+    - Wait
+    plugin_types:
+    - nav2_recoveries/Spin
+    - nav2_recoveries/BackUp
+    - nav2_recoveries/Wait
+    rotational_acc_lim: 0.2
+    simulate_ahead_time: 2.0
+    use_sim_time: False
