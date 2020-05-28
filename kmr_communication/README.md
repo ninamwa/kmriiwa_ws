@@ -1,24 +1,22 @@
 ## 1. Description
 
 This package handles the communication with the KMR iiwa. 
-There are two different versions implemented: one with UDP connection and one with TCP connection. 
-The only difference between the files are which type of connection is implemented. 
+There is one launch file which will launch all of the seven communication nodes: 
+- kmp_commands_node
+- kmp_odometry_node
+- kmp_laserscan_node
+- kmp_statusdata_node
+- lbr_statusdata_node
+- lbr_commands_node
+- lbr_sensordata_node
 
+The connection type (UDP/TCP) can be set in the launch parameters. 
+The IP address to your computer should be set in the parameter file called bringup.yaml. 
+In this file, you can also change the port number for each of the nodes. 
 
 
 ## 2. Run
-To run the kmr_communication_node with TCP connection: 
+To launch all of the communcation nodes, run: 
 ```
-$ ros2 run kuka_communication client_TCP.py 
-```
-
-To run the kmr_communication_node with UDP connection: 
-```
-$ ros2 run kuka_communication client_UDP.py 
-```
-
-If you want to test any of the code without connecting to the robot a script which publishes dummy odometry and dummy laser data is created. To launch this, run: 
-
-```
-$ ros2 run kuka_communication dummy_data.py 
+$ ros2 launch kmr_communication sunrise_communication.py 
 ```
