@@ -61,7 +61,7 @@ class ObjectDetectionNode(Node):
     def __init__(self):
         super().__init__('object_detection_node')
         self.name='object_detection_node'
-        self.detection_threshold = 0.72 # must be tuned
+        self.detection_threshold = 0.70 # must be tuned
         self.detected_object_pose = None
 
         self.pipelinename = "object"
@@ -82,20 +82,20 @@ class ObjectDetectionNode(Node):
 
 
     def detectedObject_callback(self, ObjectsInBoxes):
-            for instance in ObjectsInBoxes.objects_in_boxes:
-                probability = instance.object.probability
-                print(probability)
-                if(probability>=self.detection_threshold and self.isSearching):
-                      self.detected_object_pose = self.getBoundingBoxMidPoint(instance.min, instance.max)
-                      print("OBJECT DETECTED")
-                      self.endSearch()
+        for instance in ObjectsInBoxes.objects_in_boxes:
+            probability = instance.object.probability
+            print(probability)
+            if(probability>=self.detection_threshold and self.isSearching):
+                self.detected_object_pose = self.getBoundingBoxMidPoint(instance.min, instance.max)
+                print("OBJECT DETECTED")
+                self.endSearch()
 
     def object_search_callback(self, goal_handle):
         self.startSearch()
         starttime = time.time()
         self.get_logger().info('Executing goal...')
         elapsed = 0
-        while (self.isSearching and elapsed<10):
+        while (self.isSearching and elapsed<30):
             elapsed = time.time() - starttime
             pass
         print("done searching")

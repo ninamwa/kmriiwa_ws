@@ -13,9 +13,11 @@ def generate_launch_description():
     object_param = os.path.join(get_package_share_directory('kmr_manipulator'), 'param', 'object_detection.yaml')
     object_model = os.path.join(get_package_share_directory('kmr_manipulator'), 'model', 'circbox.xml')
     multiplecamera_launch_dir = os.path.join(get_package_share_directory('kmr_manipulator'), 'launch')
+    camera_optical_frame_id = LaunchConfiguration('optical_frame_id', default='camera_color_optical_frame')
 
-    camera_base_frame_id = LaunchConfiguration('base_frame_id', default='ManipulatorCamera_link')
-    camera_serial_no_manipulator = LaunchConfiguration('serial_no', default='831612070671')
+
+    camera_base_frame_id = LaunchConfiguration('base_frame_id', default='d435_manipulator_link')
+    camera_serial_no_manipulator = LaunchConfiguration('serial_no', default="'831612070671'")
     
 
     default_rviz = os.path.join(get_package_share_directory('object_analytics_node'), 'launch', 'rviz/default.rviz')
@@ -28,9 +30,10 @@ def generate_launch_description():
     node_namespace="/ManipulatorCamera",
     output='screen',
     parameters=[{'serial_no':camera_serial_no_manipulator, 
-		 #'base_frame_id': camera_base_frame_id,
-		 'infra1.enabled': False,
-		 'infra2.enabled': False}])
+                         'optical_frame_id': camera_optical_frame_id,
+                        'base_frame_id': camera_base_frame_id,
+                        'infra1.enabled': False,
+                        'infra2.enabled': False}])
 
     # OpenVINO Node
     openvinonode = Node(
@@ -53,8 +56,11 @@ def generate_launch_description():
 
     # Object Search Node
     searchnode = Node(
-    package='kmr_manipulator', node_executable='object_search_node.py', node_name='object_search_node',
-    output='screen')
+    package='kmr_manipulator', node_executable='object_detection_node.py', node_name='object_detection_node',
+    output='screen',
+    emulate_tty=True,
+
+    )
 
    # GRipper node:
     grippernode = Node(
@@ -65,13 +71,39 @@ def generate_launch_description():
             parameters=[],
             emulate_tty=True,
             )
+    static_tf_gripper_camera = Node(
+            package='tf2_ros',
+            node_executable='static_transform_publisher',
+            node_name='static_transform_publisher',
+            output='screen',
+            arguments=['-0.03902832457377', '0.071972604504285', '-0.068351201911208','-0.2516176', '-0.6556494', '-0.2718023', '0.6579786', 'gripper_middle_point', 'd435_manipulator_link']
+            #FROM HANDEYE: arguments=['-0.0289927992727699', '0.0824023165622858', '-0.06869676363920808', '0.008927740427062715','0.011256968823999847', '-0.9185240083416109','0.3951040650307494' , 'gripper_middle_point', 'camera_color_optical_frame]
+            )
+
+        # object_analytics_rviz, add to launch description if desired
+    oarviz = Node(
+    package='object_analytics_rviz', node_executable='image_publisher',
+    remappings=[('/object_analytics/rgb', 'ManipulatorCamera/camera/color/image_raw')],)
+    #output='screen')
+
+    oarviz2 = Node(
+    package='object_analytics_rviz', node_executable='marker_publisher',)
+    #output='screen')
+
+    rviz= Node(
+    package='rviz2', node_executable='rviz2', output='screen',
+    arguments=['--display-config', default_rviz])
 
 
     return launch.LaunchDescription([d435_manipulator,
-                                      openvinonode,
-                                      oanode,
-                                      searchnode,
-                                      grippernode,
-                                      IncludeLaunchDescription(
-                                        PythonLaunchDescriptionSource([multiplecamera_launch_dir,'/multiple_cameras.launch.py'])
-                                      )])
+                                      #static_tf_gripper_camera,
+                                      #openvinonode,
+                                      #oanode,
+                                      #searchnode,
+                                      #grippernode,
+                                      #oarviz,
+                                      #oarviz2,
+                                      #rviz,
+                                      #IncludeLaunchDescription(
+                                       # PythonLaunchDescriptionSource([multiplecamera_launch_dir,'/multiple_cameras.launch.py']))
+					])
