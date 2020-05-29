@@ -500,6 +500,71 @@
     </visual>
   </link>
 
+  <joint name="joint_adapter-feste1" type="fixed">
+      <origin rpy="0 0 0" xyz="-0.0425 0 0.0125"/>
+      <parent link="adapter"/>
+      <child link="kamerafeste1"/>
+      <axis xyz="0 0 0"/>
+  </joint>
+  
+  <link name="kamerafeste1">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.01 0.015 0.01"/>
+      </geometry>
+      <material name="aluminum"/>
+    </visual>
+  </link>
+
+  <joint name="joint_adapter-feste2" type="fixed">
+      <origin rpy="0 0 0" xyz="-0.01 0 0.005"/>
+      <parent link="kamerafeste1"/>
+      <child link="kamerafeste2"/>
+      <axis xyz="0 0 0"/>
+  </joint>
+
+  <link name="kamerafeste2">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.01 0.015 0.02"/>
+      </geometry>
+      <material name="aluminum"/>
+    </visual>
+  </link>
+
+  <!-- Manipulator camera, with origin at bottom screw mount -->
+    <joint name="d435_manipulator_joint" type="fixed">
+      <origin xyz="-0.005 0.0 0.005" rpy="0 -1.570796 0"/>
+      <parent link="kamerafeste2"/>
+      <child link="d435_manipulator_link" />
+    </joint>
+
+    <link name="d435_manipulator_link">
+      <visual>
+      <origin xyz="0.0149 0.0 0.0125" rpy="1.570796 0 1.570796 "/>
+        <geometry>
+	        <mesh filename="package://kmr_bringup/meshes/sensors/visual/d435.dae" />
+        </geometry>
+        <material name="aluminum"/>
+      </visual>
+      <collision>
+        <origin xyz="0.0149 0.0 0.0125" rpy="3.1415 1.570796 0 "/>
+        <geometry>
+        <box size="0.02505 0.090 0.025"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <!-- The following are not reliable values, and should not be used for modeling -->
+        <mass value="0.564" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.003881243" ixy="0.0" ixz="0.0" iyy="0.000498940" iyz="0.0" izz="0.003879257" />
+      </inertial>
+    </link>
+    <!--  -->
+
+
   <joint name="joint_adapter-gripper" type="fixed">
       <origin rpy="0 0 0" xyz="0 0 0.0175"/>
       <parent link="adapter"/>
@@ -934,36 +999,6 @@
       <limit lower="0" upper="0.8" velocity="2.0" effort="1000" />
     </joint>
 
-
-    <!-- Manipulator camera, with origin at bottom screw mount -->
-    <joint name="d435_manipulator_joint" type="fixed">
-      <origin xyz="-0.0375 0.0 0.0" rpy="0 -1.570796 0"/>
-      <parent link="adapter"/>
-      <child link="d435_manipulator_link" />
-    </joint>
-
-    <link name="d435_manipulator_link">
-      <visual>
-      <origin xyz="0.0149 0.0 0.0125" rpy="1.570796 0 1.570796 "/>
-        <geometry>
-	        <mesh filename="package://kmr_bringup/meshes/sensors/visual/d435.dae" />
-        </geometry>
-        <material name="aluminum"/>
-      </visual>
-      <collision>
-        <origin xyz="0.0149 0.0 0.0125" rpy="3.1415 1.570796 0 "/>
-        <geometry>
-        <box size="0.02505 0.090 0.025"/>
-        </geometry>
-      </collision>
-      <inertial>
-        <!-- The following are not reliable values, and should not be used for modeling -->
-        <mass value="0.564" />
-        <origin xyz="0 0 0" />
-        <inertia ixx="0.003881243" ixy="0.0" ixz="0.0" iyy="0.000498940" iyz="0.0" izz="0.003879257" />
-      </inertial>
-    </link>
-    <!--  -->
     
     <!-- camera body, with origin at bottom screw mount -->
     <joint name="d435_base_front_joint" type="fixed">
