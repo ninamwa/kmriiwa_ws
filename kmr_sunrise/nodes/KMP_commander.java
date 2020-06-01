@@ -74,7 +74,9 @@ public class KMP_commander extends Node{
 	    	if ((splt[0]).equals("setTwist") && !getEmergencyStop()){
 					setNewVelocity(Commandstr);
 					}
-	    	
+	    	if ((splt[0]).equals("setPose") && !getEmergencyStop()){
+					setNewPose(Commandstr);
+					}
 		}
     }
 	
@@ -83,6 +85,9 @@ public class KMP_commander extends Node{
 			while(isNodeRunning()) {
 				if (getEmergencyStop()){
 					setNewVelocity("vel 0 0 0");
+					if(!(this._currentMotion == null)){
+						this._currentMotion.cancel();
+					}
 					}
 				}
 			}
@@ -116,6 +121,32 @@ public class KMP_commander extends Node{
 						  setisKMPMoving(false);					  }
 				  }
 		}
+	}
+	
+	public void setNewPose(String data){
+		String []lineSplt = data.split(" ");
+		System.out.println(data);
+		if (lineSplt.length==4){
+			double pose_x = Double.parseDouble(lineSplt[1]);
+			double pose_y = Double.parseDouble(lineSplt[2]);
+			double pose_theta = Double.parseDouble(lineSplt[3]);
+		
+			MobilePlatformRelativeMotion MRM = new MobilePlatformRelativeMotion(pose_x, pose_y, pose_theta);
+			MRM.setVelocity(300, 10);
+			MRM.setTimeout(100);
+			MRM.setAcceleration(10, 10);
+			
+			if(kmp.isReadyToMove()) {
+				System.out.println("moving");
+				this._currentMotion =  kmp.moveAsync(MRM);
+			}
+			else {
+				getLogger().warn("Kmp is not ready to move!");
+			}
+		}else{
+			getLogger().info("Unacceptable Mobile Platform Relative Velocity command!");
+		}
+		
 	}
 	
 	public class MonitorKMPCommandConnectionsThread extends Thread {
