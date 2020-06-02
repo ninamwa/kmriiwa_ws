@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="3581e98e-b924-4ed6-b4eb-e0a056cbaf5d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/kmr_navigation2/param/param_TestCamera.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/kmr_navigation2/param/param_TestCamera.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kmr_simulation/models/kmr/model.sdf" beforeDir="false" afterPath="$PROJECT_DIR$/kmr_simulation/models/kmr/model.sdf" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1ZFYH4T1HkwWfQmHkKQfjvmkBZR" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/kuka_manipulator/nodes/gripper" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.testitest">
+    <configuration name="Gripper_node" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="src" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/kuka_manipulator/nodes/gripper" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/kuka_manipulator/nodes/gripper/Gripper_node.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="testitest" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="src" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/kmr_communication/nodes" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/kmr_communication/nodes/testitest.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.testitest" />
+        <item itemvalue="Python.Gripper_node" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3581e98e-b924-4ed6-b4eb-e0a056cbaf5d" name="Default Changelist" comment="" />
+      <created>1584436217404</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1584436217404</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Add clear memory">
+      <created>1586454510851</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1586454510851</updated>
+    </task>
+    <task id="LOCAL-00002" summary="fix import issues. python path must be added to bashrc">
+      <created>1586454589096</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1586454589096</updated>
+    </task>
+    <task id="LOCAL-00003" summary="add __init__.py">
+      <created>1586454628465</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1586454628465</updated>
+    </task>
+    <task id="LOCAL-00004" summary="comments for testing">
+      <created>1586454662430</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1586454662430</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add clear memory" />
+    <MESSAGE value="fix import issues. python path must be added to bashrc" />
+    <MESSAGE value="add __init__.py" />
+    <MESSAGE value="comments for testing" />
+    <MESSAGE value="Merge branch 'behaviortree' of https://github.com/ninamwa/kuka_ws into behaviortree&#10;&#10;# Conflicts:&#10;#&#9;kuka_communication/nodes/lbr_commands_node.py&#10;#&#9;kuka_manipulator/script/gripper_msgs.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merge branch 'behaviortree' of https://github.com/ninamwa/kuka_ws into behaviortree&#10;&#10;# Conflicts:&#10;#&#9;kuka_communication/nodes/lbr_commands_node.py&#10;#&#9;kuka_manipulator/script/gripper_msgs.py" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="67" y="27" width="912" height="873" key="CommitChangelistDialog2" timestamp="1586454929454">
+      <screen x="67" y="27" width="1373" height="873" />
+    </state>
+    <state x="67" y="27" width="912" height="873" key="CommitChangelistDialog2/67.27.1373.873@67.27.1373.873" timestamp="1586454929454" />
+    <state x="167" y="167" width="1153" height="633" key="DiffContextDialog" timestamp="1586454929853">
+      <screen x="67" y="27" width="1373" height="873" />
+    </state>
+    <state x="167" y="167" width="1153" height="633" key="DiffContextDialog/67.27.1373.873@67.27.1373.873" timestamp="1586454929853" />
+    <state x="526" y="241" width="424" height="484" key="FileChooserDialogImpl" timestamp="1586167466029">
+      <screen x="67" y="27" width="1373" height="873" />
+    </state>
+    <state x="526" y="241" width="424" height="484" key="FileChooserDialogImpl/67.27.1373.873@67.27.1373.873" timestamp="1586167466029" />
+    <state width="1350" height="218" key="GridCell.Tab.0.bottom" timestamp="1588683050195">
+      <screen x="67" y="27" width="1373" height="873" />
+    </state>
+    <state width="1350" height="218" key="GridCell.Tab.0.bottom/67.27.1373.873@67.27.1373.873" timestamp="1588683050195" />
+    <state width="1350" height="218" key="GridCell.Tab.0.center" timestamp="1588683050194">
+      <screen x="67" y="27" width="1373" height="873" />
+    </state>
+    <state width="1350" height="218" key="GridCell.Tab.0.center/67.27.1373.873@67.27.1373.873" timestamp="1588683050194" />
+    <state width="1350" height="218" key="GridCell.Tab.0.left" timestamp="1588683050193">
+      <screen x="67" y="27" width="1373" height="873" />
+    </state>
+    <state width="1350" height="218" key="GridCell.Tab.0.left/67.27.1373.873@67.27.1373.873" timestamp="1588683050193" />
+    <state width="1350" height="218" key="GridCell.Tab.0.right" timestamp="1588683050194">
+      <screen x="67" y="27" width="1373" height="873" />
+    </state>
+    <state width="1350" height="218" key="GridCell.Tab.0.right/67.27.1373.873@67.27.1373.873" timestamp="1588683050194" />
+    <state x="199" y="98" width="1098" height="728" key="MergeDialog" timestamp="1588698745739">
+      <screen x="67" y="27" width="1373" height="873" />
+    </state>
+    <state x="199" y="98" width="1098" height="728" key="MergeDialog/67.27.1373.873@67.27.1373.873" timestamp="1588698745739" />
+    <state x="399" y="311" key="com.intellij.ide.util.TipDialog" timestamp="1586167440204">
+      <screen x="67" y="27" width="1373" height="873" />
+    </state>
+    <state x="399" y="311" key="com.intellij.ide.util.TipDialog/67.27.1373.873@67.27.1373.873" timestamp="1586167440204" />
+    <state x="407" y="80" width="683" height="764" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1585830884055">
+      <screen x="67" y="27" width="1373" height="873" />
+    </state>
+    <state x="407" y="80" width="683" height="764" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/67.27.1373.873@67.27.1373.873" timestamp="1585830884055" />
+    <state x="524" y="377" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1588698764855">
+      <screen x="67" y="27" width="1373" height="873" />
+    </state>
+    <state x="524" y="377" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/67.27.1373.873@67.27.1373.873" timestamp="1588698764855" />
+  </component>
+</project>

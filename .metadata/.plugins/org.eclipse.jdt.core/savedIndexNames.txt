@@ -1,0 +1,2 @@
+INDEX VERSION 1.131+/home/charlotte/kuka_eloquent/src/.metadata/.plugins/org.eclipse.jdt.core
+2709146761.index

@@ -1,0 +1,520 @@
+Index: kmr_bringup/urdf/kmr_withD435.urdf
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\"?>\n<robot name=\"kmr\" xmlns:xacro=\"http://ros.org/wiki/xacro\">\n\n  <link name=\"base_footprint\"/>\n\n  <joint name=\"fixed\" type=\"fixed\">\n      <parent link=\"base_footprint\"/>\n      <child link=\"base_link\"/>\n  </joint>\n\n  <material name=\"Orange\">\n    <color rgba=\"1.0 0.4 0.0 1.0\"/>\n  </material>\n  <material name=\"Grey\">\n    <color rgba=\"0.7 0.7 0.7 1.0\"/>\n  </material>\n  <material name=\"DarkGrey\">\n    <color rgba=\"0.3 0.3 0.3 1.0\"/>\n  </material>\n  <material name=\"White\">\n    <color rgba=\"1.0 1.0 1.0 1.0\"/>\n  </material>\n  <material name=\"Black\">\n    <color rgba=\"0.0 0.0 0.0 1.0\"/>\n  </material>\n  <material name=\"Red\">\n    <color rgba=\"1.0 0.0 0.0 1.0\"/>\n  </material>\n  <material name=\"Green\">\n    <color rgba=\"0.0 1.0 0.0 1.0\"/>\n  </material>\n\n  <link name=\"base_link\">\n      <visual>\n        <geometry>\n          <box size=\"1.08 0.63 0.085\"/>\n        </geometry>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 -0.1885\"/>\n        <material name=\"Orange\"/>\n      </visual>\n      <collision>\n        <geometry>\n          <box size=\"1.08 0.63 0.085\"/>\n        </geometry>\n      </collision>\n      <inertial>\n          <mass value=\"55.04\"/>\n          <inertia ixx=\"5.383\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"7.170\" iyz=\"0.0\" izz=\"1.854\"/>\n        </inertial>\n  </link>\n\n  <joint name=\"base_bottom_to_middle_joint\" type=\"fixed\">\n          <parent link=\"base_link\" />\n          <child link=\"base_link_middle\" />\n          <origin xyz=\"0 0 -0.122\" rpy=\"0 0 0\"/>\n  </joint>\n\n  <link name=\"base_link_middle\">\n      <visual>\n        <geometry>\n          <box size=\"0.84 0.48 0.048\"/>\n        </geometry>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0.0\"/>\n        <material name=\"Orange\"/>\n      </visual>\n      <collision>\n        <geometry>\n          <box size=\"0.920 0.51 0.055\"/>\n        </geometry>\n      </collision>\n      <inertial>\n          <mass value=\"18.42\"/>\n          <inertia ixx=\"1.0866\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"1.437\" iyz=\"0.0\" izz=\"0.357\"/>\n      </inertial>\n    </link>\n\n  <joint name=\"base_middle_to_top_joint\" type=\"fixed\">\n          <parent link=\"base_link_middle\" />\n          <child link=\"base_link_top\" />\n          <origin xyz=\"0 0 0.2865\" rpy=\"0 0 0\"/>\n  </joint>\n\n  <link name=\"base_link_top\">\n      <visual>\n        <geometry>\n          <box size=\"1.08 0.63 0.525\"/>\n        </geometry>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0.0\"/>\n        <material name=\"Grey\"/>\n      </visual>\n      <collision>\n        <geometry>\n          <box size=\"1.08 0.63 0.5335\"/>\n        </geometry>\n      </collision>\n      <inertial>\n          <mass value=\"339.96\"/>\n          <inertia ixx=\"39.1077\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"42.397\" iyz=\"0.0\" izz=\"18.238\"/>\n      </inertial>\n  </link>\n\n\n  <joint name=\"laser_B1_joint\" type=\"fixed\">\n          <parent link=\"base_link\" />\n          <child link=\"laser_B1_link\" />\n          <origin xyz=\"0.483 -0.258 -0.112\" rpy=\"0 0 -0.7854\"/>\n  </joint>\n\n  <link name=\"laser_B1_link\">\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"3.1413 0 0\"/>\n        <geometry>\n            <mesh filename=\"package://kmr_bringup/meshes/sensors/visual/sick_lms1xx.dae\" />\n        </geometry>\n        <material name=\"dark\"/>\n      </visual>\n      <collision>\n          <origin xyz=\"0.0 0 0.0\" rpy=\"0 0 0\"/>\n          <geometry>\n              <mesh filename=\"package://kmr_bringup/meshes/sensors/collision/sick_lms1xx.stl\" />\n          </geometry>\n      </collision>\n      <inertial>\n          <mass value=\"1.2\"/>\n          <inertia ixx=\"0.002355\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"0.002355\" iyz=\"0.0\" izz=\"0.0002809\"/>\n      </inertial>\n  </link>\n\n  <joint name=\"laser_B4_joint\" type=\"fixed\">\n          <parent link=\"base_link\" />\n          <child link=\"laser_B4_link\" />\n          <origin xyz=\"-0.483 0.258 -0.112\" rpy=\"0 0 2.3562\"/>\n  </joint>\n\n  <link name=\"laser_B4_link\">\n      <visual>\n        <origin xyz=\"0.0 0 0\" rpy=\"0 3.1413 3.1413\"/>\n        <geometry>\n            <mesh filename=\"package://kmr_bringup/meshes/sensors/visual/sick_lms1xx.dae\" />\n        </geometry>\n        <material name=\"dark\"/>\n      </visual>\n      <collision>\n          <origin xyz=\"0 0 0\" rpy=\"0 0 0\"/>\n          <geometry>\n                <mesh filename=\"package://kmr_bringup/meshes/sensors/collision/sick_lms1xx.stl\" />\n          </geometry>\n      </collision>\n      <inertial>\n          <mass value=\"1.2\"/>\n          <inertia ixx=\"0.002355\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"0.002355\" iyz=\"0.0\" izz=\"0.0002809\"/>\n      </inertial>\n  </link>\n\n  <link name=\"front_left_wheel_link\">\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/wheels/omni_wheel_1.dae\" />\n        </geometry>\n      </visual>\n      <collision>\n        <geometry>\n          <cylinder length=\"0.175\" radius=\"0.125\" />\n        </geometry>\n      </collision>\n\n      <inertial>\n        <mass value=\"6.5\" />\n        <origin xyz=\"0 0 0\" />\n        <inertia ixx=\"0.04197\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"0.0508\" iyz=\"0.0\" izz=\"0.04197\"/>\n      </inertial>\n  </link>\n\n  <link name=\"front_right_wheel_link\">\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/wheels/omni_wheel_1.dae\" />\n        </geometry>\n      </visual>\n      <collision>\n        <geometry>\n          <cylinder length=\"0.175\" radius=\"0.125\" />\n        </geometry>\n      </collision>\n\n      <inertial>\n        <mass value=\"6.5\" />\n        <origin xyz=\"0 0 0\" />\n        <inertia ixx=\"0.04197\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"0.0508\" iyz=\"0.0\" izz=\"0.04197\"/>\n      </inertial>\n  </link>\n\n  <link name=\"back_left_wheel_link\">\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/wheels/omni_wheel_1.dae\" />\n        </geometry>\n      </visual>\n      <collision>\n        <geometry>\n          <cylinder length=\"0.175\" radius=\"0.125\" />\n        </geometry>\n      </collision>\n\n      <inertial>\n        <mass value=\"6.5\" />\n        <origin xyz=\"0 0 0\" />\n        <inertia ixx=\"0.04197\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"0.0508\" iyz=\"0.0\" izz=\"0.04197\"/>\n      </inertial>\n  </link>\n\n  <link name=\"back_right_wheel_link\">\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/wheels/omni_wheel_1.dae\" />\n        </geometry>\n      </visual>\n      <collision>\n        <geometry>\n          <cylinder length=\"0.175\" radius=\"0.125\" />\n        </geometry>\n      </collision>\n\n      <inertial>\n        <mass value=\"6.5\" />\n        <origin xyz=\"0 0 0\" />\n        <inertia ixx=\"0.04197\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"0.0508\" iyz=\"0.0\" izz=\"0.04197\"/>\n      </inertial>\n  </link>\n\n  <joint name=\"front_left_wheel_joint\" type=\"fixed\">\n      <parent link=\"base_link\"/>\n      <child link=\"front_left_wheel_link\"/>\n      <axis xyz=\"0 1 0\"/>\n      <origin xyz=\"0.28 0.1825 -0.135\"/>\n      <limit effort=\"100\" velocity=\"100\"/>\n      <joint_properties damping=\"0.0\" friction=\"0.0\"/>\n  </joint>\n\n  <joint name=\"front_right_wheel_joint\" type=\"fixed\">\n      <parent link=\"base_link\"/>\n      <child link=\"front_right_wheel_link\"/>\n      <origin xyz=\"0.28 -0.1825 -0.135\"/>\n      <axis xyz=\"0 1 0\"/>\n      <limit effort=\"100\" velocity=\"100\"/>\n      <joint_properties damping=\"0.0\" friction=\"0.0\"/>\n  </joint>\n\n  <joint name=\"back_left_wheel_joint\" type=\"fixed\">\n      <parent link=\"base_link\"/>\n      <child link=\"back_left_wheel_link\"/>\n      <origin xyz=\"-0.28 0.1825 -0.135\"/>\n      <axis xyz=\"0 1 0\"/>\n      <limit effort=\"100\" velocity=\"100\"/>\n      <joint_properties damping=\"0.0\" friction=\"0.0\"/>\n  </joint>\n\n  <joint name=\"back_right_wheel_joint\" type=\"fixed\">\n      <parent link=\"base_link\"/>\n      <child link=\"back_right_wheel_link\"/>\n      <origin xyz=\"-0.28 -0.1825 -0.135\"/>\n      <axis xyz=\"0 1 0\"/>\n      <limit effort=\"100\" velocity=\"100\"/>\n      <joint_properties damping=\"0.0\" friction=\"0.0\"/>\n  </joint>\n\n      <joint name=\"base_link-to-iiwa\" type=\"fixed\">\n      <origin rpy=\"0 0 -1.5708\" xyz=\"0.363 -0.184 0.2625\"/>\n      <parent link=\"base_link_top\"/>\n      <child link=\"base_iiwa\"/>\n  </joint>\n\n  <link name=\"base_iiwa\">\n      <inertial>\n        <origin xyz=\"-0.1 0 0.07\" rpy=\"0 0 0\"/>\n        <mass value=\"5\"/>\n        <inertia ixx=\"0.05\"  ixy=\"0\"  ixz=\"0\" iyy=\"0.06\" iyz=\"0\" izz=\"0.03\" />\n      </inertial>\n      <visual>\n        <origin rpy=\"0.0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/base_link.dae\"/>\n        </geometry>\n      </visual>\n      <collision>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/base_link.stl\"/>\n        </geometry>\n      </collision>\n  </link>\n  <link name=\"link_1\">\n      <inertial>\n        <origin xyz=\"0 -0.03 0.12\" rpy=\"0 0 0\"/>\n        <mass value=\"4\"/>\n        <inertia ixx=\"0.1\"  ixy=\"0\"  ixz=\"0\" iyy=\"0.09\" iyz=\"0\" izz=\"0.02\" />\n      </inertial>\n      <visual>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_1.dae\"/>\n        </geometry>\n      </visual>\n      <collision>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_1.stl\"/>\n        </geometry>\n      </collision>\n  </link>\n  <link name=\"link_2\">\n      <inertial>\n        <origin xyz=\"0.0003 0.059 0.042\" rpy=\"0 0 0\"/>\n        <mass value=\"4\"/>\n        <inertia ixx=\"0.05\"  ixy=\"0\"  ixz=\"0\" iyy=\"0.018\" iyz=\"0\" izz=\"0.044\" />\n      </inertial>\n      <visual>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_2.dae\"/>\n        </geometry>\n      </visual>\n      <collision>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_2.stl\"/>\n        </geometry>\n      </collision>\n  </link>\n  <link name=\"link_3\">\n      <inertial>\n        <origin xyz=\"0 0.03 0.13\" rpy=\"0 0 0\"/>\n        <mass value=\"3\"/>\n        <inertia ixx=\"0.08\"  ixy=\"0\"  ixz=\"0\" iyy=\"0.075\" iyz=\"0\" izz=\"0.01\" />\n      </inertial>\n      <visual>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_3.dae\"/>\n        </geometry>\n      </visual>\n      <collision>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_3.stl\"/>\n        </geometry>\n      </collision>\n  </link>\n  <link name=\"link_4\">\n      <inertial>\n        <origin xyz=\"0 0.067 0.034\" rpy=\"0 0 0\"/>\n        <mass value=\"2.7\"/>\n        <inertia ixx=\"0.03\"  ixy=\"0\"  ixz=\"0\" iyy=\"0.01\" iyz=\"0\" izz=\"0.029\" />\n      </inertial>\n      <visual>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_4.dae\"/>\n        </geometry>\n      </visual>\n      <collision>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_4.stl\"/>\n        </geometry>\n      </collision>\n  </link>\n  <link name=\"link_5\">\n      <inertial>\n        <origin xyz=\"0.0001 0.021 0.076\" rpy=\"0 0 0\"/>\n        <mass value=\"1.7\"/>\n        <inertia ixx=\"0.02\"  ixy=\"0\"  ixz=\"0\" iyy=\"0.018\" iyz=\"0\" izz=\"0.005\" />\n      </inertial>\n      <visual>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_5.dae\"/>\n        </geometry>\n      </visual>\n      <collision>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_5.stl\"/>\n        </geometry>\n      </collision>\n  </link>\n  <link name=\"link_6\">\n      <inertial>\n        <origin xyz=\"0 0.0006 0.0004\" rpy=\"0 0 0\"/>\n        <mass value=\"1.8\"/>\n        <inertia ixx=\"0.005\"  ixy=\"0\"  ixz=\"0\" iyy=\"0.0036\" iyz=\"0\" izz=\"0.0047\" />\n      </inertial>\n      <visual>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_6.dae\"/>\n        </geometry>\n      </visual>\n      <collision>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_6.stl\"/>\n        </geometry>\n      </collision>\n  </link>\n  <link name=\"link_7\">\n      <inertial>\n        <origin xyz=\"0 0 0.02\" rpy=\"0 0 0\"/>\n        <mass value=\"0.3\"/>\n        <inertia ixx=\"0.001\"  ixy=\"0\"  ixz=\"0\" iyy=\"0.001\" iyz=\"0\" izz=\"0.001\" />\n      </inertial>\n      <visual>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/visual/link_7.dae\"/>\n        </geometry>\n      </visual>\n      <collision>\n        <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/lbr_iiwa_14_r820/collision/link_7.stl\"/>\n        </geometry>\n      </collision>\n  </link>\n  <link name=\"tool0\"/>\n\n  <joint name=\"joint_a1\" type=\"revolute\">\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n      <parent link=\"base_iiwa\"/>\n      <child link=\"link_1\"/>\n      <axis xyz=\"0 0 1\"/>\n      <limit effort=\"0\" lower=\"-2.9668\" upper=\"2.9668\" velocity=\"1.4834\"/>\n  </joint>\n  <joint name=\"joint_a2\" type=\"revolute\">\n      <origin rpy=\"0 0 0\" xyz=\"-0.00043624 0 0.36\"/>\n      <parent link=\"link_1\"/>\n      <child link=\"link_2\"/>\n      <axis xyz=\"0 1 0\"/>\n      <limit effort=\"0\" lower=\"-2.0942\" upper=\"2.0942\" velocity=\"1.4834\"/>\n  </joint>\n  <joint name=\"joint_a3\" type=\"revolute\">\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n      <parent link=\"link_2\"/>\n      <child link=\"link_3\"/>\n      <axis xyz=\"0 0 1\"/>\n      <limit effort=\"0\" lower=\"-2.9668\" upper=\"2.9668\" velocity=\"1.7452\"/>\n  </joint>\n  <joint name=\"joint_a4\" type=\"revolute\">\n      <origin rpy=\"0 0 0\" xyz=\"0.00043624 0 0.42\"/>\n      <parent link=\"link_3\"/>\n      <child link=\"link_4\"/>\n      <axis xyz=\"0 -1 0\"/>\n      <limit effort=\"0\" lower=\"-2.0942\" upper=\"2.0942\" velocity=\"1.3089\"/>\n  </joint>\n  <joint name=\"joint_a5\" type=\"revolute\">\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n      <parent link=\"link_4\"/>\n      <child link=\"link_5\"/>\n      <axis xyz=\"0 0 1\"/>\n      <limit effort=\"0\" lower=\"-2.9668\" upper=\"2.9668\" velocity=\"2.2688\"/>\n  </joint>\n  <joint name=\"joint_a6\" type=\"revolute\">\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0.4\"/>\n      <parent link=\"link_5\"/>\n      <child link=\"link_6\"/>\n      <axis xyz=\"0 1 0\"/>\n      <limit effort=\"0\" lower=\"-2.0942\" upper=\"2.0942\" velocity=\"2.356\"/>\n  </joint>\n  <joint name=\"joint_a7\" type=\"revolute\">\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0\"/>\n      <parent link=\"link_6\"/>\n      <child link=\"link_7\"/>\n      <axis xyz=\"0 0 1\"/>\n      <limit effort=\"0\" lower=\"-3.0541\" upper=\"3.0541\" velocity=\"2.356\"/>\n  </joint>\n  <joint name=\"joint_a7-tool0\" type=\"fixed\">\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0.126\"/>\n      <parent link=\"link_7\"/>\n      <child link=\"tool0\"/>\n      <axis xyz=\"0 0 0\"/>\n  </joint>\n\n  <joint name=\"joint_a7-gripper\" type=\"fixed\">\n      <origin rpy=\"0 0 0\" xyz=\"0 0 0.126\"/>\n      <parent link=\"link_7\"/>\n      <child link=\"gripper_base_link\"/>\n      <axis xyz=\"0 0 0\"/>\n  </joint>\n\n\n  <link name=\"gripper_base_link\">\n    <inertial>\n      <origin\n        xyz=\"0.00021987 -2.3546E-10 0.030163\"\n        rpy=\"0 0 0\" />\n      <mass value=\"0.30915\" />\n      <inertia\n        ixx=\"0.00028972\"\n        ixy=\"-5.7879E-10\"\n        ixz=\"-1.8543E-06\"\n        iyy=\"0.00030737\"\n        iyz=\"1.682E-12\"\n        izz=\"0.00019914\" />\n    </inertial>\n    <visual>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_base_link.dae\" scale=\"0.001 0.001 0.001\"/>\n      </geometry>\n      <material name=\"\">\n        <color rgba=\"0.1 0.1 0.1 1\" />\n      </material>\n    </visual>\n    <collision>\n      <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      <geometry>\n        <mesh filename=\"package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_base_link.stl\" />\n      </geometry>\n    </collision>\n  </link>\n\n  <joint name=\"right_outer_knuckle_joint\" type=\"fixed\">\n      <origin xyz=\"0 0.0306011 0.054904\" rpy=\"0 0 0\"/>\n      <parent link=\"gripper_base_link\" />\n      <child link=\"right_outer_knuckle\" />\n      <axis xyz=\"1 0 0\" />\n      <limit lower=\"0\" upper=\"0.81\" velocity=\"2.0\" effort=\"1000\" />\n    </joint>\n\n    <link name=\"left_outer_knuckle\">\n      <inertial>\n        <origin\n          xyz=\"0.0178331863169983 3.68915177224286E-11 0.0021442477325704\"\n          rpy=\"0 0 0\" />\n        <mass\n          value=\"0.00684838849434396\" />\n        <inertia\n          ixx=\"2.66832029033166E-07\"\n          ixy=\"1.66142314639824E-15\"\n          ixz=\"1.45945633322873E-07\"\n          iyy=\"1.3889233257419E-06\"\n          iyz=\"2.82951161241588E-15\"\n          izz=\"1.26603336914415E-06\" />\n      </inertial>\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_outer_knuckle.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n        <material name=\"\">\n          <color rgba=\"0.792156862745098 0.819607843137255 0.933333333333333 1\" />\n        </material>\n      </visual>\n      <collision>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_outer_knuckle.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n      </collision>\n    </link>\n    <link name=\"right_outer_knuckle\">\n      <inertial>\n        <origin\n          xyz=\"0.0178097074051638 3.60493211424024E-11 0.00233123458346721\"\n          rpy=\"0 0 0\" />\n        <mass\n          value=\"0.00684838849401352\" />\n        <inertia\n          ixx=\"2.70004361573169E-07\"\n          ixy=\"1.59579467624491E-15\"\n          ixz=\"1.56396493788199E-07\"\n          iyy=\"1.38892332558312E-06\"\n          iyz=\"2.82357800318817E-15\"\n          izz=\"1.26286103637978E-06\" />\n      </inertial>\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_outer_knuckle.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n        <material name=\"\">\n          <color rgba=\"0.792156862745098 0.819607843137255 0.933333333333333 1\" />\n        </material>\n      </visual>\n      <collision>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_outer_knuckle.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n      </collision>\n    </link>\n\n    <link name=\"left_outer_finger\">\n      <inertial>\n        <origin\n          xyz=\"0.00131451599174296 2.88942057994543E-15 0.0215404163180413\"\n          rpy=\"0 0 0\" />\n        <mass\n          value=\"0.0273093985570947\" />\n        <inertia\n          ixx=\"8.51629628283022E-06\"\n          ixy=\"2.58174336207405E-19\"\n          ixz=\"3.83829504344079E-07\"\n          iyy=\"6.9133328065108E-06\"\n          iyz=\"-7.58589926143789E-19\"\n          izz=\"2.25006832221981E-06\" />\n      </inertial>\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_outer_finger.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n        <material name=\"\">\n          <color rgba=\"0.1 0.1 0.1 1\" />\n        </material>\n      </visual>\n      <collision>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_outer_finger.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n      </collision>\n    </link>\n\n    <link name=\"right_outer_finger\">\n      <inertial>\n        <origin\n          xyz=\"0.00108844269639009 -2.611488350845E-15 0.0215530225245502\"\n          rpy=\"0 0 0\" />\n        <mass\n          value=\"0.0273093985570947\" />\n        <inertia\n          ixx=\"8.52366028592721E-06\"\n          ixy=\"3.41683380899422E-19\"\n          ixz=\"3.18003675694284E-07\"\n          iyy=\"6.91333280651081E-06\"\n          iyz=\"7.37726682706417E-19\"\n          izz=\"2.24270431912283E-06\" />\n      </inertial>\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_outer_finger.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n        <material name=\"\">\n          <color rgba=\"0.1 0.1 0.1 1\" />\n        </material>\n      </visual>\n      <collision>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_outer_finger.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n      </collision>\n    </link>\n\n    <link name=\"left_inner_knuckle\">\n      <inertial>\n        <origin\n          xyz=\"0.017097546626628 -3.93808524389535E-10 0.0224918438201868\"\n          rpy=\"0 0 0\" />\n        <mass\n          value=\"0.0110930853895903\" />\n        <inertia\n          ixx=\"4.23392770691541E-06\"\n          ixy=\"5.748978936968E-15\"\n          ixz=\"1.78855677119788E-06\"\n          iyy=\"3.96548790524392E-06\"\n          iyz=\"1.05464666369669E-14\"\n          izz=\"3.24068002883007E-06\" />\n      </inertial>\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_inner_knuckle.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n        <material name=\"\">\n          <color rgba=\"0.1 0.1 0.1 1\" />\n        </material>\n      </visual>\n      <collision>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_inner_knuckle.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n      </collision>\n    </link>\n\n    <link name=\"right_inner_knuckle\">\n      <inertial>\n        <origin\n          xyz=\"0.0168606186773776 3.93808471820465E-10 0.0226699950793434\"\n          rpy=\"0 0 0\" />\n        <mass\n          value=\"0.0110930853895903\" />\n        <inertia\n          ixx=\"4.27134775939882E-06\"\n          ixy=\"-8.53568456728898E-15\"\n          ixz=\"1.77774229944246E-06\"\n          iyy=\"3.96548790524392E-06\"\n          iyz=\"-8.45108024914164E-15\"\n          izz=\"3.20325997634666E-06\" />\n      </inertial>\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_inner_knuckle.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n        <material name=\"\">\n          <color rgba=\"0.1 0.1 0.1 1\" />\n        </material>\n      </visual>\n      <collision>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_inner_knuckle.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n      </collision>\n    </link>\n\n    <link name=\"left_inner_finger\">\n      <inertial>\n        <origin\n          xyz=\"0.0060275613594574 -6.29183141465421E-15 0.00669925693133241\"\n          rpy=\"0 0 0\" />\n        <mass\n          value=\"0.00724255346165745\" />\n        <inertia\n          ixx=\"1.47824274053603E-06\"\n          ixy=\"-3.94884463570303E-19\"\n          ixz=\"-3.45268847648622E-07\"\n          iyy=\"1.70064480838395E-06\"\n          iyz=\"3.5059838910097E-19\"\n          izz=\"4.77151336838364E-07\" />\n      </inertial>\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_inner_finger.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n        <material name=\"\">\n          <color rgba=\"0.1 0.1 0.1 1\" />\n        </material>\n      </visual>\n      <collision>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_inner_finger.dae\" scale=\"0.001 0.001 0.001\" />\n        </geometry>\n      </collision>\n    </link>\n\n    <link name=\"right_inner_finger\">\n      <inertial>\n        <origin\n          xyz=\"0.00602756228812038 -6.47284509480176E-15 0.00669925609578108\"\n          rpy=\"0 0 0\" />\n        <mass\n          value=\"0.00724255346165744\" />\n        <inertia\n          ixx=\"1.47824283625957E-06\"\n          ixy=\"-3.95952064019123E-19\"\n          ixz=\"-3.45268708875543E-07\"\n          iyy=\"1.70064480838394E-06\"\n          iyz=\"3.55286507960029E-19\"\n          izz=\"4.77151241114822E-07\" />\n      </inertial>\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/visual/robotiq_arg2f_85_inner_finger.dae\" scale=\"0.001 0.001 0.001\"/>\n        </geometry>\n        <material name=\"\">\n          <color rgba=\"0.1 0.1 0.1 1\" />\n        </material>\n      </visual>\n      <collision>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <mesh filename=\"package://kmr_bringup/meshes/gripper/collision/robotiq_arg2f_85_inner_finger.dae\" scale=\"0.001 0.001 0.001\" />\n        </geometry>\n      </collision>\n    </link>\n\n   <!-- Finger pad link, the default are the \"big pads\" with rubber-->\n    <link name=\"left_inner_finger_pad\">\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <box size=\"0.022 0.00635 0.0375\"/>\n        </geometry>\n        <material name=\"\">\n          <color rgba=\"0.9 0.9 0.9 1\" />\n        </material>\n      </visual>\n      <collision>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n           <box size=\"0.022 0.00635 0.0375\"/>\n        </geometry>\n        <material name=\"\">\n          <color rgba=\"0.9 0.0 0.0 1\" />\n        </material>\n      </collision>\n      <inertial>\n          <mass value=\"0.019555\" />\n          <origin xyz=\"0.0 0.0 0.0\" />\n          <inertia ixx = \"0.000002\" ixy = \"0.000000\" ixz = \"0.000000\"\n                    iyx = \"0.000000\" iyy = \"0.000005\" iyz = \"0.000000\"\n                    izx = \"0.000000\" izy = \"0.000000\" izz = \"0.000006\" />\n      </inertial>\n    </link>\n    <link name=\"right_inner_finger_pad\">\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n          <box size=\"0.022 0.00635 0.0375\"/>\n        </geometry>\n        <material name=\"\">\n          <color rgba=\"0.9 0.9 0.9 1\" />\n        </material>\n      </visual>\n      <collision>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n        <geometry>\n           <box size=\"0.022 0.00635 0.0375\"/>\n        </geometry>\n        <material name=\"\">\n          <color rgba=\"0.9 0.0 0.0 1\" />\n        </material>\n      </collision>\n      <inertial>\n        <mass value=\"0.019555\" />\n        <origin xyz=\"0.0 0.0 0.0\" />\n        <inertia ixx = \"0.000002\" ixy = \"0.000000\" ixz = \"0.000000\"\n                  iyx = \"0.000000\" iyy = \"0.000005\" iyz = \"0.000000\"\n                  izx = \"0.000000\" izy = \"0.000000\" izz = \"0.000006\" />\n      </inertial>\n    </link>\n\n    <link name=\"gripper_middle_point\">\n      <visual>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      </visual>\n      <collision>\n        <origin xyz=\"0 0 0\" rpy=\"0 0 0\" />\n      </collision>\n    </link>\n\n    <joint name=\"left_outer_finger_joint\" type=\"fixed\">\n      <origin xyz=\"0 0.0315 -0.0041\" rpy=\"0 0 0\"/>\n      <parent link=\"left_outer_knuckle\" />\n      <child link=\"left_outer_finger\" />\n      <axis xyz=\"1 0 0\" />\n    </joint>\n\n    <joint name=\"right_outer_finger_joint\" type=\"fixed\">\n      <origin xyz=\"0 0.0315 -0.0041\" rpy=\"0 0 0\"/>\n      <parent link=\"right_outer_knuckle\" />\n      <child link=\"right_outer_finger\" />\n      <axis xyz=\"1 0 0\" />\n    </joint>\n\n    <joint name=\"left_inner_knuckle_joint\" type=\"fixed\">\n      <origin xyz=\"0 -0.0127 0.06142\" rpy=\"0 0 3.1415\"/>\n      <parent link=\"gripper_base_link\" />\n      <child link=\"left_inner_knuckle\" />\n      <axis xyz=\"1 0 0\" />\n      <limit lower=\"0\" upper=\"0.8757\" velocity=\"2.0\" effort=\"1000\" />\n    </joint>\n\n    <joint name=\"right_inner_knuckle_joint\" type=\"fixed\">\n      <origin xyz=\"0 0.0127 0.06142\" rpy=\"0 0 0\"/>\n      <parent link=\"gripper_base_link\" />\n      <child link=\"right_inner_knuckle\" />\n      <axis xyz=\"1 0 0\" />\n      <limit lower=\"0\" upper=\"0.8757\" velocity=\"2.0\" effort=\"1000\" />\n    </joint>\n\n    <joint name=\"left_inner_finger_joint\" type=\"fixed\">\n      <origin xyz=\"0 0.0061 0.0471\" rpy=\"0 0 0\"/>\n      <parent link=\"left_outer_finger\" />\n      <child link=\"left_inner_finger\" />\n      <axis xyz=\"1 0 0\" />\n      <limit lower=\"0\" upper=\"0.8757\" velocity=\"2.0\" effort=\"1000\" />\n    </joint>\n\n    <joint name=\"right_inner_finger_joint\" type=\"fixed\">\n      <origin xyz=\"0 0.0061 0.0471\" rpy=\"0 0 0\"/>\n      <parent link=\"right_outer_finger\" />\n      <child link=\"right_inner_finger\" />\n      <axis xyz=\"1 0 0\" />\n      <limit lower=\"0\" upper=\"0.8757\" velocity=\"2.0\" effort=\"1000\" />\n    </joint>\n\n\n    <joint name=\"left_inner_finger_pad_joint\" type=\"fixed\">\n      <origin xyz=\"0 -0.0220203446692936 0.03242\" rpy=\"0 0 0\"/>\n      <parent link=\"left_inner_finger\" />\n      <child link=\"left_inner_finger_pad\" />\n      <axis xyz=\"0 0 1\" />\n    </joint>\n\n    <joint name=\"right_inner_finger_pad_joint\" type=\"fixed\">\n      <origin xyz=\"0 -0.0220203446692936 0.03242\" rpy=\"0 0 0\"/>\n      <parent link=\"right_inner_finger\" />\n      <child link=\"right_inner_finger_pad\" />\n      <axis xyz=\"0 0 1\" />\n    </joint>\n\n    <joint name=\"finger_joint\" type=\"fixed\">\n      <origin xyz=\"0 -0.0306011 0.054904\" rpy=\"0 0 3.1415\"/>\n      <parent link=\"gripper_base_link\" />\n      <child link=\"left_outer_knuckle\" />\n      <axis xyz=\"1 0 0\" />\n      <limit lower=\"0\" upper=\"0.8\" velocity=\"2.0\" effort=\"1000\" />\n    </joint>\n\n\n    <material name=\"aluminum\">\n      <color rgba=\"0.5 0.5 0.5 1\"/>\n    </material>\n    <!-- camera body, with origin at bottom screw mount -->\n    <joint name=\"d435_joint\" type=\"fixed\">\n      <origin xyz=\"0.483 0.0 0.2625\" rpy=\"0 0 0\"/>\n      <parent link=\"base_link_top\"/>\n      <child link=\"camera_link\" />\n    </joint>\n\n    <link name=\"d435_link\">\n      <visual>\n      <origin xyz=\"0.0149 0.0 0.0125\" rpy=\"1.570796 0 1.570796\"/>\n        <geometry>\n\t        <mesh filename=\"package://kmr_bringup/meshes/sensors/visual/d435.dae\" />\n        </geometry>\n        <material name=\"aluminum\"/>\n      </visual>\n      <collision>\n        <origin xyz=\"0.0 0.0 0.0125\" rpy=\"0 0 0\"/>\n        <geometry>\n        <box size=\"0.02505 0.090 0.025\"/>\n        </geometry>\n      </collision>\n      <inertial>\n        <!-- The following are not reliable values, and should not be used for modeling -->\n        <mass value=\"0.564\" />\n        <origin xyz=\"0 0 0\" />\n        <inertia ixx=\"0.003881243\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"0.000498940\" iyz=\"0.0\" izz=\"0.003879257\" />\n      </inertial>\n    </link>\n   \n    <!-- camera depth joints and links -->\n    <joint name=\"camera_depth_joint\" type=\"fixed\">\n      <origin xyz=\"0.0149 -0.0075 0.0125\" rpy=\"0 0 0\"/>\n      <parent link=\"camera_link\"/>\n      <child link=\"camera_depth_frame\" />\n    </joint>\n    <link name=\"camera_depth_frame\"/>\n\n    <joint name=\"camera_depth_optical_joint\" type=\"fixed\">\n      <origin xyz=\"0 0 0\" rpy=\"-1.570796 0 -1.570796\" />\n      <parent link= \"camera_depth_frame\" />\n      <child link=\"camera_depth_optical_frame\" />\n    </joint>\n    <link name=\"camera_depth_optical_frame\"/>\n      \n    <!-- camera left IR joints and links -->\n    <joint name=\"camera_left_ir_joint\" type=\"fixed\">\n      <origin xyz=\"0 -0.025 0\" rpy=\"0 0 0\" />\n      <parent link=\"camera_depth_frame\" />\n      <child link=\"camera_left_ir_frame\" />\n    </joint>\n    <link name=\"camera_left_ir_frame\"/>\n\n    <joint name=\"camera_left_ir_optical_joint\" type=\"fixed\">\n      <origin xyz=\"0 0 0\" rpy=\"-1.570796 0 -1.570796\" />\n      <parent link=\"camera_left_ir_frame\" />\n      <child link=\"camera_left_ir_optical_frame\" />\n    </joint>\n    <link name=\"camera_left_ir_optical_frame\"/>\n\n    <!-- camera right IR joints and links -->\n    <joint name=\"camera_right_ir_joint\" type=\"fixed\">\n      <origin xyz=\"0 0.025 0\" rpy=\"0 0 0\" />\n      <parent link=\"camera_depth_frame\" />\n      <child link=\"camera_right_ir_frame\" />\n    </joint>\n    <link name=\"camera_right_ir_frame\"/>\n\n    <joint name=\"camera_right_ir_optical_joint\" type=\"fixed\">\n      <origin xyz=\"0 0 0\" rpy=\"-1.570796 0 -1.570796\" />\n      <parent link=\"camera_right_ir_frame\" />\n      <child link=\"camera_right_ir_optical_frame\" />\n    </joint>\n    <link name=\"camera_right_ir_optical_frame\"/>\n\n    <!-- camera fisheye joints and links -->\n    <joint name=\"camera_fisheye_joint\" type=\"fixed\">\n      <origin xyz=\"0 0.040 0\" rpy=\"0 0 0\" />\n      <parent link=\"camera_depth_frame\" />\n      <child link=\"camera_fisheye_frame\" />\n    </joint>\n    <link name=\"camera_fisheye_frame\"/>\n\n    <joint name=\"camera_fisheye_optical_joint\" type=\"fixed\">\n      <origin xyz=\"0 0 0\" rpy=\"-1.570796 0 -1.570796\" />\n      <parent link=\"camera_fisheye_frame\" />\n      <child link=\"camera_fisheye_optical_frame\" />\n    </joint>\n    <link name=\"camera_fisheye_optical_frame\"/>\n\n\n</robot>\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- kmr_bringup/urdf/kmr_withD435.urdf	(revision 0b560713392c601819a4fb2a5211e452e6c0d7fe)
++++ kmr_bringup/urdf/kmr_withD435.urdf	(date 1587028701091)
+@@ -842,15 +842,6 @@
+       </inertial>
+     </link>
+ 
+-    <link name="gripper_middle_point">
+-      <visual>
+-        <origin xyz="0 0 0" rpy="0 0 0" />
+-      </visual>
+-      <collision>
+-        <origin xyz="0 0 0" rpy="0 0 0" />
+-      </collision>
+-    </link>
+-
+     <joint name="left_outer_finger_joint" type="fixed">
+       <origin xyz="0 0.0315 -0.0041" rpy="0 0 0"/>
+       <parent link="left_outer_knuckle" />
+@@ -928,7 +919,7 @@
+     <joint name="d435_joint" type="fixed">
+       <origin xyz="0.483 0.0 0.2625" rpy="0 0 0"/>
+       <parent link="base_link_top"/>
+-      <child link="camera_link" />
++      <child link="d435_link" />
+     </joint>
+ 
+     <link name="d435_link">
+@@ -956,7 +947,7 @@
+     <!-- camera depth joints and links -->
+     <joint name="camera_depth_joint" type="fixed">
+       <origin xyz="0.0149 -0.0075 0.0125" rpy="0 0 0"/>
+-      <parent link="camera_link"/>
++      <parent link="d435_link"/>
+       <child link="camera_depth_frame" />
+     </joint>
+     <link name="camera_depth_frame"/>
+Index: kmr_navigation2/param/param_TestCamera.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>amcl:\n  ros__parameters:\n    use_sim_time: True\n    alpha1: 0.2\n    alpha2: 0.2\n    alpha3: 0.2\n    alpha4: 0.2\n    alpha5: 0.2\n    base_frame_id: \"base_footprint\"\n    beam_skip_distance: 0.5\n    beam_skip_error_threshold: 0.9\n    beam_skip_threshold: 0.3\n    do_beamskip: false\n    global_frame_id: \"map\"\n    lambda_short: 0.1\n    laser_likelihood_max_dist: 2.0\n    laser_max_range: 100.0\n    laser_min_range: -1.0\n    laser_model_type: \"likelihood_field\"\n    max_beams: 60\n    max_particles: 2000\n    min_particles: 500\n    odom_frame_id: \"odom\"\n    pf_err: 0.05\n    pf_z: 0.99\n    recovery_alpha_fast: 0.0\n    recovery_alpha_slow: 0.0\n    resample_interval: 1\n    robot_model_type: \"omnidirectional\"\n    save_pose_rate: 0.5\n    sigma_hit: 0.2\n    tf_broadcast: true\n    transform_tolerance: 1.0\n    update_min_a: 0.2\n    update_min_d: 0.25\n    z_hit: 0.5\n    z_max: 0.05\n    z_rand: 0.5\n    z_short: 0.05\n\namcl_map_client:\n  ros__parameters:\n    use_sim_time: True\n\namcl_rclcpp_node:\n  ros__parameters:\n    use_sim_time: True\n\nbt_navigator:\n  ros__parameters:\n    use_sim_time: True\n    bt_xml_filename: \"navigate_w_replanning.xml\"\n    plugin_lib_names:\n    - nav2_compute_path_to_pose_action_bt_node\n    - nav2_follow_path_action_bt_node\n    - nav2_back_up_action_bt_node\n    - nav2_spin_action_bt_node\n    - nav2_wait_action_bt_node\n    - nav2_clear_costmap_service_bt_node\n    - nav2_is_stuck_condition_bt_node\n    - nav2_goal_reached_condition_bt_node\n    - nav2_initial_pose_received_condition_bt_node\n    - nav2_reinitialize_global_localization_service_bt_node\n    - nav2_rate_controller_bt_node\n    - nav2_recovery_node_bt_node\n    - nav2_pipeline_sequence_bt_node\n\nbt_navigator_rclcpp_node:\n  ros__parameters:\n    use_sim_time: True\n\n\ncontroller_server:\n  ros__parameters:\n    use_sim_time: True\n    controller_frequency: 20.0\n    controller_plugin_types: [\"dwb_core::DWBLocalPlanner\"]\n    controller_plugin_ids: [\"FollowPath\"]\n    min_x_velocity_threshold: 0.001\n    min_y_velocity_threshold: 0.001\n    min_theta_velocity_threshold: 0.001\n\n    # DWB parameters\n    FollowPath.debug_trajectory_details: True\n    FollowPath.min_vel_x: -0.3\n    FollowPath.min_vel_y: -0.2\n    FollowPath.max_vel_x: 0.3\n    FollowPath.max_vel_y: 0.2\n    FollowPath.max_vel_theta: 0.15\n    FollowPath.min_speed_xy: -0.2\n    FollowPath.max_speed_xy: 0.2\n    FollowPath.min_speed_theta: -0.15\n    FollowPath.min_x_velocity_threshold: 0.001\n    # Add high threshold velocity for turtlebot 3 issue.\n    # https://github.com/ROBOTIS-GIT/turtlebot3_simulations/issues/75\n    FollowPath.min_y_velocity_threshold: 0.001\n    FollowPath.min_theta_velocity_threshold: 0.001\n    FollowPath.acc_lim_x: 0.2\n    FollowPath.acc_lim_y: 0.2\n    FollowPath.acc_lim_theta: 0.2\n    FollowPath.decel_lim_y: -1.0\n    FollowPath.decel_lim_theta: -1.0\n    FollowPath.vx_samples: 20\n    FollowPath.vy_samples: 20\n    FollowPath.vtheta_samples: 40\n    FollowPath.sim_time: 3.0\n    FollowPath.linear_granularity: 0.05\n    FollowPath.angular_granularity: 0.025\n    FollowPath.time_granularity: 0.05\n    FollowPath.xy_goal_tolerance: 0.6\n    FollowPath.yaw_goal_tolerance: 0.6\n    FollowPath.transform_tolerance: 0.2\n    FollowPath.critics: [\"RotateToGoal\", \"Oscillation\", \"BaseObstacle\", \"GoalAlign\", \"PathAlign\", \"PathDist\", \"GoalDist\"]\n    FollowPath.ObstacleFootprint.scale: 0.02\n    FollowPath.PathAlign.scale: 0.0\n    FollowPath.GoalAlign.scale: 0.0\n    FollowPath.PathDist.scale: 32.0\n    FollowPath.GoalDist.scale: 24.0\n    FollowPath.RotateToGoal.scale: 12.0\n\ncontroller_server_rclcpp_node:\n  ros__parameters:\n    use_sim_time: True\n\nlocal_costmap:\n  local_costmap:\n    ros__parameters:\n      update_frequency: 5.0\n      publish_frequency: 2.0\n      robot_base_frame: base_link\n      use_sim_time: True\n      global_frame: odom\n      plugin_names: [\"obstacle_layer\", \"voxel_layer\", \"inflation_layer\"]\n      plugin_types: [\"nav2_costmap_2d::ObstacleLayer\", \"nav2_costmap_2d::VoxelLayer\", \"nav2_costmap_2d::InflationLayer\"]\n      rolling_window: true\n      width: 3\n      height: 3\n      resolution: 0.5\n      robot_radius: 0.54\n      inflation_layer:\n        cost_scaling_factor: 1.0\n        inflation_layer.inflation_radius: 0.1\n      obstacle_layer:\n        enabled: True\n        observation_sources: scan_1 scan_2\n        scan_1:\n          topic: /scan\n          max_obstacle_height: 2.0\n          clearing: True\n          marking: True\n          data_type: \"LaserScan\"\n        scan_2:\n          topic: /scan_2\n          max_obstacle_height: 2.0\n          clearing: True\n          marking: True\n          data_type: \"LaserScan\"\n      voxel_layer:\n        enabled: True\n        publish_voxel_map: True\n        origin_z: 0.0\n        z_resolution: 0.2\n        z_voxels: 10\n        max_obstacle_height: 2.0\n        mark_threshold: 0\n        observation_sources:\n        points2:\n          topic: /points2\n          max_obstacle_height: 2.0\n          clearing: True\n          marking: True\n          data_type: \"PointCloud2\"\n      static_layer:\n        map_subscribe_transient_local: True\n      always_send_full_costmap: True\n  local_costmap_client:\n    ros__parameters:\n      use_sim_time: True\n  local_costmap_rclcpp_node:\n    ros__parameters:\n      use_sim_time: True\n\nglobal_costmap:\n  global_costmap:\n    ros__parameters:\n      update_frequency: 1.0\n      publish_frequency: 1.0\n      robot_base_frame: base_link\n      global_frame: map\n      use_sim_time: True\n      plugin_names: [\"static_layer\", \"obstacle_layer\", \"voxel_layer\", \"inflation_layer\"]\n      plugin_types: [\"nav2_costmap_2d::StaticLayer\", \"nav2_costmap_2d::ObstacleLayer\", \"nav2_costmap_2d::VoxelLayer\", \"nav2_costmap_2d::InflationLayer\"]\n      robot_radius: 0.54\n      resolution: 1.0\n      obstacle_layer:\n        enabled: True\n        observation_sources: scan_1 scan_2\n        scan_1:\n          topic: /scan\n          max_obstacle_height: 2.0\n          clearing: True\n          marking: True\n          data_type: \"LaserScan\"\n        scan_2:\n          topic: /scan_2\n          max_obstacle_height: 2.0\n          clearing: True\n          marking: True\n          data_type: \"LaserScan\"\n      voxel_layer:\n        enabled: True\n        publish_voxel_map: True\n        origin_z: 0.0\n        z_resolution: 0.2\n        z_voxels: 10\n        max_obstacle_height: 2.0\n        mark_threshold: 0\n        observation_sources:\n        points2:\n          topic: /points2\n          max_obstacle_height: 2.0\n          clearing: True\n          marking: True\n          data_type: \"PointCloud2\"\n      static_layer:\n        map_subscribe_transient_local: True\n      always_send_full_costmap: True\n  global_costmap_client:\n    ros__parameters:\n      use_sim_time: True\n  global_costmap_rclcpp_node:\n    ros__parameters:\n      use_sim_time: True\n\nmap_server:\n  ros__parameters:\n    use_sim_time: True\n    yaml_filename: \"turtlebot3_world.yaml\"\n\nplanner_server:\n  ros__parameters:\n    planner_plugin_types: [\"nav2_navfn_planner/NavfnPlanner\"]\n    planner_plugin_ids: [\"GridBased\"]\n    use_sim_time: True\n    GridBased.tolerance: 1.0\n    GridBased.use_astar: false\n    GridBased.allow_unknown: true\n\nplanner_server_rclcpp_node:\n  ros__parameters:\n    use_sim_time: True\n\nrobot_state_publisher:\n  ros__parameters:\n    use_sim_time: True\n\nrecoveries_server:\n  ros__parameters:\n    costmap_topic: local_costmap/costmap_raw\n    cycle_frequency: 10.0\n    footprint_topic: local_costmap/published_footprint\n    max_rotational_vel: 0.1\n    min_rotational_vel: 0.05\n    plugin_names:\n    - Spin\n    - BackUp\n    - Wait\n    plugin_types:\n    - nav2_recoveries/Spin\n    - nav2_recoveries/BackUp\n    - nav2_recoveries/Wait\n    rotational_acc_lim: 0.2\n    simulate_ahead_time: 2.0\n    use_sim_time: True\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- kmr_navigation2/param/param_TestCamera.yaml	(revision 0b560713392c601819a4fb2a5211e452e6c0d7fe)
++++ kmr_navigation2/param/param_TestCamera.yaml	(date 1588698415200)
+@@ -73,15 +73,17 @@
+ controller_server:
+   ros__parameters:
+     use_sim_time: True
+-    controller_frequency: 20.0
++    controller_frequency: 10.0
+     controller_plugin_types: ["dwb_core::DWBLocalPlanner"]
+     controller_plugin_ids: ["FollowPath"]
+-    min_x_velocity_threshold: 0.001
+-    min_y_velocity_threshold: 0.001
+-    min_theta_velocity_threshold: 0.001
++    min_x_velocity_threshold: 0.0001
++    min_y_velocity_threshold: 0.0001
++    min_theta_velocity_threshold: 0.0001
+ 
+     # DWB parameters
+     FollowPath.debug_trajectory_details: True
++    FollowPath.movement_time_allowance: 60.0
++    FollowPath.required_movement_radius: 1.0
+     FollowPath.min_vel_x: -0.3
+     FollowPath.min_vel_y: -0.2
+     FollowPath.max_vel_x: 0.3
+@@ -95,28 +97,30 @@
+     # https://github.com/ROBOTIS-GIT/turtlebot3_simulations/issues/75
+     FollowPath.min_y_velocity_threshold: 0.001
+     FollowPath.min_theta_velocity_threshold: 0.001
+-    FollowPath.acc_lim_x: 0.2
+-    FollowPath.acc_lim_y: 0.2
+-    FollowPath.acc_lim_theta: 0.2
++    FollowPath.acc_lim_x: 1.0
++    FollowPath.acc_lim_y: 1.0
++    FollowPath.acc_lim_theta: 1.0
++    FollowPath.decel_lim_x: -1.0
+     FollowPath.decel_lim_y: -1.0
+     FollowPath.decel_lim_theta: -1.0
+     FollowPath.vx_samples: 20
+     FollowPath.vy_samples: 20
+     FollowPath.vtheta_samples: 40
+-    FollowPath.sim_time: 3.0
++    FollowPath.sim_time: 4.0
+     FollowPath.linear_granularity: 0.05
+     FollowPath.angular_granularity: 0.025
+     FollowPath.time_granularity: 0.05
+-    FollowPath.xy_goal_tolerance: 0.6
+-    FollowPath.yaw_goal_tolerance: 0.6
++    FollowPath.xy_goal_tolerance: 0.3
++    FollowPath.yaw_goal_tolerance: 0.3
+     FollowPath.transform_tolerance: 0.2
+     FollowPath.critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
+     FollowPath.ObstacleFootprint.scale: 0.02
+     FollowPath.PathAlign.scale: 0.0
+     FollowPath.GoalAlign.scale: 0.0
++#    FollowPath.Oscillation.scale: 0.0
+     FollowPath.PathDist.scale: 32.0
+     FollowPath.GoalDist.scale: 24.0
+-    FollowPath.RotateToGoal.scale: 12.0
++    FollowPath.RotateToGoal.scale: 32.0
+ 
+ controller_server_rclcpp_node:
+   ros__parameters:
+@@ -136,10 +140,10 @@
+       width: 3
+       height: 3
+       resolution: 0.5
+-      robot_radius: 0.54
++      robot_radius: 0.626
+       inflation_layer:
+         cost_scaling_factor: 1.0
+-        inflation_layer.inflation_radius: 0.1
++        inflation_layer.inflation_radius: 0.1	
+       obstacle_layer:
+         enabled: True
+         observation_sources: scan_1 scan_2
+@@ -190,7 +194,7 @@
+       use_sim_time: True
+       plugin_names: ["static_layer", "obstacle_layer", "voxel_layer", "inflation_layer"]
+       plugin_types: ["nav2_costmap_2d::StaticLayer", "nav2_costmap_2d::ObstacleLayer", "nav2_costmap_2d::VoxelLayer", "nav2_costmap_2d::InflationLayer"]
+-      robot_radius: 0.54
++      robot_radius: 0.626
+       resolution: 1.0
+       obstacle_layer:
+         enabled: True
+Index: kmr_simulation/models/kmr/model.sdf
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><sdf version='1.6'>\n  <model name='kmr'>\n    <link name='base_footprint'/>\n    <joint name=\"fixed\" type=\"fixed\">\n        <parent>base_footprint</parent>\n        <child>base_link</child>\n    </joint>\n    <link name='base_link'>\n      <pose frame=''>0 0 0 0 -0 0</pose>\n      <inertial>\n        <mass>55.04</mass>\n        <inertia>\n          <ixx> 5.383 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>7.170</iyy> <iyz>0.0</iyz> <izz>1.854</izz> \n        </inertia>\n      </inertial>\n      <collision name='base_link_collision'>\n        <pose frame=''>0 0 0 0 -0 0</pose>\n        <geometry>\n          <box>\n            <size>1.08 0.63 0.085</size>\n          </box>\n        </geometry>\n      </collision>\n      <visual name='base_link_visual'>\n        <pose frame=''>0 0 -0.1885 0 -0 0</pose>\n        <geometry>\n          <box>\n            <size>1.08 0.63 0.085</size>\n          </box>\n        </geometry>\n      </visual>\n    </link>\n\n    <joint name=\"base_bottom_to_middle_joint\" type=\"fixed\">\n      <child>base_link_middle</child>\n      <parent>base_link</parent>\n    </joint>\n\n    <link name=\"base_link_middle\">\n      <inertial>\n        <mass>18.42</mass>\n        <inertia>\n          <ixx> 1.0866 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>1.437</iyy> <iyz>0.0</iyz> <izz>0.357</izz> \n        </inertia>\n      </inertial>\n      <collision name='base_link_middle_collision'>\n        <pose frame=''>0 0 -0.122 0 -0 0</pose>\n        <geometry>\n          <box>\n            <size>0.92 0.51 0.055</size>\n          </box>\n        </geometry>\n      </collision>\n      <visual name='base_link_middle_visual'>\n        <pose frame=''>0 0 -0.122 0 -0 0</pose>\n        <geometry>\n          <box>\n            <size>0.84 0.48 0.048</size>\n          </box>\n        </geometry>\n      </visual>\n    </link>\n\n    <joint name=\"base_middle_to_top_joint\" type=\"fixed\">\n      <child>base_link_top</child>\n      <parent>base_link_middle</parent>\n    </joint>\n\n    <link name=\"base_link_top\">\n      <inertial>\n        <mass>339.96</mass>\n        <inertia>\n          <ixx> 39.1077 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>42.397</iyy> <iyz>0.0</iyz> <izz>18.238</izz> \n        </inertia>\n      </inertial>\n      <visual name='base_link_top_visual'>\n        <pose frame=''>0 0 0.1645 0 -0 0</pose>\n        <geometry>\n          <box>\n            <size>1.08 0.63 0.525</size>\n          </box>\n        </geometry>\n      </visual>\n      <collision name='base_link_top_collision'>\n        <pose frame=''>0 0 0.1645 0 -0 0</pose>\n        <geometry>\n          <box>\n            <size>1.08 0.63 0.5335</size>\n          </box>\n        </geometry>\n      </collision>\n    </link>\n\n    <joint name=\"back_left_wheel_joint\" type=\"revolute\">\n        <parent> base_link</parent>\n        <child>back_left_wheel_link</child>\n        <pose>-0.28 0.1825 -0.135</pose>\n        <axis>\n            <xyz>0 1 0</xyz>\n        </axis>\n    </joint>\n\n    <link name=\"back_left_wheel_link\">\n      <visual name='back_left_wheel_link_visual'>\n        <pose frame=''>-0.28 0.1825 -0.135 0 -0 0</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/wheels/omni_wheel_1.dae</uri>\n          </mesh>\n        </geometry>\n      </visual>\n      <collision name='back_left_wheel_link_collision'>\n        <pose frame=''>-0.28 0.1825 -0.135 0 -0 0</pose>\n        <geometry>\n          <cylinder>\n            <length>0.175</length>\n            <radius>0.125</radius>\n          </cylinder>\n        </geometry>\n      </collision>\n      <inertial>\n        <pose>0 0 0 0 0 0 </pose>\n        <mass>6.5</mass>\n        <inertia>\n          <ixx> 0.04197 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.0508</iyy> <iyz>0.0</iyz> <izz>0.04197</izz> \n        </inertia>\n      </inertial>\n    </link>\n\n    <joint name=\"back_right_wheel_joint\" type=\"revolute\">\n        <parent>base_link</parent>\n        <child>back_right_wheel_link</child>\n        <pose>-0.28 -0.1825 -0.135</pose>\n        <axis>\n            <xyz>0 1 0</xyz>\n        </axis>\n    </joint>\n\n    <link name=\"back_right_wheel_link\">\n      <visual name='back_right_wheel_link_visual'>\n        <pose frame=''>-0.28 -0.1825 -0.135 0 -0 0</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/wheels/omni_wheel_1.dae</uri>\n          </mesh>\n        </geometry>\n      </visual>\n      <collision name='back_right_wheel_link_collision'>\n        <pose frame=''>-0.28 -0.1825 -0.135 0 -0 0</pose>\n        <geometry>\n          <cylinder>\n            <length>0.175</length>\n            <radius>0.125</radius>\n          </cylinder>\n        </geometry>\n      </collision>\n      <inertial>\n          <pose>0 0 0 0 0 0 </pose>\n          <mass>6.5</mass>\n          <inertia>\n            <ixx> 0.04197 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.0508</iyy> <iyz>0.0</iyz> <izz>0.04197</izz> \n          </inertia>\n      </inertial>\n    </link>\n\n   <joint name=\"front_left_wheel_joint\" type=\"revolute\">\n        <parent>base_link</parent>\n        <child>front_left_wheel_link</child>\n        <pose>0.28 0.1825 -0.135</pose>\n        <axis>\n            <xyz>0 1 0</xyz>\n        </axis>\n   </joint>\n\n    <link name=\"front_left_wheel_link\">\n        <collision name='front_left_wheel_link_collision'>\n            <pose frame=''>0.28 0.1825 -0.135 0 -0 0</pose>\n            <geometry>\n              <cylinder>\n                <length>0.175</length>\n                <radius>0.125</radius>\n              </cylinder>\n            </geometry>\n        </collision>\n        <visual name='front_left_wheel_link_visual'>\n            <pose frame=''>0.28 0.1825 -0.135 0 -0 0</pose>\n            <geometry>\n              <mesh>\n                <scale>1 1 1</scale>\n                <uri>model://kmr/meshes/wheels/omni_wheel_1.dae</uri>\n              </mesh>\n            </geometry>\n        </visual>\n        <inertial>\n          <pose>0 0 0 0 0 0 </pose>\n          <mass>6.5</mass>\n          <inertia>\n            <ixx> 0.04197 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.0508</iyy> <iyz>0.0</iyz> <izz>0.04197</izz> \n          </inertia>\n        </inertial>\n    </link>\n\n    <joint name=\"front_right_wheel_joint\" type=\"revolute\">\n        <parent>base_link</parent>\n        <child>front_right_wheel_link</child>\n        <pose>0.28 -0.1825 -0.135</pose>\n        <axis>\n            <xyz>0 1 0</xyz>\n        </axis>\n    </joint>\n\n    <link name=\"front_right_wheel_link\">\n       <collision name='front_right_wheel_link_collision'>\n        <pose frame=''>0.28 -0.1825 -0.135 0 -0 0</pose>\n        <geometry>\n          <cylinder>\n            <length>0.175</length>\n            <radius>0.125</radius>\n          </cylinder>\n        </geometry>\n       </collision>\n       <visual name='front_right_wheel_link_visual'>\n            <pose frame=''>0.28 -0.1825 -0.135 0 -0 0</pose>\n            <geometry>\n              <mesh>\n                <scale>1 1 1</scale>\n                <uri>model://kmr/meshes/wheels/omni_wheel_1.dae</uri>\n              </mesh>\n            </geometry>\n       </visual>\n       <inertial>\n          <pose>0 0 0 0 0 0 </pose>\n          <mass>6.5</mass>\n          <inertia>\n            <ixx> 0.04197 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.0508</iyy> <iyz>0.0</iyz> <izz>0.04197</izz> \n          </inertia>\n        </inertial>\n    </link>\n\n    <joint name=\"laser_B1_joint\" type=\"fixed\">\n        <parent>base_link</parent>\n        <child>laser_B1_link</child>\n        <pose>0.483 -0.258 -0.112 3.1413 -0 -0.7854</pose>\n    </joint>\n\n    <link name='laser_B1_link'>\n      <inertial>\n        <mass>1.2</mass>\n        <inertia>\n          <ixx> 0.002355 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.002355</iyy> <iyz>0.0</iyz> <izz>0.0002809</izz> \n        </inertia>\n      </inertial>\n      <visual name='laser_B1_link_visual'>\n        <pose frame=''>0.483 -0.258 -0.112 3.1413 -0 -0.7854</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/sensors/visual/sick_lms1xx.dae</uri>\n          </mesh>\n        </geometry>\n      </visual>\n      <collision name='laser_B1_link_collision'>\n        <pose frame=''>0.483 -0.258 -0.112 3.1413 0 -0.7854</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/sensors/collision/sick_lms1xx.stl</uri>\n          </mesh>\n        </geometry>\n      </collision>\n      <sensor name=\"sensor_B1\" type=\"ray\">\n        <always_on>true</always_on>\n        <visualize>true</visualize>\n        <pose frame=''>0.483 -0.258 -0.112 0 -0 -0.7854</pose>\n        <update_rate>5</update_rate>\n        <ray>\n          <scan>\n            <horizontal>\n              <samples>540</samples>\n              <resolution>1.000000</resolution>\n              <min_angle>-1.5708</min_angle>\n              <max_angle>1.5708</max_angle>\n            </horizontal>\n          </scan>\n          <range>\n            <min>0.3</min>\n            <max>10</max>\n            <resolution>0.015000</resolution>\n          </range>\n          <noise>\n            <type>gaussian</type>\n            <mean>0.0</mean>\n            <stddev>0.01</stddev>\n          </noise>\n        </ray>\n        <plugin name=\"gazebo_sensor_B1_controller\" filename=\"libgazebo_ros_ray_sensor.so\">\n          <ros>\n            <argument>~/out:=scan</argument>\n          </ros>\n          <output_type>sensor_msgs/LaserScan</output_type>\n          <frame_name>laser_B1_link</frame_name>\n        </plugin>\n      </sensor>\n    </link>\n\n    <joint name=\"laser_B4_joint\" type=\"fixed\">\n        <parent>base_link</parent>\n        <child>laser_B4_link</child>\n        <pose>-0.483 0.258 -0.112 0 3.1413 5.4977</pose>\n    </joint>\n\n    <link name='laser_B4_link'>\n      <inertial>\n        <mass>1.2</mass>\n        <inertia>\n          <ixx> 0.002355 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.002355</iyy> <iyz>0.0</iyz> <izz>0.0002809</izz> \n        </inertia>\n      </inertial>\n      <collision name='laser_B4_link_collision'>\n        <pose frame=''>-0.483 0.258 -0.112 0 3.1413 5.4977</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/sensors/collision/sick_lms1xx.stl</uri>\n          </mesh>\n        </geometry>\n      </collision>\n      <visual name='laser_B4_link_visual'>\n        <pose frame=''>-0.483 0.258 -0.112 0 3.1413 5.4977</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/sensors/visual/sick_lms1xx.dae</uri>\n          </mesh>\n        </geometry>\n      </visual>\n      <sensor name=\"sensor_B4\" type=\"ray\">\n        <always_on>true</always_on>\n        <visualize>true</visualize>\n        <pose frame=''>-0.483 0.258 -0.112 3.1413 3.1413 5.4977</pose>\n        <update_rate>5</update_rate>\n        <ray>\n          <scan>\n            <horizontal>\n              <samples>540</samples>\n              <resolution>1.000000</resolution>\n              <min_angle>-1.5708</min_angle>\n              <max_angle>1.5708</max_angle>\n            </horizontal>\n          </scan>\n          <range>\n            <min>0.3</min>\n            <max>10</max>\n            <resolution>0.015000</resolution>\n          </range>\n          <noise>\n            <type>gaussian</type>\n            <mean>0.0</mean>\n            <stddev>0.01</stddev>\n          </noise>\n        </ray>\n        <plugin name=\"gazebo_sensor_B4_controller\" filename=\"libgazebo_ros_ray_sensor.so\">\n          <ros>\n            <argument>~/out:=scan_2</argument>\n          </ros>\n          <output_type>sensor_msgs/LaserScan</output_type>\n          <frame_name>laser_B4_link</frame_name>\n        </plugin>\n      </sensor>\n    </link>\n\n    <joint name=\"base_iiwa_joint\" type=\"fixed\">\n        <parent>base_link_top</parent>\n        <child>base_iiwa</child>\n        <pose>0.363 -0.184 0.427 0 0 -1.5708</pose>\n    </joint>\n\n    <link name=\"base_iiwa\">\n         <visual name='base_iiwa_visual'>\n            <pose frame=''>0.363 -0.184 0.427 0 0 -1.5708</pose>\n            <geometry>\n              <mesh>\n                <scale>1 1 1</scale>\n                <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/base_link.dae</uri>\n              </mesh>\n            </geometry>\n         </visual>\n         <collision name='base_iiwa_collision'>\n            <pose frame=''>0.363 -0.184 0.427 0 0 -1.5708</pose>\n            <geometry>\n              <mesh>\n                <scale>1 1 1</scale>\n                <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/base_link.stl</uri>\n              </mesh>\n            </geometry>\n         </collision>\n         <inertial>\n            <pose>-0.1 0 0.07 0 0 0 </pose>\n            <mass>5.0</mass>\n            <inertia>\n              <ixx> 0.05 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.06</iyy> <iyz>0.0</iyz> <izz>0.03</izz> \n            </inertia>\n         </inertial>\n    </link>\n\n    <joint name=\"joint_a1\" type=\"fixed\">\n        <parent>base_iiwa</parent>\n        <child>link_1</child>\n        <pose>0.363 -0.184 0.427 0 0 -1.5708</pose>\n        <axis>\n            <xyz>0 0 1</xyz>\n        </axis>\n    </joint>\n\n\n    <link name=\"link_1\">\n          <collision name='link_1_collision'>\n            <pose frame=''>0.363 -0.184 0.427 0 0 -1.5708</pose>\n            <geometry>\n              <mesh>\n                <scale>1 1 1</scale>\n                <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_1.stl</uri>\n              </mesh>\n            </geometry>\n          </collision>\n\n          <visual name='link_1_visual'>\n            <pose frame=''>0.363 -0.184 0.427 0 0 -1.5708</pose>\n            <geometry>\n              <mesh>\n                <scale>1 1 1</scale>\n                <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_1.dae</uri>\n              </mesh>\n            </geometry>\n          </visual>\n\n          <inertial>\n            <pose>0 -0.03 0.12 0 0 0 </pose>\n            <mass>4.0</mass>\n            <inertia>\n              <ixx> 0.1 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.09</iyy> <iyz>0.0</iyz> <izz>0.02</izz> \n            </inertia>\n          </inertial>\n    </link>\n\n    <joint name=\"joint_a2\" type=\"fixed\">\n        <parent>link_1</parent>\n        <child>link_2</child>\n        <pose>0.363 -0.183564 0.787 0 0 -1.5708</pose>\n        <axis>\n            <xyz>0 1 0</xyz>\n        </axis>\n    </joint>\n\n    <link name=\"link_2\">\n      <collision name='link_2_collision'>\n        <pose frame=''>0.363 -0.183564 0.787 0 0 -1.5708</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_2.stl</uri>\n          </mesh>\n        </geometry>\n      </collision>\n      <visual name='link_2_visual'>\n        <pose frame=''>0.363 -0.183564 0.787 0 0 -1.5708</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_2.dae</uri>\n          </mesh>\n        </geometry>\n      </visual>\n      <inertial>\n        <pose>0.0003 0.059 0.042 0 0 0 </pose>\n        <mass>4.0</mass>\n        <inertia>\n          <ixx> 0.05 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.018</iyy> <iyz>0.0</iyz> <izz>0.044</izz> \n        </inertia>\n      </inertial>\n    </link>\n\n    <joint name=\"joint_a3\" type=\"fixed\">\n        <parent>link_2</parent>\n        <child>link_3</child>\n        <pose>0.363 -0.183564 0.787 0 0 -1.5708</pose>\n        <axis>\n            <xyz>0 0 1</xyz>\n        </axis>\n    </joint>\n\n\n    <link name=\"link_3\">\n      <visual name='link_3_visual'>\n        <pose frame=''>0.363 -0.183564 0.787 0 0 -1.5708</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_3.dae</uri>\n          </mesh>\n        </geometry>\n      </visual>\n      <collision name='link_3_collision'>\n        <pose frame=''>0.363 -0.183564 0.787 0 0 -1.5708</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_3.stl</uri>\n          </mesh>\n        </geometry>\n      </collision>\n      <inertial>\n        <pose>0 0.03 0.13 0 0 0 </pose>\n        <mass>3.0</mass>\n        <inertia>\n          <ixx> 0.08 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.075</iyy> <iyz>0.0</iyz> <izz>0.01</izz> \n        </inertia>\n      </inertial>\n      \n    </link>\n\n    <joint name=\"joint_a4\" type=\"fixed\">\n        <parent>link_3</parent>\n        <child>link_4</child>\n        <pose>0.363 -0.184 1.207 0 0 -1.5708</pose>\n        <axis>\n            <xyz>0 -1 0</xyz>\n        </axis>\n    </joint>\n\n    <link name=\"link_4\">\n      <collision name='link_4_collision'>\n        <pose frame=''>0.363 -0.184 1.207 0 0 -1.5708</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_4.stl</uri>\n          </mesh>\n        </geometry>\n      </collision>\n      <visual name='link_4_visual'>\n        <pose frame=''>0.363 -0.184 1.207 0 0 -1.5708</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_4.dae</uri>\n          </mesh>\n        </geometry>\n      </visual>\n      <inertial>\n        <pose>0 0.067 0.034 0 0 0 </pose>\n        <mass>2.7</mass>\n        <inertia>\n          <ixx> 0.03 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.01</iyy> <iyz>0.0</iyz> <izz>0.029</izz> \n        </inertia>\n      </inertial>\n    </link>\n\n    <joint name=\"joint_a5\" type=\"fixed\">\n        <parent>link_4</parent>\n        <child>link_5</child>\n        <pose>0.363 -0.184 1.207 0 0 -1.5708</pose>\n        <axis>\n            <xyz>0 0 1</xyz>\n        </axis>\n    </joint>\n\n    <link name=\"link_5\">\n      <collision name='link_5_collision'>\n        <pose frame=''>\n            0.363 -0.184 1.207 0 0 -1.5708\n        </pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_5.stl</uri>\n          </mesh>\n        </geometry>\n      </collision>\n      <visual name='link_5_visual'>\n        <pose frame=''>0.363 -0.184 1.207 0 0 -1.5708</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_5.dae</uri>\n          </mesh>\n        </geometry>\n      </visual>\n      <inertial>\n        <pose>0.0001 0.021 0.076 0 0 0 </pose>\n        <mass>1.7</mass>\n        <inertia>\n          <ixx> 0.02 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.018</iyy> <iyz>0.0</iyz> <izz>0.005</izz> \n        </inertia>\n      </inertial>\n    </link>\n\n    <joint name=\"joint_a6\" type=\"fixed\">\n        <parent>link_5</parent>\n        <child>link_6</child>\n        <pose>0.363 -0.184 1.607 0 0 -1.5708</pose>\n        <axis>\n            <xyz>0 1 0</xyz>\n        </axis>\n    </joint>\n\n    <link name=\"link_6\">\n      <collision name='link_6_collision'>\n        <pose frame=''>0.363 -0.184 1.607 0 0 -1.5708</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_6.stl</uri>\n          </mesh>\n        </geometry>\n      </collision>\n      <visual name='link_6_visual'>\n        <pose frame=''>0.363 -0.184 1.607 0 0 -1.5708</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_6.dae</uri>\n          </mesh>\n        </geometry>\n      </visual>\n      <inertial>\n        <pose>0 0.0006 0.0004 0 0 0 </pose>\n        <mass>1.8</mass>\n        <inertia>\n          <ixx> 0.005 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.036</iyy> <iyz>0.0</iyz> <izz>0.0047</izz> \n        </inertia>\n      </inertial>\n      \n    </link>\n\n    <joint name=\"joint_a7\" type=\"fixed\">\n        <parent>link_6</parent>\n        <child>link_7</child>\n        <pose>0.363 -0.184 1.607 0 0 -1.5708</pose>\n        <axis>\n            <xyz>0 0 1</xyz>\n        </axis>\n    </joint>\n\n    <link name=\"link_7\">\n      <collision name='link_7_collision'>\n        <pose frame=''>0.363 -0.184 1.607 0 0 -1.5708</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/lbr_iiwa_14_r820/collision/link_7.stl</uri>\n          </mesh>\n        </geometry>\n      </collision>\n      <visual name='link_7_visual'>\n        <pose frame=''>0.363 -0.184 1.607 0 0 -1.5708</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/lbr_iiwa_14_r820/visual/link_7.dae</uri>\n          </mesh>\n        </geometry>\n      </visual>\n      <inertial>\n        <pose>0 0.0 0.02 0 0 0 </pose>\n        <mass>0.3</mass>\n        <inertia>\n          <ixx> 0.001 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.001</iyy> <iyz>0.0</iyz> <izz>0.001</izz> \n        </inertia>\n      </inertial>\n    </link>\n\n    <joint name=\"joint_tool0\" type=\"fixed\">\n        <parent>link_7</parent>\n        <child>tool0</child>\n        <axis>\n            <xyz>0 0 0</xyz>\n        </axis>\n    </joint>\n\n    <link name=\"tool0\"/>\n\n    <joint name=\"d435_joint\" type=\"fixed\">\n        <parent>base_link_top</parent>\n        <child>d435_link</child>\n        <pose>0.0149 0.0 0.0125 1.570796 0 1.570796</pose>\n        <axis>\n            <xyz>0 0 0</xyz>\n        </axis>\n    </joint>\n\n    <link name=\"d435_link\">\n      <collision name='d435_link_collision'>\n        <pose frame=''>0.0149 0.0 0.0125 1.570796 0 1.570796</pose>\n        <geometry>\n          <box>\n            <size>0.02505 0.090 0.025</size>\n          </box>\n        </geometry>\n      </collision>\n      <visual name='d435_link_visual'>\n        <pose frame=''>0.0149 0.0 0.0125 1.570796 0 1.570796</pose>\n        <geometry>\n          <mesh>\n            <scale>1 1 1</scale>\n            <uri>model://kmr/meshes/sensors/visual/d435.dae</uri>\n          </mesh>\n        </geometry>\n      </visual>\n      <inertial>\n        <pose>0 0.0 0.0 0 0 0 </pose>\n        <mass>0.564</mass>\n        <inertia>\n          <ixx> 0.003881243 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.000498940</iyy> <iyz>0.0</iyz> <izz>0.003879257</izz> \n        </inertia>\n      </inertial>\n      <sensor name=\"camera\" type=\"depth\">\n        <always_on>true</always_on>\n        <visualize>true</visualize>\n        <pose frame=''>0.0149 -0.0075 0.0125 0 -0 0</pose>\n        <update_rate>30</update_rate>\n        <camera name=\"intel_realsense_d435\">\n          <horizontal_fov>1.02974</horizontal_fov>\n          <image>\n              <width>640</width>\n              <height>480</height>\n              <format>B8G8R8</format>\n          </image>\n          <depth_camera>\n          </depth_camera>\n          <clip>\n              <near>0.02</near>\n              <far>300</far>\n          </clip>\n          <noise>\n            <type>gaussian</type>\n            <!-- Noise is sampled independently per pixel on each frame.\n                  That pixel's noise value is added to each of its color\n                  channels, which at that point lie in the range [0,1]. -->\n            <mean>0.0</mean>\n            <stddev>0.007</stddev>\n          </noise>\n        </camera>\n          <plugin name=\"camera_driver\" filename=\"libgazebo_ros_camera.so\">\n            <ros>\n              <!-- topics need to be prefixed with camera_name for remapping -->\n              <remapping>mycamera/image_raw:=mycamera/image_demo</remapping>\n              <remapping>mycamera/depth/image_raw:=mycamera/depth_demo</remapping>\n              <remapping>mycamera/camera_info:=mycamera/raw_cam_info_demo</remapping>\n              <remapping>mycamera/depth/camera_info:=mycamera/depth_cam_info_demo</remapping>\n              <remapping>mycamera/points:=points2</remapping>\n            </ros>\n\n            <!-- omit camera_name to default to sensor name -->\n            <camera_name>mycamera</camera_name>\n\n            <!-- camera_name>omit so it defaults to sensor name</camera_name-->\n            <!-- frame_name>omit so it defaults to link name</frameName-->\n            <!-- <hack_baseline>0.07</hack_baseline> -->\n          </plugin>\n      </sensor>\n    </link>\n\n    <plugin name='planar_move' filename='libgazebo_ros_planar_move.so'>\n        <ros>\n          <argument>cmd_vel:=cmd_vel</argument>\n          <argument>odom:=odom</argument>\n        </ros>\n\n        <update_rate>100</update_rate>\n        <publish_rate>10</publish_rate>\n\n        <!-- output -->\n        <publish_odom>true</publish_odom>\n        <publish_odom_tf>true</publish_odom_tf>\n\n        <odometry_frame>odom</odometry_frame>\n        <robot_base_frame>base_footprint</robot_base_frame>\n\n        <covariance_x>0.0001</covariance_x>\n        <covariance_y>0.0001</covariance_y>\n        <covariance_yaw>0.01</covariance_yaw>\n    </plugin>\n\n    <plugin name=\"gazebo_ros_joint_state_publisher\" filename=\"libgazebo_ros_joint_state_publisher.so\">\n      <ros>\n        <!-- <namespace>/tb3</namespace> -->\n        <argument>~/out:=joint_states</argument>\n      </ros>\n      <update_rate>30</update_rate>\n      <joint_name>back_right_wheel_joint</joint_name>\n      <joint_name>back_left_wheel_joint</joint_name>\n      <joint_name>front_left_wheel_joint</joint_name>\n      <joint_name>front_right_wheel_joint</joint_name>\n    </plugin>\n  </model>\n</sdf>\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- kmr_simulation/models/kmr/model.sdf	(revision 0b560713392c601819a4fb2a5211e452e6c0d7fe)
++++ kmr_simulation/models/kmr/model.sdf	(date 1587374907825)
+@@ -1,20 +1,15 @@
+ <sdf version='1.6'>
+   <model name='kmr'>
+     <link name='base_footprint'/>
++
+     <joint name="fixed" type="fixed">
+         <parent>base_footprint</parent>
+         <child>base_link</child>
+     </joint>
++
+     <link name='base_link'>
+-      <pose frame=''>0 0 0 0 -0 0</pose>
+-      <inertial>
+-        <mass>55.04</mass>
+-        <inertia>
+-          <ixx> 5.383 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>7.170</iyy> <iyz>0.0</iyz> <izz>1.854</izz> 
+-        </inertia>
+-      </inertial>
+       <collision name='base_link_collision'>
+-        <pose frame=''>0 0 0 0 -0 0</pose>
++        <pose frame=''>0 0 -0.1885 0 -0 0</pose>
+         <geometry>
+           <box>
+             <size>1.08 0.63 0.085</size>
+@@ -37,12 +32,6 @@
+     </joint>
+ 
+     <link name="base_link_middle">
+-      <inertial>
+-        <mass>18.42</mass>
+-        <inertia>
+-          <ixx> 1.0866 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>1.437</iyy> <iyz>0.0</iyz> <izz>0.357</izz> 
+-        </inertia>
+-      </inertial>
+       <collision name='base_link_middle_collision'>
+         <pose frame=''>0 0 -0.122 0 -0 0</pose>
+         <geometry>
+@@ -67,12 +56,6 @@
+     </joint>
+ 
+     <link name="base_link_top">
+-      <inertial>
+-        <mass>339.96</mass>
+-        <inertia>
+-          <ixx> 39.1077 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>42.397</iyy> <iyz>0.0</iyz> <izz>18.238</izz> 
+-        </inertia>
+-      </inertial>
+       <visual name='base_link_top_visual'>
+         <pose frame=''>0 0 0.1645 0 -0 0</pose>
+         <geometry>
+@@ -85,7 +68,7 @@
+         <pose frame=''>0 0 0.1645 0 -0 0</pose>
+         <geometry>
+           <box>
+-            <size>1.08 0.63 0.5335</size>
++            <size>1.08 0.63 0.525</size>
+           </box>
+         </geometry>
+       </collision>
+@@ -100,6 +83,7 @@
+         </axis>
+     </joint>
+ 
++
+     <link name="back_left_wheel_link">
+       <visual name='back_left_wheel_link_visual'>
+         <pose frame=''>-0.28 0.1825 -0.135 0 -0 0</pose>
+@@ -111,21 +95,15 @@
+         </geometry>
+       </visual>
+       <collision name='back_left_wheel_link_collision'>
+-        <pose frame=''>-0.28 0.1825 -0.135 0 -0 0</pose>
++        <pose frame=''>-0.28 0.1825 -0.135 1.570796 -0 0</pose>
+         <geometry>
+           <cylinder>
+-            <length>0.175</length>
++            <length>0.100</length>
+             <radius>0.125</radius>
+           </cylinder>
+         </geometry>
+       </collision>
+-      <inertial>
+-        <pose>0 0 0 0 0 0 </pose>
+-        <mass>6.5</mass>
+-        <inertia>
+-          <ixx> 0.04197 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.0508</iyy> <iyz>0.0</iyz> <izz>0.04197</izz> 
+-        </inertia>
+-      </inertial>
++
+     </link>
+ 
+     <joint name="back_right_wheel_joint" type="revolute">
+@@ -137,6 +115,7 @@
+         </axis>
+     </joint>
+ 
++
+     <link name="back_right_wheel_link">
+       <visual name='back_right_wheel_link_visual'>
+         <pose frame=''>-0.28 -0.1825 -0.135 0 -0 0</pose>
+@@ -148,21 +127,14 @@
+         </geometry>
+       </visual>
+       <collision name='back_right_wheel_link_collision'>
+-        <pose frame=''>-0.28 -0.1825 -0.135 0 -0 0</pose>
++        <pose frame=''>-0.28 -0.1825 -0.135 1.570796 -0 0</pose>
+         <geometry>
+           <cylinder>
+-            <length>0.175</length>
++            <length>0.100</length>
+             <radius>0.125</radius>
+           </cylinder>
+         </geometry>
+       </collision>
+-      <inertial>
+-          <pose>0 0 0 0 0 0 </pose>
+-          <mass>6.5</mass>
+-          <inertia>
+-            <ixx> 0.04197 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.0508</iyy> <iyz>0.0</iyz> <izz>0.04197</izz> 
+-          </inertia>
+-      </inertial>
+     </link>
+ 
+    <joint name="front_left_wheel_joint" type="revolute">
+@@ -176,10 +148,10 @@
+ 
+     <link name="front_left_wheel_link">
+         <collision name='front_left_wheel_link_collision'>
+-            <pose frame=''>0.28 0.1825 -0.135 0 -0 0</pose>
++            <pose frame=''>0.28 0.1825 -0.135 1.570796 -0 0</pose>
+             <geometry>
+               <cylinder>
+-                <length>0.175</length>
++                <length>0.100</length>
+                 <radius>0.125</radius>
+               </cylinder>
+             </geometry>
+@@ -193,13 +165,6 @@
+               </mesh>
+             </geometry>
+         </visual>
+-        <inertial>
+-          <pose>0 0 0 0 0 0 </pose>
+-          <mass>6.5</mass>
+-          <inertia>
+-            <ixx> 0.04197 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.0508</iyy> <iyz>0.0</iyz> <izz>0.04197</izz> 
+-          </inertia>
+-        </inertial>
+     </link>
+ 
+     <joint name="front_right_wheel_joint" type="revolute">
+@@ -211,12 +176,13 @@
+         </axis>
+     </joint>
+ 
++
+     <link name="front_right_wheel_link">
+        <collision name='front_right_wheel_link_collision'>
+-        <pose frame=''>0.28 -0.1825 -0.135 0 -0 0</pose>
++        <pose frame=''>0.28 -0.1825 -0.135 1.570796 -0 0</pose>
+         <geometry>
+           <cylinder>
+-            <length>0.175</length>
++            <length>0.100</length>
+             <radius>0.125</radius>
+           </cylinder>
+         </geometry>
+@@ -230,28 +196,19 @@
+               </mesh>
+             </geometry>
+        </visual>
+-       <inertial>
+-          <pose>0 0 0 0 0 0 </pose>
+-          <mass>6.5</mass>
+-          <inertia>
+-            <ixx> 0.04197 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.0508</iyy> <iyz>0.0</iyz> <izz>0.04197</izz> 
+-          </inertia>
+-        </inertial>
+     </link>
+-
+     <joint name="laser_B1_joint" type="fixed">
+         <parent>base_link</parent>
+         <child>laser_B1_link</child>
+         <pose>0.483 -0.258 -0.112 3.1413 -0 -0.7854</pose>
+     </joint>
++
++    <joint name="laser_B1_joint2" type="fixed">
++        <parent>base_link_top</parent>
++        <child>laser_B1_link</child>
++    </joint>
+ 
+     <link name='laser_B1_link'>
+-      <inertial>
+-        <mass>1.2</mass>
+-        <inertia>
+-          <ixx> 0.002355 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.002355</iyy> <iyz>0.0</iyz> <izz>0.0002809</izz> 
+-        </inertia>
+-      </inertial>
+       <visual name='laser_B1_link_visual'>
+         <pose frame=''>0.483 -0.258 -0.112 3.1413 -0 -0.7854</pose>
+         <geometry>
+@@ -311,13 +268,13 @@
+         <pose>-0.483 0.258 -0.112 0 3.1413 5.4977</pose>
+     </joint>
+ 
++    <joint name="laser_B4_joint2" type="fixed">
++        <parent>base_link_top</parent>
++        <child>laser_B4_link</child>
++    </joint>
++
++
+     <link name='laser_B4_link'>
+-      <inertial>
+-        <mass>1.2</mass>
+-        <inertia>
+-          <ixx> 0.002355 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.002355</iyy> <iyz>0.0</iyz> <izz>0.0002809</izz> 
+-        </inertia>
+-      </inertial>
+       <collision name='laser_B4_link_collision'>
+         <pose frame=''>-0.483 0.258 -0.112 0 3.1413 5.4977</pose>
+         <geometry>
+@@ -396,13 +353,6 @@
+               </mesh>
+             </geometry>
+          </collision>
+-         <inertial>
+-            <pose>-0.1 0 0.07 0 0 0 </pose>
+-            <mass>5.0</mass>
+-            <inertia>
+-              <ixx> 0.05 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.06</iyy> <iyz>0.0</iyz> <izz>0.03</izz> 
+-            </inertia>
+-         </inertial>
+     </link>
+ 
+     <joint name="joint_a1" type="fixed">
+@@ -435,14 +385,6 @@
+               </mesh>
+             </geometry>
+           </visual>
+-
+-          <inertial>
+-            <pose>0 -0.03 0.12 0 0 0 </pose>
+-            <mass>4.0</mass>
+-            <inertia>
+-              <ixx> 0.1 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.09</iyy> <iyz>0.0</iyz> <izz>0.02</izz> 
+-            </inertia>
+-          </inertial>
+     </link>
+ 
+     <joint name="joint_a2" type="fixed">
+@@ -473,13 +415,6 @@
+           </mesh>
+         </geometry>
+       </visual>
+-      <inertial>
+-        <pose>0.0003 0.059 0.042 0 0 0 </pose>
+-        <mass>4.0</mass>
+-        <inertia>
+-          <ixx> 0.05 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.018</iyy> <iyz>0.0</iyz> <izz>0.044</izz> 
+-        </inertia>
+-      </inertial>
+     </link>
+ 
+     <joint name="joint_a3" type="fixed">
+@@ -511,14 +446,6 @@
+           </mesh>
+         </geometry>
+       </collision>
+-      <inertial>
+-        <pose>0 0.03 0.13 0 0 0 </pose>
+-        <mass>3.0</mass>
+-        <inertia>
+-          <ixx> 0.08 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.075</iyy> <iyz>0.0</iyz> <izz>0.01</izz> 
+-        </inertia>
+-      </inertial>
+-      
+     </link>
+ 
+     <joint name="joint_a4" type="fixed">
+@@ -549,13 +476,6 @@
+           </mesh>
+         </geometry>
+       </visual>
+-      <inertial>
+-        <pose>0 0.067 0.034 0 0 0 </pose>
+-        <mass>2.7</mass>
+-        <inertia>
+-          <ixx> 0.03 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.01</iyy> <iyz>0.0</iyz> <izz>0.029</izz> 
+-        </inertia>
+-      </inertial>
+     </link>
+ 
+     <joint name="joint_a5" type="fixed">
+@@ -588,13 +508,6 @@
+           </mesh>
+         </geometry>
+       </visual>
+-      <inertial>
+-        <pose>0.0001 0.021 0.076 0 0 0 </pose>
+-        <mass>1.7</mass>
+-        <inertia>
+-          <ixx> 0.02 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.018</iyy> <iyz>0.0</iyz> <izz>0.005</izz> 
+-        </inertia>
+-      </inertial>
+     </link>
+ 
+     <joint name="joint_a6" type="fixed">
+@@ -625,14 +538,6 @@
+           </mesh>
+         </geometry>
+       </visual>
+-      <inertial>
+-        <pose>0 0.0006 0.0004 0 0 0 </pose>
+-        <mass>1.8</mass>
+-        <inertia>
+-          <ixx> 0.005 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.036</iyy> <iyz>0.0</iyz> <izz>0.0047</izz> 
+-        </inertia>
+-      </inertial>
+-      
+     </link>
+ 
+     <joint name="joint_a7" type="fixed">
+@@ -663,13 +568,6 @@
+           </mesh>
+         </geometry>
+       </visual>
+-      <inertial>
+-        <pose>0 0.0 0.02 0 0 0 </pose>
+-        <mass>0.3</mass>
+-        <inertia>
+-          <ixx> 0.001 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.001</iyy> <iyz>0.0</iyz> <izz>0.001</izz> 
+-        </inertia>
+-      </inertial>
+     </link>
+ 
+     <joint name="joint_tool0" type="fixed">
+@@ -685,7 +583,7 @@
+     <joint name="d435_joint" type="fixed">
+         <parent>base_link_top</parent>
+         <child>d435_link</child>
+-        <pose>0.0149 0.0 0.0125 1.570796 0 1.570796</pose>
++        <pose>0.0149 0.0 0.5 1.570796 0 1.570796</pose>
+         <axis>
+             <xyz>0 0 0</xyz>
+         </axis>
+@@ -693,7 +591,7 @@
+ 
+     <link name="d435_link">
+       <collision name='d435_link_collision'>
+-        <pose frame=''>0.0149 0.0 0.0125 1.570796 0 1.570796</pose>
++        <pose frame=''>0.0149 0.0 0.5 1.570796 0 1.570796</pose>
+         <geometry>
+           <box>
+             <size>0.02505 0.090 0.025</size>
+@@ -701,7 +599,7 @@
+         </geometry>
+       </collision>
+       <visual name='d435_link_visual'>
+-        <pose frame=''>0.0149 0.0 0.0125 1.570796 0 1.570796</pose>
++        <pose frame=''>0.0149 0.0 0.5 1.570796 0 1.570796</pose>
+         <geometry>
+           <mesh>
+             <scale>1 1 1</scale>
+@@ -709,13 +607,6 @@
+           </mesh>
+         </geometry>
+       </visual>
+-      <inertial>
+-        <pose>0 0.0 0.0 0 0 0 </pose>
+-        <mass>0.564</mass>
+-        <inertia>
+-          <ixx> 0.003881243 </ixx>  <ixy>0.0</ixy>  <ixz>0.0</ixz> <iyy>0.000498940</iyy> <iyz>0.0</iyz> <izz>0.003879257</izz> 
+-        </inertia>
+-      </inertial>
+       <sensor name="camera" type="depth">
+         <always_on>true</always_on>
+         <visualize>true</visualize>
