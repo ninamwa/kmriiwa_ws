@@ -8,7 +8,7 @@ This package handles tasks associated with manipulation of the LBR iiwa.
 
 ## 2. Requirements
 The following packages needs to be installed:
-- ROS2 Intel Realsense (ROS2 Wrapper for Intel® RealSense™ Devices)
+- ROS2 Intel Realsense
 - ROS2 Openvino Toolkit 
 - ROS2 Object Analytics
 
