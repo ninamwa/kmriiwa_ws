@@ -18,6 +18,8 @@ The connection type (UDP/TCP) and port can be set for each node in the KMRiiwaSu
 The IP address to the remote computer must be defined in either of the TCPSocket or UDPsocket classes, depending on the choice of protocol. 
 
 The files must be downloaded to a Sunrise project and synchronized to the controller from Sunrise Workbench. 
+
+## 2. Requirements
 In addition to the default KUKAJavaLib, the following .jar packages must be added to the library of the project:
 
 - com.kuka.common
