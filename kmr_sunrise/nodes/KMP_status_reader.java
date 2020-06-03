@@ -21,15 +21,9 @@ import java.util.concurrent.TimeUnit;
 
 
 //RoboticsAPI
-import API_ROS2_Sunrise.ISocket;
-import API_ROS2_Sunrise.TCPSocket;
-import API_ROS2_Sunrise.UDPSocket;
-
-import com.kuka.roboticsAPI.controllerModel.Controller;
-import com.kuka.generated.ioAccess.ScannerSignalsIOGroup;
 import com.kuka.roboticsAPI.deviceModel.OperationMode;
 import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
-//TODO: importere alle klasser fra SunriseOmniMoveMobilePlatform, scannerIO
+
 public class KMP_status_reader extends Node{
 
 	// Robot
@@ -41,11 +35,10 @@ public class KMP_status_reader extends Node{
 	private volatile boolean WarningField = false;
 	private volatile boolean ProtectionField = false;
 
-	public KMP_status_reader(int port, KmpOmniMove robot,String ConnectionType, Controller controller) {
+	public KMP_status_reader(int port, KmpOmniMove robot,String ConnectionType) {
 		super(port, ConnectionType,"KMP status reader");
 
-		this.kmp = robot;
-		
+		this.kmp = robot;		
 		if (!(isSocketConnected())) {
 			//System.out.println("Starting thread to connect KMP status node....");
 			Thread monitorKMPStatusConnections = new MonitorKMPStatusConnectionsThread();
@@ -57,7 +50,6 @@ public class KMP_status_reader extends Node{
 	public void run() {
 		while(isNodeRunning())
 		{	
-// TODO: FIND OUT HOW MUCH TO SLEEP. SAMME RATE SOM ODOMETRY?
 			updateOperationMode();
 			updateReadyToMove();
 			updateWarningFieldState();
@@ -86,8 +78,8 @@ public class KMP_status_reader extends Node{
 	
 	// scannerIO
 	private void updateWarningFieldState() {
-//		signalnames =  Arrays.asList("WarningField_B1", "WarningField_B4", "WarningFieldComplete");
 			try{
+				 // true = violation
 				this.WarningField  = kmp.getMobilePlatformSafetyState().isWarningFieldBreached();
 			}catch(Exception e){
 //					System.out.println("Could not read warning field: " + e);
@@ -96,7 +88,6 @@ public class KMP_status_reader extends Node{
 	
 	// scannerIO
 	private void updateProtectionFieldState() {
-//		signalnames =  Arrays.asList("WarningField_B1", "WarningField_B4", "WarningFieldComplete");
 			try{
 				// TRUE IF VIOLATED
 				this.ProtectionField = kmp.getMobilePlatformSafetyState().isSafetyFieldBreached();
@@ -159,8 +150,11 @@ public class KMP_status_reader extends Node{
 	@Override
 	public void close() {
 		closed = true;
-		socket.close();
-		System.out.println("KMP status closed!");
+		try{
+			this.socket.close();
+		}catch(Exception e){
+				System.out.println("Could not close KMP status connection: " +e);
+			}		System.out.println("KMP status closed!");
 
 	}
 

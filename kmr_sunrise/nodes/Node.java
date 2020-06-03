@@ -26,22 +26,18 @@ public abstract class Node extends Thread{
 	private volatile static boolean shutdown;
 	public volatile boolean closed = false;
 	private static volatile boolean EmergencyStop;
-	
 	private volatile static boolean PathFinished;
-	
-	private volatile static boolean isKMPmoving;
+	protected volatile static boolean isKMPmoving;
 	private volatile static boolean isLBRmoving;
-
 	private volatile static boolean isKMPconnected;
 	private volatile static boolean isLBRconnected;
-
-	public static int connection_timeout = 5000;
 
 	// Socket
 	protected ISocket socket;
 	private String ConnectionType;
-	private String CommandStr;
 	private int port;
+	public static int connection_timeout = 5000;
+
 	
 	// For KMP sensor reader:
 	protected ISocket laser_socket;
@@ -52,7 +48,6 @@ public abstract class Node extends Thread{
 	private String OdometryConnectionType;
 	
 	protected String node_name;
-// TODO: LEGGE INN NAVN PÅ NODER SOM PRINTES I TCP SOCKET! orker ikke mer porter	
 	
 	public Node(int port1, String Conn1, int port2, String Conn2, String nodeName){
 		this.KMP_laser_port = port1;
@@ -81,26 +76,26 @@ public abstract class Node extends Thread{
 	
 	public void createSocket(){
 		if (this.ConnectionType == "TCP") {
-			 this.socket = new TCPSocket(this.port);
+			 this.socket = new TCPSocket(this.port, this.node_name);
 		}
 		else {
-			this.socket = new UDPSocket(this.port);
+			this.socket = new UDPSocket(this.port, this.node_name);
 		}
 	}
 	
 	public void createSocket(String Type){
 		if (Type=="Laser"){
 			if(LaserConnectionType == "TCP") {
-				this.laser_socket = new TCPSocket(KMP_laser_port);
+				this.laser_socket = new TCPSocket(KMP_laser_port, this.node_name);
 			}else {
-				this.laser_socket = new UDPSocket(KMP_laser_port);
+				this.laser_socket = new UDPSocket(KMP_laser_port, this.node_name);
 			}
 		}else if(Type=="Odom") {
 			if(OdometryConnectionType == "TCP") {
-				this.odometry_socket = new TCPSocket(KMP_odometry_port);
+				this.odometry_socket = new TCPSocket(KMP_odometry_port, this.node_name);
 
 			}else {
-				this.odometry_socket = new UDPSocket(KMP_odometry_port);
+				this.odometry_socket = new UDPSocket(KMP_odometry_port, this.node_name);
 			}
 		}
 	}
@@ -110,7 +105,7 @@ public abstract class Node extends Thread{
 	}
 	
 	public boolean isNodeRunning() {
-		return this.isSocketConnected() && (!(closed) && !shutdown);
+		return this.isSocketConnected() && (!(this.closed) && !this.getShutdown());
 	}
 	
 	public static void setEmergencyStop(boolean es){

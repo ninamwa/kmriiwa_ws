@@ -1,18 +1,3 @@
-// Copyright 2019 Nina Marie Wahl og Charlotte Heggem.
-// Copyright 2019 Norwegian University of Science and Technology.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package API_ROS2_Sunrise;
 
 
@@ -40,11 +25,13 @@ public class TCPSocket implements ISocket{
 	public BufferedReader inputStream;
 	private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
 	int COMport;
+	String nodename;
 	
-	public TCPSocket(int port) {
+	public TCPSocket(int port, String node_name) {
 		isConnected = false;
 		COMport = port;
 		TCPConn = connect();
+		this.nodename=node_name;
 
 	}
 	
@@ -52,13 +39,17 @@ public class TCPSocket implements ISocket{
 	{
 		while (true){
 			try{
-				TCPConn = new Socket("192.168.10.117",COMport);
+				String remotePC = "192.168.10.117";
+				String remotePCCha = "192.168.10.121";
+				String NUC = "192.168.10.120";
+
+				TCPConn = new Socket(remotePC,COMport);
 				TCPConn.setReuseAddress(true);
-				System.out.println("KUKA connecting to ROS over TCP on port: "+ COMport);
+				System.out.println(this.nodename + " connecting to ROS over TCP on port: "+ COMport);
 				break;
 			}
 			catch(IOException e1){
-				System.out.println("Could not connect to ROS over TCP on port : "+ this.COMport + " Error: " +e1);
+				System.out.println("Could not connect "+ this.nodename+ " to ROS over TCP on port : "+ this.COMport + " Error: " +e1);
 			return null;
 			}
 		}
@@ -68,7 +59,7 @@ public class TCPSocket implements ISocket{
 			isConnected=true;
 			return TCPConn;
 		}catch(Exception e){
-			System.out.println("Error creating I/O ports for TCP communication on port: "+ this.COMport + " Error: " +e);
+			System.out.println("Error creating I/O ports for TCP communication for  "+ this.nodename+ " on port: "+ this.COMport + " Error: " +e);
 			return null;
 		}
 		
@@ -90,7 +81,7 @@ public class TCPSocket implements ISocket{
 			return line;
 		
 			}catch(Exception e){
-				System.out.println("Could not receive message from TCP connection on port: "+ this.COMport + " Error: " +e);
+				System.out.println(this.nodename+ " could not receive message from TCP connection on port: "+ this.COMport + " Error: " +e);
 				return "error";
 			}
 	}	
@@ -103,7 +94,7 @@ public class TCPSocket implements ISocket{
 			System.out.println("TCP connection to ROS closed port: " + this.COMport);
 			isConnected=false;
 		} catch (Exception e) {
-			System.out.println("ERROR closing the TCP communication port to ROS: " + this.COMport + " error: " + e);
+			System.out.println("ERROR closing the TCP communication of  "+ this.nodename+ "  on port: " + this.COMport + " error: " + e);
 		}
 	}
 	

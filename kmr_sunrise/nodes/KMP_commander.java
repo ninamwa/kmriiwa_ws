@@ -20,14 +20,12 @@ package API_ROS2_Sunrise;
 
 
 // RoboticsAPI
-import API_ROS2_Sunrise.ISocket;
 import API_ROS2_Sunrise.KMPjogger;
-import API_ROS2_Sunrise.TCPSocket;
-import API_ROS2_Sunrise.UDPSocket;
 
 import com.kuka.jogging.provider.api.common.ICartesianJoggingSupport;
 import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
 import com.kuka.roboticsAPI.executionModel.ICommandContainer;
+import com.kuka.roboticsAPI.motionModel.kmp.MobilePlatformRelativeMotion;
 
 
 public class KMP_commander extends Node{
@@ -40,11 +38,13 @@ public class KMP_commander extends Node{
 	double[] velocities = {0.0,0.0,0.0};
 	KMPjogger kmp_jogger;
 
-	
+	long jogging_period  = 4L;
+
 	public KMP_commander(int port, KmpOmniMove robot, String ConnectionType) {
 		super(port,ConnectionType, "KMP commander");
 		this.kmp = robot;
-		this.kmp_jogger = new KMPjogger((ICartesianJoggingSupport)kmp);
+		this.kmp_jogger = new KMPjogger((ICartesianJoggingSupport)kmp, jogging_period);
+		
 		
 		if (!(isSocketConnected())) {
 			//System.out.println("Starting thread to connect KMP command node....");
@@ -64,32 +64,70 @@ public class KMP_commander extends Node{
 		{
 			String Commandstr = this.socket.receive_message(); 
 	    	String []splt = Commandstr.split(" ");
-	    
-	    	if ((splt[0]).equals("shutdown")){
-	    		System.out.println("KMP received shutdown");
-				setShutdown(true);	
-				break;
-				}
-	    	
-	    	if ((splt[0]).equals("setTwist") && !getEmergencyStop()){
-					setNewVelocity(Commandstr);
+	    	if( !getShutdown() && !closed){
+		    	if ((splt[0]).equals("shutdown")){
+		    		System.out.println("KMP received shutdown");
+					setShutdown(true);	
+					break;
 					}
-	    	
-		}
+		
+		    	if ((splt[0]).equals("setTwist") && !getEmergencyStop()){
+						setNewVelocity(Commandstr);
+						}
+		    	if ((splt[0]).equals("setPose") && !getEmergencyStop()){
+
+					setNewPose(Commandstr);
+
+					}
+
+		
+	    	}
+		}System.out.println("KMPcommander no longer running");
     }
 	
 	public class MonitorEmergencyStopThread extends Thread {
 		public void run(){
 			while(isNodeRunning()) {
-				if (getEmergencyStop()){
-					setNewVelocity("vel 0 0 0");
-					}
+				if (getEmergencyStop() && getisKMPMoving()){
+					  setisKMPMoving(false);
+					  kmp_jogger.killJoggingExecution(getisKMPMoving());
+					  System.out.println("successfully killed jogging execution from emergency stop");
+					  if(!(KMP_currentMotion==null)){
+						  KMP_currentMotion.cancel();
+					  }
+				}
 				}
 			}
 		}
 	
-	
+	public void setNewPose(String data){
+		String []lineSplt = data.split(" ");
+		if (lineSplt.length==4){
+			double pose_x = Double.parseDouble(lineSplt[1]);
+			double pose_y = Double.parseDouble(lineSplt[2]);
+			double pose_theta = Double.parseDouble(lineSplt[3]);
 
+			MobilePlatformRelativeMotion MRM = new MobilePlatformRelativeMotion(pose_x, pose_y, pose_theta);
+
+			MRM.setVelocity(300, 10);
+			MRM.setTimeout(100);
+			MRM.setAcceleration(10, 10);
+
+			if(kmp.isReadyToMove()) {
+				System.out.println("moving");
+				this.KMP_currentMotion =  kmp.moveAsync(MRM);
+			}
+			else {
+				System.out.println("Kmp is not ready to move!");
+			}
+
+		}else{
+			System.out.println("Unacceptable Mobile Platform Relative Velocity command!");
+
+		}
+	}
+
+	
 	public void setNewVelocity(String vel){
 		String []lineSplt = vel.split(" ");
 
@@ -98,25 +136,26 @@ public class KMP_commander extends Node{
 				this.velocities[1] = Double.parseDouble(lineSplt[2]); // y
 				this.velocities[2] = Double.parseDouble(lineSplt[3]);  // theta
 				
-				if(velocities[0] !=0 ||velocities[1] !=0 ||velocities[2] !=0 ) {
+				if(velocities[0] == 0 && velocities[1] == 0 && velocities[2] ==0) {
 					  if(getisKMPMoving()) {
-						  System.out.println("update jogging with " + this.velocities[0]);
+						  setisKMPMoving(false);
+						  this.kmp_jogger.killJoggingExecution(true);
+						  }
+				}else{
+					  if(getisKMPMoving()&& !getEmergencyStop()) {
 						  this.kmp_jogger.updateVelocities(this.velocities);
 					  }
-					  else {
-						  System.out.println("start jogging with " + this.velocities[0]);
+					  else if(!getisKMPMoving() && !getEmergencyStop() && kmp.isReadyToMove()){
+						  setisKMPMoving(true);
 						  this.kmp_jogger.updateVelocities(this.velocities);
 						  this.kmp_jogger.startJoggingExecution();
-						  setisKMPMoving(true);
+					  }else{System.out.println("Can not jog robot, is ready to move is: " +kmp.isReadyToMove() + " calculated value: " + KmpOmniMove.calculateReadyToMove(kmp.getSafetyState()));
+
 					  }
-				  }else {
-					  if(getisKMPMoving()) {
-						  System.out.println("Stop moving KMP");
-						  this.kmp_jogger.killJoggingExecution();
-						  setisKMPMoving(false);					  }
+					  
 				  }
+				}
 		}
-	}
 	
 	public class MonitorKMPCommandConnectionsThread extends Thread {
 		int timeout = 3000;
@@ -142,20 +181,20 @@ public class KMP_commander extends Node{
 				}	
 		}
 	}
-	
+
 
 	@Override
 	public void close() {
 		closed = true;
-		setShutdown(true);
 		try{
-			setNewVelocity("vel 0 0 0");
+			 this.kmp_jogger.killJoggingExecution(getisKMPMoving());
+			 System.out.println("KMPJogger ended successfully");
 		}catch(Exception e){
 			System.out.println("Could not kill jogging execution");
 		}
 		try{
 			this.socket.close();
-			}catch(Exception e){
+		}catch(Exception e){
 				System.out.println("Could not close KMP commander connection: " +e);
 			}
 		System.out.println("KMP commander closed!");

@@ -117,7 +117,7 @@ public class LBR_sensor_reader extends Node{
 			try{
 				this.socket.send_message(sensorString);
 				if(closed){
-					System.out.println("LBR sensor sender selv om han ikke fï¿½r lov");
+					System.out.println("LBR sensor sender selv om han ikke faar lov");
 				}
 			}catch(Exception e){
 				System.out.println("Could not send LBR sensormessage to ROS: " + e);
@@ -128,7 +128,11 @@ public class LBR_sensor_reader extends Node{
 	@Override
 	public void close() {
 		closed = true;
-		socket.close();
+		try{
+			this.socket.close();
+		}catch(Exception e){
+				System.out.println("Could not close LBR sensor connection: " +e);
+			}
 		System.out.println("LBR sensor closed!");
 
 	}

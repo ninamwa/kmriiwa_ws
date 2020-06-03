@@ -64,11 +64,12 @@ public class KMP_sensor_reader extends Node{
 	}
 	
 	public void fdiConnection(){
-		listener = new DataController(laser_socket, odometry_socket);
+		//FDIConnection.DATA_TIMEOUT=14000L;
 		InetSocketAddress fdi_adress = new InetSocketAddress(FDI_IP,FDI_port);
 		this.fdi = new FDIConnection(fdi_adress);
-		this.fdi.addConnectionListener(listener);
-		this.fdi.addDataListener(listener);
+		this.listener = new DataController(laser_socket, odometry_socket);
+		this.fdi.addConnectionListener(this.listener);
+		this.fdi.addDataListener(this.listener);
 		this.fdi.connect();
 	}
 	
@@ -127,12 +128,11 @@ public class KMP_sensor_reader extends Node{
 	}
 	
 	public void subscribe_kmp_odometry_data() {
-    		fdi.getNewOdometry();
+    		this.fdi.getNewOdometry();
 	}
 	public void subscribe_kmp_laser_data(){
-    		fdi.getNewLaserScan(laser_B1);
-    		fdi.getNewLaserScan(laser_B4);
-
+		this.fdi.getNewLaserScan(laser_B1);
+		this.fdi.getNewLaserScan(laser_B4);
 	}
 	
 	@Override
@@ -143,8 +143,29 @@ public class KMP_sensor_reader extends Node{
 		if(isOdometrySocketConnected()) {
 			subscribe_kmp_odometry_data();
 		}
+		boolean attempt_reconnection=true;
+		while(!closed){
+			if(!attempt_reconnection){attempt_reconnection = true;}
+			
+			while(!getListener().fdi_isConnected){
+				if(attempt_reconnection){
+					this.fdi.disconnect();					
+					System.out.println("Initiate new FDI connection");
+					this.fdiConnection();
+					attempt_reconnection=false;
+				}if(!attempt_reconnection && this.fdi.isConnected()){
+					System.out.println("Reconnected FDI connection. Subscribing to sensor data:");
+					subscribe_kmp_laser_data();
+					subscribe_kmp_odometry_data();
+				}
+			}
+		}
 	}
 	
+	private DataController getListener() {
+		return this.listener;
+	}
+
 	@Override
 	public void close() {
 		closed = true;
@@ -167,7 +188,6 @@ public class KMP_sensor_reader extends Node{
 		System.out.println("KMP sensor closed!");
 	}
 	
-	// Dette gir feilmelding hvis det ikke eksisterer et objekt
 	public boolean isLaserSocketConnected() {
 		boolean res = false;
 		try {

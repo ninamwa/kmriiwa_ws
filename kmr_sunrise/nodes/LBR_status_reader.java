@@ -18,9 +18,6 @@ package API_ROS2_Sunrise;
 
 import java.util.concurrent.TimeUnit;
 
-import API_ROS2_Sunrise.ISocket;
-import API_ROS2_Sunrise.TCPSocket;
-import API_ROS2_Sunrise.UDPSocket;
 
 import com.kuka.roboticsAPI.deviceModel.LBR;
 
@@ -30,10 +27,6 @@ public class LBR_status_reader extends Node{
 	// Robot
 	LBR lbr;
 	
-	// LBR status variables
-	private Object isReadyToMove = null;
-	private boolean hasActiveCommand;
-
 	
 	public LBR_status_reader(int port, LBR robot, String ConnectionType) {
 		super(port,ConnectionType, "LBR status reader");
@@ -61,13 +54,7 @@ public class LBR_status_reader extends Node{
 	private boolean getReadyToMove() {
 		return lbr.isReadyToMove();
 	}
-	
-	private void updateActiveCommand(){
-		try{
-			hasActiveCommand = lbr.hasActiveMotionCommand();
-		}catch(Exception e){}
-	}
-	
+
 	
 	private String generateStatusString() {
 
@@ -124,8 +111,11 @@ public class LBR_status_reader extends Node{
 	@Override
 	public void close() {
 		closed = true;
-		socket.close();
-		System.out.println("LBR status closed!");
+		try{
+			this.socket.close();
+		}catch(Exception e){
+				System.out.println("Could not close LBR status connection: " +e);
+			}		System.out.println("LBR status closed!");
 
 	}
 	

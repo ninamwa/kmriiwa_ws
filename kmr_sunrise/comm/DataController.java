@@ -18,12 +18,12 @@ package API_ROS2_Sunrise;
 // Implemented classes
 
 
-
 // RoboticsAPI
 import API_ROS2_Sunrise.ISocket;
 
 import com.kuka.nav.fdi.DataConnectionListener;
 import com.kuka.nav.fdi.DataListener;
+//import com.kuka.nav.fdi.FDIConnection;
 import com.kuka.nav.fdi.data.CommandedVelocity;
 import com.kuka.nav.fdi.data.Odometry;
 import com.kuka.nav.fdi.data.RobotPose;
@@ -86,29 +86,27 @@ public class DataController implements DataListener, DataConnectionListener{
 
 	@Override
 	public void onConnectionClosed() {
-		System.out.println("FDIConnection closed");
 		fdi_isConnected = false;
-		
-	}
+		System.out.println("FDIConnection closed");
+		}
 
 	@Override
 	public void onConnectionFailed(Exception arg0) {
+		fdi_isConnected = false;
 		System.out.println("FDIConnection failed");
 		System.out.println(arg0);
-		fdi_isConnected = false;
 
 	}
 
 	@Override
 	public void onConnectionSuccessful() {
-		System.out.println("FDIConnection successful");
 		fdi_isConnected = true;
+		System.out.println("FDIConnection successful");
 		
 	}
 
 	@Override
 	public void onConnectionTimeout() {
-		
 		System.out.println("FDIConnection timeout");
 	}
 
@@ -127,7 +125,5 @@ public class DataController implements DataListener, DataConnectionListener{
 
 	public void setOdometrySocket(ISocket odometry_socket2) {
 		this.odometry_socket = odometry_socket2;
-		
-	}
-	
+	}	
 }
