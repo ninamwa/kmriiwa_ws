@@ -66,9 +66,6 @@ class KmpStatusNode(Node):
             pass
         self.get_logger().info('Node is ready')
 
-        thread.start_new_thread(self.run, ())
-
-    def run(self):
         while rclpy.ok() and self.soc.isconnected:
             self.status_callback(self.pub_kmp_statusdata, self.soc.kmp_statusdata)
 

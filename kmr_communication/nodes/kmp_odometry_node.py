@@ -71,9 +71,6 @@ class KmpOdometryNode(Node):
             pass
         self.get_logger().info('Node is ready')
 
-        thread.start_new_thread(self.run, ())
-
-    def run(self):
         while rclpy.ok() and self.soc.isconnected:
             self.odom_callback(self.pub_odometry, self.soc.odometry)
 
@@ -91,7 +88,7 @@ class KmpOdometryNode(Node):
 
 
             odom = Odometry()
-            odom.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
+            odom.header.stamp = self.get_clock().now().to_msg()
             odom.header.frame_id = "odom"
 
             point = Point()
@@ -133,7 +130,6 @@ class KmpOdometryNode(Node):
             odom_tf.header.frame_id = odom.header.frame_id
             odom_tf.child_frame_id = odom.child_frame_id
             odom_tf.header.stamp = odom.header.stamp
-
             self.tf_broadcaster.sendTransform(odom_tf)
             publisher.publish(odom)
 
@@ -161,7 +157,6 @@ def main(argv=sys.argv[1:]):
     parser.add_argument('-c', '--connection')
     parser.add_argument('-ro', '--robot')
     args = parser.parse_args(remove_ros_args(args=argv))
-    #args.robot='KMR2'
     rclpy.init(args=argv)
     odometry_node = KmpOdometryNode(args.connection,args.robot)
 

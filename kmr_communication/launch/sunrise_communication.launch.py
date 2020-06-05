@@ -36,7 +36,7 @@ def generate_launch_description(argv=sys.argv[1:]):
     # robot = args.robot
 
     connection_type_TCP='TCP'
-    connection_type_UDP = 'UDP'
+    connection_type_UDP ='UDP'
 
     #robot = argv[len(argv)-1].split("=")[1]
     robot="KMR2"
@@ -54,6 +54,19 @@ def generate_launch_description(argv=sys.argv[1:]):
             'param_dir',
             default_value=param_dir,
             description='Full path to parameter file to load'),
+
+        launch_ros.actions.Node(
+            package='tf2_ros',
+            node_executable='static_transform_publisher',
+            output='screen',
+            arguments=['0', '0', '0', '0', '0', '0', 'laser_B4_link', 'scan_2']
+            ),
+        launch_ros.actions.Node(
+            package='tf2_ros',
+            node_executable='static_transform_publisher',
+            output='screen',
+            arguments=['0', '0', '0', '0', '0', '0', 'laser_B1_link', 'scan']
+            ),
 
         launch_ros.actions.Node(
             package="kmr_communication",
