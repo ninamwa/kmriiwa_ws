@@ -171,14 +171,12 @@ private:
     switch (rc) {
       case kmr_behavior_tree::BtStatus::SUCCEEDED:
         RCLCPP_INFO(get_logger(), "Object found and handled - succeeded");
-        //start_bt();
-        exit(0);
+        start_bt();
         break;
 
       case kmr_behavior_tree::BtStatus::FAILED:
         RCLCPP_ERROR(get_logger(), "Object found and handled - failed");
-        //start_bt();
-        exit(0);
+        start_bt();
         break;
 
       case kmr_behavior_tree::BtStatus::CANCELED:
@@ -209,6 +207,7 @@ private:
   }
 
   bool send_navigation_goal(geometry_msgs::msg::PoseStamped pose){
+    RCLCPP_INFO(LOGGER, "Send navigation goal to drive home");
     auto is_action_server_ready = action_client_->wait_for_action_server(std::chrono::seconds(5));
       if (!is_action_server_ready) {
         RCLCPP_ERROR(LOGGER,"NavigateToPose action server is not available.");

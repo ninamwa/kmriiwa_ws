@@ -1,5 +1,5 @@
 
-<root main_tree_to_execute="Test2">
+<root main_tree_to_execute="TestNav">
 
     <BehaviorTree ID="Test2">
         <Sequence name="main_sequence">
@@ -20,27 +20,133 @@
 
     <BehaviorTree ID="Test3">
         <Sequence name="main_sequence">
-            <MoveGripper action="close"/>
-            <MoveGripper action="open"/>
+            <PlanManipulatorPath plan_to_frame="search3" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
         </Sequence>
     </BehaviorTree> 
 
     <BehaviorTree ID="TestNav">
         <Sequence name="main_sequence">
+            <MoveGripper action="open"/>
             <NavigateVehicle/>
-            <PlanManipulatorPath plan_to_frame="search2" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
-            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <Sequence name="main_manipulator_sequence">
+                <Fallback name="find_object">
+                    <ForceFailure name="force_failure11">
+                        <Sequence name="search1">
+                            <PlanManipulatorPath plan_to_frame="search1" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                        </Sequence>
+                    </ForceFailure>
+                    <Sequence name="search_frame3">
+                        <Sequence name="search3">
+                            <PlanManipulatorPath plan_to_frame="search3" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                        </Sequence>
+                        <ObjectSearch object_pose="{object_pose}"/>
+                    </Sequence>
+                    <ForceFailure name="force_failure1">
+                        <Sequence name="gotodrive">
+                            <PlanManipulatorPath plan_to_frame="driveposition" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                        </Sequence>
+                    </ForceFailure>
+                </Fallback>
+                <Sequence name="handle_object">
+                    <Fallback name="handle_not_able_to_close">
+                        <Sequence name="pick_object">
+                            <Sequence name="main_move_to_object">
+                                <PlanManipulatorPath plan_to_frame="object" object_pose="{object_pose}" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                                <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                            </Sequence>
+                            <MoveGripper action="close"/>
+                        </Sequence>
+                        <ForceFailure name="force_failure1">
+                            <Sequence name="movetodrive">
+                                <PlanManipulatorPath plan_to_frame="driveposition" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                                <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                            </Sequence>
+                        </ForceFailure>
+                    </Fallback>
+                    <Sequence name="leave_object">
+                        <Fallback name="find_empty_frame">
+                            <Fallback name="check_empty_frame">
+                                <EmptyFrame check_frame="carryarea1" empty_frame="{empty_frame}"/>
+                                <EmptyFrame check_frame="carryarea2" empty_frame="{empty_frame}"/>
+                                <EmptyFrame check_frame="carryarea3" empty_frame="{empty_frame}"/>
+                            </Fallback>
+                            <ForceFailure name="force_failure2">
+                                <MoveGripper action="open"/>
+                            </ForceFailure>
+                        </Fallback>
+                        <Sequence name="emptyframe">
+                            <PlanManipulatorPath plan_to_frame="{empty_frame}" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                        </Sequence>
+                        <MoveGripper action="open"/>
+                        <Sequence name="drive">
+                            <PlanManipulatorPath plan_to_frame="driveposition" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                        </Sequence>
+                    </Sequence>
+                </Sequence>
+            </Sequence>
         </Sequence>
     </BehaviorTree> 
 
     <BehaviorTree ID="TestTree">
         <Sequence name="main_sequence">
-            <PlanManipulatorPath plan_to_frame="search2" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <MoveGripper action="open"/>
+            <PlanManipulatorPath plan_to_frame="search1" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
             <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
-            <ObjectSearch object_pose="{object_pose}"/>
-            <PlanManipulatorPath plan_to_frame="object" object_pose="{object_pose}" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <PlanManipulatorPath plan_to_frame="search3" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
             <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
-            <MoveGripper action="close"/>
+            <Fallback name="object_search">
+                <ObjectSearch object_pose="{object_pose}"/>
+                <ForceFailure name="force_failure1">
+                    <Sequence name="gotodrive">
+                        <PlanManipulatorPath plan_to_frame="driveposition" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                        <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                    </Sequence>
+                </ForceFailure>
+            </Fallback>
+            <Sequence name="handle_object">
+                <Fallback name="handle_not_able_to_close">
+                    <Sequence name="pick_object">
+                        <Sequence name="main_move_to_object">
+                            <PlanManipulatorPath plan_to_frame="object" object_pose="{object_pose}" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                        </Sequence>
+                        <MoveGripper action="close"/>
+                    </Sequence>
+                    <ForceFailure name="force_failure1">
+                        <Sequence name="movetodrive">
+                            <PlanManipulatorPath plan_to_frame="driveposition" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                        </Sequence>
+                    </ForceFailure>
+                </Fallback>
+                <Sequence name="leave_object">
+                    <Fallback name="find_empty_frame">
+                        <Fallback name="check_empty_frame">
+                            <EmptyFrame check_frame="carryarea1" empty_frame="{empty_frame}"/>
+                            <EmptyFrame check_frame="carryarea2" empty_frame="{empty_frame}"/>
+                            <EmptyFrame check_frame="carryarea3" empty_frame="{empty_frame}"/>
+                        </Fallback>
+                        <ForceFailure name="force_failure2">
+                            <MoveGripper action="open"/>
+                        </ForceFailure>
+                    </Fallback>
+                    <Sequence name="emptyframe">
+                        <PlanManipulatorPath plan_to_frame="{empty_frame}" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                        <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                    </Sequence>
+                    <MoveGripper action="open"/>
+                    <Sequence name="drive">
+                        <PlanManipulatorPath plan_to_frame="driveposition" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                        <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+                    </Sequence>
+                </Sequence>
+            </Sequence>
         </Sequence>
     </BehaviorTree> 
 
