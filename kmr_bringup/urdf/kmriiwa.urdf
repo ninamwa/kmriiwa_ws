@@ -433,49 +433,49 @@
   </link>
 
 
-  <joint name="joint_a1" type="fixed">
+  <joint name="joint_a1" type="revolute">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <parent link="base_iiwa"/>
       <child link="link_1"/>
       <axis xyz="0 0 1"/>
       <limit effort="0" lower="-2.9668" upper="2.9668" velocity="1.4834"/>
   </joint>
-  <joint name="joint_a2" type="fixed">
+  <joint name="joint_a2" type="revolute">
       <origin rpy="0 0 0" xyz="-0.00043624 0 0.36"/>
       <parent link="link_1"/>
       <child link="link_2"/>
       <axis xyz="0 1 0"/>
       <limit effort="0" lower="-2.0942" upper="2.0942" velocity="1.4834"/>
   </joint>
-  <joint name="joint_a3" type="fixed">
+  <joint name="joint_a3" type="revolute">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <parent link="link_2"/>
       <child link="link_3"/>
       <axis xyz="0 0 1"/>
       <limit effort="0" lower="-2.9668" upper="2.9668" velocity="1.7452"/>
   </joint>
-  <joint name="joint_a4" type="fixed">
+  <joint name="joint_a4" type="revolute">
       <origin rpy="0 0 0" xyz="0.00043624 0 0.42"/>
       <parent link="link_3"/>
       <child link="link_4"/>
       <axis xyz="0 -1 0"/>
       <limit effort="0" lower="-2.0942" upper="2.0942" velocity="1.3089"/>
   </joint>
-  <joint name="joint_a5" type="fixed">
+  <joint name="joint_a5" type="revolute">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <parent link="link_4"/>
       <child link="link_5"/>
       <axis xyz="0 0 1"/>
       <limit effort="0" lower="-2.9668" upper="2.9668" velocity="2.2688"/>
   </joint>
-  <joint name="joint_a6" type="fixed">
+  <joint name="joint_a6" type="revolute">
       <origin rpy="0 0 0" xyz="0 0 0.4"/>
       <parent link="link_5"/>
       <child link="link_6"/>
       <axis xyz="0 1 0"/>
       <limit effort="0" lower="-2.0942" upper="2.0942" velocity="2.356"/>
   </joint>
-  <joint name="joint_a7" type="fixed">
+  <joint name="joint_a7" type="revolute">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <parent link="link_6"/>
       <child link="link_7"/>
@@ -484,7 +484,7 @@
   </joint>
 
   <joint name="joint_a7-adapter" type="fixed">
-      <origin rpy="0 0 0" xyz="0 0 0.1365"/>
+      <origin rpy="0 0 -0.785398" xyz="0 0 0.1365"/>
       <parent link="link_7"/>
       <child link="adapter"/>
       <axis xyz="0 0 0"/>
@@ -564,10 +564,43 @@
     </link>
     <!--  -->
 
+    <joint name="d435_manipulator_depth_joint" type="fixed">
+      <origin xyz="0.0149 -0.0075 0.0125" rpy="0 0 0"/>
+      <parent link="d435_manipulator_link"/>
+      <child link="d435_manipulator_depth_frame" />
+    </joint>
 
-  <joint name="joint_adapter-gripper" type="fixed">
-      <origin rpy="0 0 0" xyz="0 0 0.0175"/>
+    <link name="d435_manipulator_depth_frame"/>
+
+    <joint name="d435_manipulator_depth_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
+      <parent link= "d435_manipulator_depth_frame" />
+      <child link="d435_manipulator_depth_optical_frame" />
+    </joint>
+
+    <link name="d435_manipulator_depth_optical_frame"/>
+
+
+  <joint name="joint_adapter-gripperadapter" type="fixed">
+      <origin rpy="0 0 0" xyz="0 0 0.0255"/>
       <parent link="adapter"/>
+      <child link="gripper-adapter"/>
+      <axis xyz="0 0 0"/>
+  </joint>
+
+  <link name="gripper-adapter">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.016" radius="0.0375" />
+      </geometry>
+      <material name="Black"/>
+    </visual>
+  </link>
+
+  <joint name="joint_gripperadapter-gripper" type="fixed">
+      <origin rpy="0 0 0" xyz="0 0 0.008"/>
+      <parent link="gripper-adapter"/>
       <child link="gripper_base_link"/>
       <axis xyz="0 0 0"/>
   </joint>
@@ -924,7 +957,7 @@
     </link>
 
     <joint name="gripper_middle_point" type="fixed">
-      <origin xyz="0 0.0 0.14" rpy="0 0 0"/>
+      <origin xyz="0 0.0 0.144" rpy="0 0 0"/>
       <parent link="gripper_base_link" />
       <child link="gripper_middle_point" />
     </joint>

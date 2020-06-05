@@ -131,6 +131,16 @@
     <disable_collisions link1="d435_manipulator_link" link2="adapter" reason="Adjacent" />
     <disable_collisions link1="d435_manipulator_link" link2="gripper_base_link" reason="Adjacent" />
     <disable_collisions link1="d435_manipulator_link" link2="link_7" reason="Adjacent" />
+    <disable_collisions link1="d435_manipulator_link" link2="kamerafeste2" reason="Adjacent" />
+    <disable_collisions link1="d435_manipulator_link" link2="kamerafeste1" reason="Never" />
+    <disable_collisions link1="adapter" link2="kamerafeste1" reason="Adjacent" />
+    <disable_collisions link1="adapter" link2="kamerafeste2" reason="Never" />
+    <disable_collisions link1="kamerafeste1" link2="kamerafeste2" reason="Adjacent" />
+    <disable_collisions link1="adapter" link2="gripper-adapter" reason="Never" />
+    <disable_collisions link1="gripper-adapter" link2="gripper_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper-adapter" link2="kamerafeste1" reason="Never" />
+    <disable_collisions link1="gripper-adapter" link2="kamerafeste2" reason="Never" />
+
 
 
     <disable_collisions link1="link_7" link2="gripper_base_link" reason="Never" />
