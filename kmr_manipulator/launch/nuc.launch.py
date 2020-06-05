@@ -71,16 +71,8 @@ def generate_launch_description():
             parameters=[],
             emulate_tty=True,
             )
-    static_tf_gripper_camera = Node(
-            package='tf2_ros',
-            node_executable='static_transform_publisher',
-            node_name='static_transform_publisher',
-            output='screen',
-            arguments=['-0.03902832457377', '0.071972604504285', '-0.068351201911208','-0.2516176', '-0.6556494', '-0.2718023', '0.6579786', 'gripper_middle_point', 'd435_manipulator_link']
-            #FROM HANDEYE: arguments=['-0.0289927992727699', '0.0824023165622858', '-0.06869676363920808', '0.008927740427062715','0.011256968823999847', '-0.9185240083416109','0.3951040650307494' , 'gripper_middle_point', 'camera_color_optical_frame]
-            )
 
-        # object_analytics_rviz, add to launch description if desired
+    # object_analytics_rviz, add to launch description if desired
     oarviz = Node(
     package='object_analytics_rviz', node_executable='image_publisher',
     remappings=[('/object_analytics/rgb', 'ManipulatorCamera/camera/color/image_raw')],)
@@ -96,14 +88,13 @@ def generate_launch_description():
 
 
     return launch.LaunchDescription([d435_manipulator,
-                                      #static_tf_gripper_camera,
-                                      #openvinonode,
-                                      #oanode,
-                                      #searchnode,
-                                      #grippernode,
-                                      #oarviz,
-                                      #oarviz2,
-                                      #rviz,
+                                      openvinonode,
+                                      oanode,
+                                      searchnode,
+                                      grippernode,
+                                      oarviz,
+                                      oarviz2,
+                                      rviz,
                                       #IncludeLaunchDescription(
                                        # PythonLaunchDescriptionSource([multiplecamera_launch_dir,'/multiple_cameras.launch.py']))
 					])

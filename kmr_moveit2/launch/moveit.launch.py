@@ -94,7 +94,7 @@ def generate_launch_description():
                                   )
 
     return LaunchDescription([ static_tf,rviz_node,run_moveit_node,
-     #IncludeLaunchDescription(
-     #       PythonLaunchDescriptionSource([state_publisher_launch_file_dir, '/state_publisher.launch.py']),
-     #   ),
+     IncludeLaunchDescription(
+           PythonLaunchDescriptionSource([state_publisher_launch_file_dir, '/state_publisher.launch.py']),
+       ),
         ])

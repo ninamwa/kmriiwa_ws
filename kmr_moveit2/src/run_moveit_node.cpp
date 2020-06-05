@@ -69,6 +69,8 @@ public:
     , robot_state_publisher_(node_->create_publisher<moveit_msgs::msg::DisplayRobotState>("display_robot_state", 1))
     , trajectory_publisher_(node_->create_publisher<trajectory_msgs::msg::JointTrajectory>(
           "/fake_joint_trajectory_controller/joint_trajectory", 1))
+    , pose_publisher_(node_->create_publisher<geometry_msgs::msg::PoseStamped>(
+          "/pose2", 1))
     , goal_pose_subscriber_(node_->create_subscription<geometry_msgs::msg::PoseStamped>(
       "/moveit/goalpose", 10 ,std::bind(&RunMoveIt::goalpose_callback, this, std::placeholders::_1)))
     , frame_subscriber_(node_->create_subscription<std_msgs::msg::String>("/moveit/frame2",10,std::bind(&RunMoveIt::frame_callback, this, std::placeholders::_1)))
@@ -163,38 +165,28 @@ public:
       //scene->processCollisionObjectMsg(collision_object);
     }  // Unlock PlanningScene
   
-    // Set joint state goal
-    // RCLCPP_INFO(LOGGER, "Set goal");
-    // arm.setGoal("pose1");
 
     geometry_msgs::msg::PoseStamped pose_msg;
-    pose_msg.header.frame_id = "base_footprint";
-    pose_msg.pose.position.x = -0.2;
-    pose_msg.pose.position.y = 0.0;
-    pose_msg.pose.position.z = 0.75;
-    pose_msg.pose.orientation.w = 0.0;
-    pose_msg.pose.orientation.x = 1.0;
-    pose_msg.pose.orientation.y= 0.0;
-    pose_msg.pose.orientation.z = 0.0;
+    pose_msg.header.frame_id = "d435_manipulator_depth_optical_frame";
+    pose_msg.pose.position.x = -0.0;
+    pose_msg.pose.position.y = 0.6;
+    pose_msg.pose.position.z = 0.3;
+    pose_msg.pose.orientation.x = -0.4098535;
+    pose_msg.pose.orientation.y= -0.0;
+    pose_msg.pose.orientation.z = 0.7079288;
+    pose_msg.pose.orientation.w = 0.5752016;
 
-
-    geometry_msgs::msg::PoseStamped pose;
-    pose.header.frame_id = "base_iiwa";
-    pose.pose.position.x = 0.3;
-    pose.pose.position.y = 0.4;
-    pose.pose.position.z = 0.9;
-    pose.pose.orientation.w = 1.0;
-
-    // arm->setGoal(pose_msg,"gripper_middle_point");
-    //arm->setGoal("driveposition");
-    //RunMoveIt::move();
-    //rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
+    // rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
+    // arm->setGoal("driveposition");
+    // RCLCPP_INFO(LOGGER, "Moving to search3");
+    // RunMoveIt::move();
+    // rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
     
-/* 
-
-    arm->setGoal(pose_msg, "gripper_base_link"); */
-    //RunMoveIt::move();
-    //rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
+    // pose_publisher_->publish(pose_msg);
+    // arm->setGoal(pose_msg, "gripper_middle_point"); 
+    // RCLCPP_INFO(LOGGER, "Moving to object");
+    // RunMoveIt::move();
+    // rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
 
     // arm->setGoal("search2");
     // RunMoveIt::move();
@@ -305,6 +297,7 @@ private:
         std::cout << goal->pose.pose.position.y << std::endl;
         std::cout << goal->pose.pose.position.z << std::endl;
         std::cout << goal->pose.header.frame_id << std::endl;
+        pose_publisher_->publish(goal->pose);
         arm->setGoal(goal->pose,"gripper_middle_point");
     }else{
         RCLCPP_INFO(LOGGER, "GoalFrame Received: %s", (goal->frame).c_str());
@@ -339,7 +332,11 @@ private:
         goal_handle->succeed(result);
         RCLCPP_INFO(LOGGER, "Goal Succeeded");
         visualizeTrajectory(*plan_solution.trajectory);
-      }
+        RCLCPP_INFO(LOGGER, "Sending the trajectory for execution");
+        moveit_msgs::msg::RobotTrajectory robot_trajectory2;
+        plan_solution.trajectory->getRobotTrajectoryMsg(robot_trajectory2);
+        trajectory_publisher_->publish(robot_trajectory2.joint_trajectory);
+        }
 
     }
     else{
@@ -352,6 +349,7 @@ private:
   }
 
   rclcpp::Node::SharedPtr node_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_publisher_;
   rclcpp::Publisher<moveit_msgs::msg::DisplayRobotState>::SharedPtr robot_state_publisher_;
   rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr trajectory_publisher_;
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pose_subscriber_;
