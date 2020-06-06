@@ -23,6 +23,7 @@ The files must be downloaded to a Sunrise project and synchronized to the contro
 In addition to the default KUKAJavaLib, the following .jar packages must be added to the library of the project:
 
 - com.kuka.common
+- com.kuka.nav.comm.api
 - com.kuka.nav.encryption.provider.api
 - com.kuka.nav.provider
 - com.kuka.nav.provider
