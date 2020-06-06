@@ -40,8 +40,7 @@ public class TCPSocket implements ISocket{
 		while (true){
 			try{
 				String remotePC = "192.168.10.117";
-				String remotePCCha = "192.168.10.121";
-				String NUC = "192.168.10.120";
+				//String NUC = "192.168.10.120";
 
 				TCPConn = new Socket(remotePC,COMport);
 				TCPConn.setReuseAddress(true);

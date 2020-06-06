@@ -16,9 +16,6 @@
 package API_ROS2_Sunrise;
 
 
-import java.util.concurrent.TimeUnit;
-
-
 import com.kuka.roboticsAPI.deviceModel.LBR;
 
 
@@ -26,6 +23,8 @@ public class LBR_status_reader extends Node{
 	
 	// Robot
 	LBR lbr;
+	private long last_sendtime = System.currentTimeMillis();
+
 	
 	
 	public LBR_status_reader(int port, LBR robot, String ConnectionType) {
@@ -43,11 +42,8 @@ public class LBR_status_reader extends Node{
 	public void run() {
 		while( isNodeRunning())
 		{	
-			sendStatus();
-			try {
-				TimeUnit.MILLISECONDS.sleep(10);
-			} catch (InterruptedException e) {
-				System.out.println(this.node_name + " thread could not sleep");
+			if(System.currentTimeMillis()-last_sendtime>30){
+				sendStatus();
 			}
 		}
 	}
@@ -69,6 +65,8 @@ public class LBR_status_reader extends Node{
 	
 	public void sendStatus() {
 		String statusString = generateStatusString();
+		last_sendtime = System.currentTimeMillis();
+
 		if(isNodeRunning()){
 			try{
 				this.socket.send_message(statusString);

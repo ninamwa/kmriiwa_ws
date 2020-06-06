@@ -17,12 +17,8 @@
 package API_ROS2_Sunrise;
 
 // Configuration
-
-//import java.lang.management.ManagementFactory;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.apache.log4j.BasicConfigurator;
 
 // Implementated classes
@@ -43,9 +39,7 @@ import com.kuka.roboticsAPI.deviceModel.LBR;
 import static com.kuka.roboticsAPI.motionModel.BasicMotions.ptp;
 
 
-// DEBUG APPLICATION PAUSE:
 import com.kuka.generated.ioAccess.ControlPanelIOGroup;
-import com.kuka.generated.ioAccess.ScannerSignalsIOGroup;
 
 // AUT MODE: 3s, T1/T2/CRR: 2s
 @ResumeAfterPauseEvent(delay = 0 ,  afterRepositioning = true)
@@ -92,8 +86,6 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 	KMP_status_reader kmp_status_reader;
 	LBR_status_reader lbr_status_reader;
 
-	// Close open UDP ports if not closed successfully
-	CheckOpenPorts CheckPorts;
 	
 	// Check if application is paused:
 	@Inject
@@ -140,7 +132,7 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 				break;
 			}				
 		}
-		// Establish remaning nodes
+		// Establish remaining nodes
 		if(AppRunning){
 			kmp_status_reader = new KMP_status_reader(KMP_status_port, kmp,TCPConnection);
 			lbr_status_reader = new LBR_status_reader(LBR_status_port, lbr,TCPConnection);
@@ -218,16 +210,10 @@ public class KMRiiwaSunriseApplication extends RoboticsAPIApplication{
 				kmp_sensor_reader.start();
 			}
 		}
-		boolean first = true;
 		while(AppRunning)
 		{    
 			AppRunning = (!(kmp_commander.getShutdown() || lbr_commander.getShutdown()));
-			//if(first && kmp_commander.getisKMPMoving()){
-				//System.out.println("processors: " + java.lang.Runtime.getRuntime().availableProcessors());
-		       // System.out.println("num of threads:" + ManagementFactory.getThreadMXBean().getThreadCount());
-		      //  first=false;
-			//}
-			
+
 		}
 		
 		System.out.println("Shutdown message received in main application");

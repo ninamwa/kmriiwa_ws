@@ -23,7 +23,6 @@ import API_ROS2_Sunrise.ISocket;
 
 import com.kuka.nav.fdi.DataConnectionListener;
 import com.kuka.nav.fdi.DataListener;
-//import com.kuka.nav.fdi.FDIConnection;
 import com.kuka.nav.fdi.data.CommandedVelocity;
 import com.kuka.nav.fdi.data.Odometry;
 import com.kuka.nav.fdi.data.RobotPose;
@@ -31,12 +30,10 @@ import com.kuka.nav.provider.LaserScan;
 
 public class DataController implements DataListener, DataConnectionListener{
 
-//	private static int laser_B1 = 1801;
-//	private static int laser_B4 = 1802;
 	public boolean fdi_isConnected;
 	ISocket laser_socket;
 	ISocket odometry_socket;
-
+	long ms_sent = System.currentTimeMillis();
 	Odometry odom;
 	
 
@@ -56,7 +53,6 @@ public class DataController implements DataListener, DataConnectionListener{
 	@Override
 	public void onNewLaserData(LaserScan scan) {
 
-		// TODO: sending both lasers
 		if(fdi_isConnected && this.laser_socket.isConnected()){
 			String scan_data = ">laserScan " +  scan.getTimestamp() + " " + scan.getLaserId()  + " " + scan.getRangesAsString();
 			try{
@@ -69,10 +65,14 @@ public class DataController implements DataListener, DataConnectionListener{
 
 	@Override
 	public void onNewOdometryData(Odometry odom) {
+		long msg_time = System.currentTimeMillis();
 		if(fdi_isConnected && this.odometry_socket.isConnected()){
 			try{
-				String odom_data = ">odometry " + odom.getTimestamp() + " " + odom.getPose().toString() + " " + odom.getVelocity().toString();
-				this.odometry_socket.send_message(odom_data);
+				if(msg_time-ms_sent>=50){
+					ms_sent = System.currentTimeMillis();
+					String odom_data = ">odometry " + odom.getTimestamp() + " " + odom.getPose().toString() + " " + odom.getVelocity().toString();
+					this.odometry_socket.send_message(odom_data);
+				}
 			}catch(Exception e){
 				System.out.println("Could not send KMP odometry data to ROS: " + e);
 			}

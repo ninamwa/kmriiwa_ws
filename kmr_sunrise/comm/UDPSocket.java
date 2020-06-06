@@ -35,17 +35,14 @@ public class UDPSocket implements ISocket{
 		while (!isConnected){
 			try{
 				System.out.println("Connecting  "+ this.nodename+ " to ROS over UDP on port: " + COMport); 
-//		    	String kuka_host = "192.168.10.102"; // KMR iiwa 2
 		    	int kuka_port = this.COMport; // change this if cannot bind error
 		        InetSocketAddress socket_address = new InetSocketAddress(kuka_port);
 		    	
-		    	String ros_host = "192.168.10.117"; // REMOTE PC 116
+		    	String ros_host = "192.168.10.117"; // REMOTE PC
 
 		    	int ros_port = this.COMport;
 		        InetAddress address = InetAddress.getByName(ros_host);
-		        
-//		        udpConn = new DatagramSocket(kuka_port); 
-//		        udpConn.setReuseAddress(true);
+
 		        
 		        udpConn = new DatagramSocket(null); 
 		        udpConn.setReuseAddress(true);

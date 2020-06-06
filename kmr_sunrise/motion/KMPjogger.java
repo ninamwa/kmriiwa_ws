@@ -4,7 +4,6 @@ package API_ROS2_Sunrise;
 // RoboticsAPI
 import com.kuka.jogging.provider.api.common.ICartesianJoggingSupport;
 import com.kuka.roboticsAPI.deviceModel.kmp.SunriseOmniMoveMobilePlatform;
-//import com.kuka.service.remoteControlSupport.internal.jog.interfaces.IRemoteControlJogger;
 
 // Java Util
 import java.util.TimerTask;
@@ -18,11 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 public class KMPjogger
 {
-
-  
-//  private static final int JOG_START_DELAY = 0;
-//  private static final int EXECUTOR_THREAD_POOL_SIZE = 2;
-
   private long JOG_UPDATE_PERIOD = 50L;
 
   public ScheduledExecutorService _executor;

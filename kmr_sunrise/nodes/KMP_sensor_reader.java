@@ -18,17 +18,11 @@ import java.net.InetSocketAddress;
 
 
 // Implemented classes
-
-// RoboticsAPI
 import API_ROS2_Sunrise.DataController;
-import API_ROS2_Sunrise.ISocket;
-import API_ROS2_Sunrise.TCPSocket;
-import API_ROS2_Sunrise.UDPSocket;
 import com.kuka.nav.fdi.FDIConnection;
 
 public class KMP_sensor_reader extends Node{
 	
-	// Runtime variables
 
     // Data retrieval socket via FDI 
     public FDIConnection fdi;
@@ -47,13 +41,11 @@ public class KMP_sensor_reader extends Node{
 
 		
 		if (!(isLaserSocketConnected())) {
-			//System.out.println("Starting thread to connect laser node....");
 			Thread monitorLaserConnections = new MonitorLaserConnectionThread();
 			monitorLaserConnections.start();
 			}
 				
 		if (!(isOdometrySocketConnected())) {
-			//System.out.println("Starting thread to connect odometry node....");
 			Thread monitorOdometryConnections = new MonitorOdometryConnectionThread();
 			monitorOdometryConnections.start();
 			}
@@ -64,7 +56,6 @@ public class KMP_sensor_reader extends Node{
 	}
 	
 	public void fdiConnection(){
-		//FDIConnection.DATA_TIMEOUT=14000L;
 		InetSocketAddress fdi_adress = new InetSocketAddress(FDI_IP,FDI_port);
 		this.fdi = new FDIConnection(fdi_adress);
 		this.listener = new DataController(laser_socket, odometry_socket);
@@ -128,11 +119,19 @@ public class KMP_sensor_reader extends Node{
 	}
 	
 	public void subscribe_kmp_odometry_data() {
+		while(!this.fdi.getSubscription().isOdometrySubscribed()){
     		this.fdi.getNewOdometry();
+
+		}
+
 	}
 	public void subscribe_kmp_laser_data(){
-		this.fdi.getNewLaserScan(laser_B1);
-		this.fdi.getNewLaserScan(laser_B4);
+		while(!this.fdi.getSubscription().isLaserSubscribed(laser_B1)){
+			this.fdi.getNewLaserScan(laser_B1);
+		}
+		while(!this.fdi.getSubscription().isLaserSubscribed(laser_B4)){
+			this.fdi.getNewLaserScan(laser_B4);
+		}
 	}
 	
 	@Override

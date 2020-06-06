@@ -15,33 +15,24 @@
 package API_ROS2_Sunrise;
 
 // Implemented classes
-
-// Robotics API
-import API_ROS2_Sunrise.ISocket;
-import API_ROS2_Sunrise.TCPSocket;
-import API_ROS2_Sunrise.UDPSocket;
 import API_ROS2_Sunrise.PTPpoint;
 
 
 // RoboticsAPI
-import com.kuka.condition.ICondition;
 import com.kuka.roboticsAPI.deviceModel.JointPosition;
 import com.kuka.roboticsAPI.deviceModel.LBR;
 import com.kuka.roboticsAPI.executionModel.ExecutionState;
 import com.kuka.roboticsAPI.executionModel.ICommandContainer;
 import com.kuka.roboticsAPI.executionModel.IExecutionContainer;
 import com.kuka.roboticsAPI.geometricModel.AbstractFrame;
-import com.kuka.roboticsAPI.geometricModel.ObjectFrame;
 import com.kuka.roboticsAPI.motionModel.IMotion;
 import com.kuka.roboticsAPI.motionModel.IMotionContainer;
 import com.kuka.roboticsAPI.motionModel.IMotionContainerListener;
-import com.kuka.roboticsAPI.motionModel.PTP;
 import com.kuka.roboticsAPI.motionModel.SplineJP;
 import com.kuka.roboticsAPI.motionModel.SplineMotionJP;
-import com.kuka.roboticsAPI.motionModel.SplineRuntimeData;
-
 import static com.kuka.roboticsAPI.motionModel.BasicMotions.ptp;
 
+// Java util
 import java.util.ArrayList;
 import java.util.List;
 
@@ -152,7 +143,6 @@ public class LBR_commander extends Node{
 		return value;
 	}
 
-	// TODO: what happens if an emergency stop is triggered?
 	private void followPath(){
 		if( !(getEmergencyStop()) && !splineSegments.isEmpty() && isNodeRunning()){
 			SplineJP spline = new SplineJP(splineSegments.toArray(new SplineMotionJP<?>[splineSegments.size()]));
@@ -250,7 +240,6 @@ public class LBR_commander extends Node{
 		  }
 		@Override
 		public void onStateChanged(IExecutionContainer arg0, ExecutionState arg1) {
-			// TODO Auto-generated method stub	
 		}
 
 		@Override

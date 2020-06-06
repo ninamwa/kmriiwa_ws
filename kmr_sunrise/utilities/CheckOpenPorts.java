@@ -7,11 +7,6 @@ import java.io.InputStreamReader;
 
 public class CheckOpenPorts{
 	
-//	public static void main(String[] args) {
-//		CheckOpenPorts nr = new CheckOpenPorts();
-////		nr.runApplication();
-//		nr.run();
-//	}
 
 
 	public boolean run(){

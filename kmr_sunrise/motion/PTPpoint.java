@@ -3,7 +3,6 @@ package API_ROS2_Sunrise;
 
 import com.kuka.roboticsAPI.deviceModel.JointPosition;
 import com.kuka.roboticsAPI.motionModel.PTP;
-import com.kuka.roboticsAPI.motionModel.SplineMotionJP;
 
 
 public class PTPpoint{
