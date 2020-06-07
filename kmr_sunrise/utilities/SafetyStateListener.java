@@ -22,7 +22,6 @@ import com.kuka.roboticsAPI.controllerModel.StatePortData;
 import com.kuka.roboticsAPI.controllerModel.sunrise.ISunriseControllerStateListener;
 import com.kuka.roboticsAPI.controllerModel.sunrise.SunriseSafetyState;
 import com.kuka.roboticsAPI.deviceModel.Device;
-import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
 
 public class SafetyStateListener implements ISunriseControllerStateListener{
 	Controller controller;
@@ -56,7 +55,7 @@ public class SafetyStateListener implements ISunriseControllerStateListener{
 	}
 	@Override
 	public void onIsReadyToMoveChanged(Device arg0, boolean arg1) {
-		// TODO Auto-generated method stub
+		System.out.println("READY TO MOVE! "+ arg1 + " "+ arg0);
 		
 	}
 	@Override
@@ -77,16 +76,15 @@ public class SafetyStateListener implements ISunriseControllerStateListener{
 	@Override
 	public void onSafetyStateChanged(Device device, SunriseSafetyState safetyState) {
 		if(safetyState.getSafetyStopSignal()==SunriseSafetyState.SafetyStopType.STOP1){
-			System.out.println("EMERGENCY STOP IN LISTENER: " + device);
+			System.out.println("EMERGENCY STOP IN LISTENER:");
 			Node.setEmergencyStop(true);
 
-			//lbr_commander.setEmergencyStop(true);
-			//kmp_commander.setEmergencyStop(true);
-			//lbr_status_reader.setEmergencyStop(true);
-			//kmp_status_reader.setEmergencyStop(true);
+
 		}else if(safetyState.getSafetyStopSignal()==SunriseSafetyState.SafetyStopType.NOSTOP) {
+			System.out.println("No longer emergency stop in listener");
 			Node.setEmergencyStop(false);
 
 		}		
 	}
 }
+

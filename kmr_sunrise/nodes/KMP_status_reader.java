@@ -16,20 +16,11 @@
 package API_ROS2_Sunrise;
 
 
-//Implemented classes
-import java.util.concurrent.TimeUnit;
-
 
 //RoboticsAPI
-import API_ROS2_Sunrise.ISocket;
-import API_ROS2_Sunrise.TCPSocket;
-import API_ROS2_Sunrise.UDPSocket;
-
-import com.kuka.roboticsAPI.controllerModel.Controller;
-import com.kuka.generated.ioAccess.ScannerSignalsIOGroup;
 import com.kuka.roboticsAPI.deviceModel.OperationMode;
 import com.kuka.roboticsAPI.deviceModel.kmp.KmpOmniMove;
-//TODO: importere alle klasser fra SunriseOmniMoveMobilePlatform, scannerIO
+
 public class KMP_status_reader extends Node{
 
 	// Robot
@@ -40,14 +31,13 @@ public class KMP_status_reader extends Node{
 	private Object isReadyToMove = null; 
 	private volatile boolean WarningField = false;
 	private volatile boolean ProtectionField = false;
+	private long last_sendtime = System.currentTimeMillis();
 
-	public KMP_status_reader(int port, KmpOmniMove robot,String ConnectionType, Controller controller) {
+	public KMP_status_reader(int port, KmpOmniMove robot,String ConnectionType) {
 		super(port, ConnectionType,"KMP status reader");
 
-		this.kmp = robot;
-		
+		this.kmp = robot;		
 		if (!(isSocketConnected())) {
-			//System.out.println("Starting thread to connect KMP status node....");
 			Thread monitorKMPStatusConnections = new MonitorKMPStatusConnectionsThread();
 			monitorKMPStatusConnections.start();
 			}
@@ -57,21 +47,19 @@ public class KMP_status_reader extends Node{
 	public void run() {
 		while(isNodeRunning())
 		{	
-// TODO: FIND OUT HOW MUCH TO SLEEP. SAMME RATE SOM ODOMETRY?
-			updateOperationMode();
-			updateReadyToMove();
-			updateWarningFieldState();
-			updateProtectionFieldState();
-			sendStatus();
+
+			if(System.currentTimeMillis()-last_sendtime>30){
+				updateOperationMode();
+				updateReadyToMove();
+				updateWarningFieldState();
+				updateProtectionFieldState();
+				sendStatus();
+			}
 			
 			if(!isSocketConnected() || (closed)){
 				break;
 			}
-			try {
-				TimeUnit.MILLISECONDS.sleep(30);
-			} catch (InterruptedException e) {
-				System.out.println("KMP status thread could not sleep");
-			}
+	
 		}
  }
 
@@ -84,30 +72,22 @@ public class KMP_status_reader extends Node{
 		this.isReadyToMove = kmp.isReadyToMove();
 	}
 	
-	// scannerIO
 	private void updateWarningFieldState() {
-//		signalnames =  Arrays.asList("WarningField_B1", "WarningField_B4", "WarningFieldComplete");
 			try{
+				 // true = violation
 				this.WarningField  = kmp.getMobilePlatformSafetyState().isWarningFieldBreached();
-			}catch(Exception e){
-//					System.out.println("Could not read warning field: " + e);
-				}
+			}catch(Exception e){}
 		}
 	
-	// scannerIO
 	private void updateProtectionFieldState() {
-//		signalnames =  Arrays.asList("WarningField_B1", "WarningField_B4", "WarningFieldComplete");
 			try{
-				// TRUE IF VIOLATED
+				 // true = violation
 				this.ProtectionField = kmp.getMobilePlatformSafetyState().isSafetyFieldBreached();
-			}catch(Exception e){
-//				System.out.println("Could not read protection field: " + e);
-				}
+			}catch(Exception e){}
 		
 		}
 
 	
-	// TODO: LEGG INN KMP_is_MOVING
 	private String generateStatusString() {
 		return 	">kmp_statusdata ,"  + System.nanoTime() + 
 				",OperationMode:"+ this.operation_mode.toString() + 
@@ -120,7 +100,9 @@ public class KMP_status_reader extends Node{
 	}
 	
 	public void sendStatus() {
+
 		String toSend = this.generateStatusString();
+		last_sendtime = System.currentTimeMillis();
 		if(isNodeRunning()){
 			try{
 				this.socket.send_message(toSend);
@@ -159,8 +141,11 @@ public class KMP_status_reader extends Node{
 	@Override
 	public void close() {
 		closed = true;
-		socket.close();
-		System.out.println("KMP status closed!");
+		try{
+			this.socket.close();
+		}catch(Exception e){
+				System.out.println("Could not close KMP status connection: " +e);
+			}		System.out.println("KMP status closed!");
 
 	}
 

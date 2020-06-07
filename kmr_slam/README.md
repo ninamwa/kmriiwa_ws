@@ -1,37 +1,36 @@
 ## 1. Description
 
-This package handles the use of the Cartographer package for realtime SLAM and creating a map together with the KMR iiwa. 
+This package is used for performing realtime SLAM and creating a map together with the KMR iiwa. 
+Both the packages Cartographer and RTAB-Map can be used.
 
 ## 2. Requirements
 The following packages needs to be installed:
 - Cartographer
 - Cartographer_ros
-- Nav2_map_server (if you want to save the map)
-
+- RTAB-Map
+- rtabmap_ros (ROS wrapper for RTAB-Map)
+- Nav2_map_server (for saving the maps - it is a part of the Navigation2 package)
 
 
 
 ## 3. Run
 
-As of now, the launch file is not correctly launching the cartographer nodes, and this needs to be launched on its own. 
-
-You need four terminals where you are running the commands: 
+To launch Cartographer, run: 
 ```
 $ ros2 launch kmr_slam cartographer.launch.py
 ```
+To launch RTAB-Map, run: 
 ```
-$ ros2 run cartographer_ros cartographer_node -configuration_directory $HOME/PROJECT-NAME/src/kmr_slam/config -configuration_basename kmr_2d_cartographer.lua
-```
-```
-$ ros2 run cartographer_ros occupancy_grid_node
+$ ros2 launch kmr_slam rtabmap.launch.py 
 ```
 
-This will launch the communication node for the KMR iiwa, start Rviz with the correct configurations and also the state publisher of the URDF, which makes it possible to view the robot in Rviz. The two last commands will launch the necessary Cartographer nodes. 
+The communication with the KMR must be started, and the robot can be driven around manually by using the implemented keyboard: 
+```
+$ ros2 run kmr_navigation2 twist_keyboard.py 
+```
 
 If you want to save the map which are created, this can be done by running the following command in a separate terminal:
 
 ```
-$ ros2 run nav2_map_server map_saver -f ~/PATH_TO/created_maps
+$ ros2 run nav2_map_server map_saver
 ```
-
-The PROJECT-NAME needs to be changed based on where your project is saved. 

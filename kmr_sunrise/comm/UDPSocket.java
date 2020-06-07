@@ -1,18 +1,3 @@
-// Copyright 2019 Nina Marie Wahl og Charlotte Heggem.
-// Copyright 2019 Norwegian University of Science and Technology.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package API_ROS2_Sunrise;
 
 
@@ -35,30 +20,29 @@ public class UDPSocket implements ISocket{
 	private final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
 	int COMport;
     static BindException b;
+    String nodename;
 
 	
-	public UDPSocket(int port) {
+	public UDPSocket(int port, String node_name) {
 		isConnected = false;
 		this.COMport = port;
 		udpConn = connect();
+		this.nodename=node_name;
 	}
 	
 	public DatagramSocket connect()
 	{
 		while (!isConnected){
 			try{
-				System.out.println("Connecting to ROS over UDP on port: " + COMport); 
-//		    	String kuka_host = "192.168.10.102"; // KMR iiwa 2
+				System.out.println("Connecting  "+ this.nodename+ " to ROS over UDP on port: " + COMport); 
 		    	int kuka_port = this.COMport; // change this if cannot bind error
 		        InetSocketAddress socket_address = new InetSocketAddress(kuka_port);
 		    	
-		    	String ros_host = "192.168.10.117"; // REMOTE PC 116
+		    	String ros_host = "192.168.10.117"; // REMOTE PC
 
 		    	int ros_port = this.COMport;
 		        InetAddress address = InetAddress.getByName(ros_host);
-		        
-//		        udpConn = new DatagramSocket(kuka_port); 
-//		        udpConn.setReuseAddress(true);
+
 		        
 		        udpConn = new DatagramSocket(null); 
 		        udpConn.setReuseAddress(true);
@@ -80,19 +64,19 @@ public class UDPSocket implements ISocket{
 
 		        udpConn.receive(package_in); 
 		        String s = decode(package_in);
-		        System.out.println("Received packet data over UDP on port : " + COMport + " Message: " +s);  
+		        System.out.println(this.nodename+ " received packet data over UDP on port : " + COMport + " Message: " +s);  
 		        
 		        if(s.length()<1){
 		    	   udpConn.close();
 		       		isConnected=false;
-		       		System.out.println("No message received in 3 seconds, shutting off");
+		       		System.out.println( this.nodename+ "  did not receive any message in 3 seconds, shutting off");
 		       		break;
 		       	 }
 		        udpConn.setSoTimeout(0);
 		        isConnected=true;
 			}
 			catch(Exception e1){
-		        System.out.println("ERROR connecting to ROS over UDP on port: " + this.COMport + " Error: " + e1);
+		        System.out.println("ERROR connecting  "+ this.nodename+ " to ROS over UDP on port: " + this.COMport + " Error: " + e1);
 		        isConnected=false;
 		        close();
 				b = new BindException();
@@ -127,7 +111,7 @@ public class UDPSocket implements ISocket{
      try {
 			udpConn.send(package_out);
 		} catch (Exception e) {
-			System.out.println("Could not send package over UDP on port: "  + this.COMport + " error: " + e);
+			System.out.println( this.nodename+ " could not send package over UDP on port: "  + this.COMport + " error: " + e);
 		}
 	}
     @Override
@@ -140,7 +124,7 @@ public class UDPSocket implements ISocket{
 	    	return line;
 		}
 		catch(Exception e){
-			System.out.println("Error receiving package over UDP on port: " + this.COMport + " error: " + e);
+			System.out.println("Error receiving package  "+ this.nodename+ " over UDP on port: " + this.COMport + " error: " + e);
 			return " ";
 		}
 	}
@@ -152,7 +136,7 @@ public class UDPSocket implements ISocket{
 			System.out.println("Connection to ROS closed on port: " + COMport);
 			isConnected=false;
 		} catch (Exception e) {
-			System.out.println("ERROR closing the UDP communication port to ROS: " + COMport);
+			System.out.println("ERROR closing the UDP communication for "+ this.nodename+ " on port to ROS: " + COMport);
 		}
 	}
 

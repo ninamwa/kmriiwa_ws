@@ -1,4 +1,3 @@
-// Copyright 2019 Nina Marie Wahl og Charlotte Heggem.
 // Copyright 2019 Norwegian University of Science and Technology.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,33 +15,24 @@
 package API_ROS2_Sunrise;
 
 // Implemented classes
-
-// Robotics API
-import API_ROS2_Sunrise.ISocket;
-import API_ROS2_Sunrise.TCPSocket;
-import API_ROS2_Sunrise.UDPSocket;
 import API_ROS2_Sunrise.PTPpoint;
 
 
 // RoboticsAPI
-import com.kuka.condition.ICondition;
 import com.kuka.roboticsAPI.deviceModel.JointPosition;
 import com.kuka.roboticsAPI.deviceModel.LBR;
 import com.kuka.roboticsAPI.executionModel.ExecutionState;
 import com.kuka.roboticsAPI.executionModel.ICommandContainer;
 import com.kuka.roboticsAPI.executionModel.IExecutionContainer;
 import com.kuka.roboticsAPI.geometricModel.AbstractFrame;
-import com.kuka.roboticsAPI.geometricModel.ObjectFrame;
 import com.kuka.roboticsAPI.motionModel.IMotion;
 import com.kuka.roboticsAPI.motionModel.IMotionContainer;
 import com.kuka.roboticsAPI.motionModel.IMotionContainerListener;
-import com.kuka.roboticsAPI.motionModel.PTP;
 import com.kuka.roboticsAPI.motionModel.SplineJP;
 import com.kuka.roboticsAPI.motionModel.SplineMotionJP;
-import com.kuka.roboticsAPI.motionModel.SplineRuntimeData;
-
 import static com.kuka.roboticsAPI.motionModel.BasicMotions.ptp;
 
+// Java util
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,19 +92,19 @@ public class LBR_commander extends Node{
 		{   
 			String Commandstr = socket.receive_message(); 
 	    	String []splt = Commandstr.split(" ");
-	    	
-	    	if ((splt[0]).equals("shutdown")){
-	    		System.out.println("LBR RECEIVED SHUTDOWN");
-	    		setShutdown(true);
-	    		break;
-				}
-			if ((splt[0]).equals("setLBRmotion")){
-				JointLBRMotion(Commandstr);
-				}
-			if ((splt[0]).equals("pathPointLBR")){
-				addPointToSegment(Commandstr);
-				}
-		}
+	    	if(!getShutdown()&& !closed){
+		    	if ((splt[0]).equals("shutdown")){
+		    		System.out.println("LBR RECEIVED SHUTDOWN");
+		    		setShutdown(true);
+		    		break;
+					}
+				if ((splt[0]).equals("setLBRmotion")){
+					JointLBRMotion(Commandstr);
+					}
+				if ((splt[0]).equals("pathPointLBR")){
+					addPointToSegment(Commandstr);
+					}
+		}}
     }
 
 	private void addPointToSegment(String commandstr){
@@ -137,10 +127,6 @@ public class LBR_commander extends Node{
 					accelerations[i] = accel;
 				}
 			}
-			//String posstring = poses[0] + " " + poses[1] + " " + poses[2] + " " + poses[3] + " " + poses[4] + " " + poses[5] + " " + poses[6];
-			String velstring = velocities[0] + " " + velocities[1] + " " + velocities[2] + " " + velocities[3] + " " + velocities[4] + " " + velocities[5] + " " + velocities[6];
-			String accelstring = accelerations[0] + " " + accelerations[1] + " " + accelerations[2] + " " + accelerations[3] + " " + accelerations[4] + " " + accelerations[5] + " " + accelerations[6];
-			System.out.println("Pointtype: " + pointType + "  " + " Vel: " + velstring + " Accel: " + accelstring);
 			PTPpoint ptp = new PTPpoint(pointType, new JointPosition(poses), velocities, accelerations);
 			splineSegments.add(ptp.getPTP());
 			
@@ -157,13 +143,8 @@ public class LBR_commander extends Node{
 		return value;
 	}
 
-	// TODO: what happens if an emergency stop is triggered?
 	private void followPath(){
-		System.out.println("empt: " + !splineSegments.isEmpty());
-		System.out.println("run: " + isNodeRunning());
-		System.out.println("stop: " + !(getEmergencyStop()));
 		if( !(getEmergencyStop()) && !splineSegments.isEmpty() && isNodeRunning()){
-			System.out.println("followpath:");
 			SplineJP spline = new SplineJP(splineSegments.toArray(new SplineMotionJP<?>[splineSegments.size()]));
 			currentmotion = lbr.moveAsync(spline, new SplineMotionListener());
 			}
@@ -259,7 +240,6 @@ public class LBR_commander extends Node{
 		  }
 		@Override
 		public void onStateChanged(IExecutionContainer arg0, ExecutionState arg1) {
-			// TODO Auto-generated method stub	
 		}
 
 		@Override
@@ -282,9 +262,12 @@ public class LBR_commander extends Node{
 	
 	@Override
 	public void close(){
-		setShutdown(true);
 		closed = true;
+		try{
 		CommandedjointPos.set(lbr.getCurrentJointPosition());
+		}catch(Exception e){
+			System.out.println("No motion to end!");
+		}
 
 		if(getisLBRMoving()){
 			try{
@@ -293,7 +276,11 @@ public class LBR_commander extends Node{
 				System.out.println("LBR could not stop motion: " +e);
 			}
 		}
-		socket.close();
+		try{
+			this.socket.close();
+		}catch(Exception e){
+				System.out.println("Could not close LBR commander connection: " +e);
+			}
 		System.out.println("LBR command closed!");
 
 	}

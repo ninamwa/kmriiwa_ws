@@ -1,18 +1,3 @@
-// Copyright 2019 Nina Marie Wahl og Charlotte Heggem.
-// Copyright 2019 Norwegian University of Science and Technology.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package API_ROS2_Sunrise;
 
 import java.io.BufferedReader;
@@ -22,18 +7,13 @@ import java.io.InputStreamReader;
 
 public class CheckOpenPorts{
 	
-//	public static void main(String[] args) {
-//		CheckOpenPorts nr = new CheckOpenPorts();
-////		nr.runApplication();
-//		nr.run();
-//	}
 
 
 	public boolean run(){
 		String s = "";
 		boolean openports = false;
 				try {
-					Process p = Runtime.getRuntime().exec("netstat -aop \"UDP\"  "); 
+					Process p = Runtime.getRuntime().exec("netstat -aop \"TCP\"  "); 
 
 					BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 					BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -46,7 +26,7 @@ public class CheckOpenPorts{
 							String[] pid30001 = s.split("                                    ");
 							String PID1 = pid30001[1];
 							openports = true;
-//							Process killpid = Runtime.getRuntime().exec("taskkill /PID "+ PID1); 
+							Process killpid = Runtime.getRuntime().exec("taskkill /PID "+ PID1); 
 							}
 
 						if(s.contains("30002")){
@@ -54,7 +34,7 @@ public class CheckOpenPorts{
 							String[] pid30002 = s.split("                                    ");
 							String PID2 = pid30002[1];
 							openports = true;
-//							Process killpid = Runtime.getRuntime().exec("taskkill /PID "+ PID2); 
+							Process killpid = Runtime.getRuntime().exec("taskkill /PID "+ PID2); 
 							}
 						if(s.contains("30003")){
 							System.out.println(s);
