@@ -3,21 +3,22 @@ behavior_tree_node:
   ros__parameters:
     use_sim_time: True
     goal_list: 
-    - WS1
+    - WS3
+    - WS2
     - HOME
     WS1:
-        position: -3.0,-1.0
-        orientation: 3.7
+        position: -0.45, -4.29
+        orientation: -1.6700057
     WS2:
-        position: 0.64,1.83
-        orientation: 1.0
+        position: 4.22, -0.17
+        orientation: -0.1
 
     WS3:
-        position: -3.0,0.0
-        orientation: 1.0
+        position: 2.69, 0.28
+        orientation: 1.6133431
     HOME: 
-        position: -5.327,-2.481
-        orientation: 0.461
+        position: -0.284, 0.034
+        orientation: -0.029
     plugin_lib_names:
     - move_gripper_action_bt_node
     - move_manipulator_action_bt_node

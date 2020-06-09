@@ -15,12 +15,14 @@ The following packages needs to be installed:
 To visualize the URDF model of the robot in Rviz, you need two terminals and run the following commands:
 
 ```
-$ ros2 launch kuka_bringup rviz.launch.py
+$ ros2 launch kmr_bringup rviz.launch.py
 ```
 ```
-$ ros2 launch kuka_bringup state_publisher.launch.py
+$ ros2 launch kmr_bringup state_publisher.launch.py
+```
+```
+$ ros2 run kmr_bringup dummy_joint_states
 ```
 
-This will automtically launch the dummy joint state publisher with a user interface, which do it possible to control the state of the joints in rviz. 
-There do also exist a script for controlling the states. This can be launched by uncommenting the node in the *rviz.launch.py* file 
+The latter will run a dummy joint state publisher which publishes fake data for the joints which are not fixed. This is necessary to properly visualize the manipulator. 
 

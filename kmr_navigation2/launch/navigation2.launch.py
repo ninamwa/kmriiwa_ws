@@ -80,8 +80,8 @@ def generate_launch_description():
 
         #Node(
         #    package='kmr_navigation2',
-        #   node_executable='navigation_node.py',
-        #    node_name='navigation_node',
+        #   node_executable='navigation_support_node.py',
+        #    node_name='navigation_support_node',
         #    output='screen'),
 
         Node(

@@ -83,7 +83,6 @@ class LbrSensordataNode(Node):
             if len(self.soc.lbr_sensordata):
                 self.data_callback(self.pub_lbr_sensordata, self.soc.lbr_sensordata.pop(0))
 
-
     def data_callback(self, publisher, values):
         data=values[1]
         if (data.split(',')[1] != self.last_data_timestamp):

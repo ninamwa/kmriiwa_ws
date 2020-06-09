@@ -45,6 +45,16 @@
 
 
     <group_state name="search2" group="manipulator">
+        <joint name="joint_a1" value="0.0" />
+        <joint name="joint_a2" value="0.0" />
+        <joint name="joint_a3" value="1.57" />
+        <joint name="joint_a4" value="-2.0940" />
+        <joint name="joint_a5" value="-0.1623" />
+        <joint name="joint_a6" value="0.42132" />
+        <joint name="joint_a7" value="0.66078165" />
+    </group_state>
+
+    <group_state name="search3" group="manipulator">
         <joint name="joint_a1" value="2.966" />
         <joint name="joint_a2" value="0.30403635" />
         <joint name="joint_a3" value="0.0181514" />
@@ -54,16 +64,6 @@
         <joint name="joint_a7" value="0.66078165" />
     </group_state>
 
-
-    <group_state name="search3" group="manipulator">
-        <joint name="joint_a1" value="0.0" />
-        <joint name="joint_a2" value="0.0" />
-        <joint name="joint_a3" value="1.57" />
-        <joint name="joint_a4" value="-2.0940" />
-        <joint name="joint_a5" value="-0.1623" />
-        <joint name="joint_a6" value="0.42132" />
-        <joint name="joint_a7" value="0.66078165" />
-    </group_state>
 
     <group_state name="carryarea1" group="manipulator">
         <joint name="joint_a1" value="-1.58091924" />
@@ -131,6 +131,16 @@
     <disable_collisions link1="d435_manipulator_link" link2="adapter" reason="Adjacent" />
     <disable_collisions link1="d435_manipulator_link" link2="gripper_base_link" reason="Adjacent" />
     <disable_collisions link1="d435_manipulator_link" link2="link_7" reason="Adjacent" />
+    <disable_collisions link1="d435_manipulator_link" link2="kamerafeste2" reason="Adjacent" />
+    <disable_collisions link1="d435_manipulator_link" link2="kamerafeste1" reason="Never" />
+    <disable_collisions link1="adapter" link2="kamerafeste1" reason="Adjacent" />
+    <disable_collisions link1="adapter" link2="kamerafeste2" reason="Never" />
+    <disable_collisions link1="kamerafeste1" link2="kamerafeste2" reason="Adjacent" />
+    <disable_collisions link1="adapter" link2="gripper-adapter" reason="Never" />
+    <disable_collisions link1="gripper-adapter" link2="gripper_base_link" reason="Adjacent" />
+    <disable_collisions link1="gripper-adapter" link2="kamerafeste1" reason="Never" />
+    <disable_collisions link1="gripper-adapter" link2="kamerafeste2" reason="Never" />
+
 
 
     <disable_collisions link1="link_7" link2="gripper_base_link" reason="Never" />

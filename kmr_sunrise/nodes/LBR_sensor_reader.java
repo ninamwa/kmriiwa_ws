@@ -16,18 +16,11 @@
 package API_ROS2_Sunrise;
 
 
-import java.util.concurrent.TimeUnit;
-
-import API_ROS2_Sunrise.ISocket;
-import API_ROS2_Sunrise.TCPSocket;
-import API_ROS2_Sunrise.UDPSocket;
-
 import com.kuka.roboticsAPI.deviceModel.LBR;
 
 
 public class LBR_sensor_reader extends Node{
 	
-
 	// Robot
 	LBR lbr;
 	
@@ -38,6 +31,8 @@ public class LBR_sensor_reader extends Node{
 	// Socket
 	int port;
 	String ConnectionType;
+	private long last_sendtime = System.currentTimeMillis();
+
 	
 	
 	public LBR_sensor_reader(int port, LBR robot, String ConnectionType) {
@@ -77,18 +72,14 @@ public class LBR_sensor_reader extends Node{
 	public void run() {
 		while(isNodeRunning())
 		{	
-			//FIND OUT HOW MUCH TO SLEEP. SAMME RATE SOM ODOMETRY?
-			updateMeasuredTorque();
-			updateJointPosition();
 			
 			if(!isSocketConnected() || (closed)){
 				break;
 			}
-			sendStatus();
-			try {
-				TimeUnit.MILLISECONDS.sleep(30);
-			} catch (InterruptedException e) {
-				System.out.println("LBR sensor thread could not sleep");
+			if(System.currentTimeMillis()-last_sendtime>30){
+				updateMeasuredTorque();
+				updateJointPosition();
+				sendStatus();
 			}
 		}
 	}
@@ -113,11 +104,12 @@ public class LBR_sensor_reader extends Node{
 	
 	public void sendStatus() {
 		String sensorString = generateSensorString();
+		last_sendtime = System.currentTimeMillis();
 		if(isNodeRunning()){
 			try{
 				this.socket.send_message(sensorString);
 				if(closed){
-					System.out.println("LBR sensor sender selv om han ikke fï¿½r lov");
+					System.out.println("LBR sensor sender selv om han ikke faar lov");
 				}
 			}catch(Exception e){
 				System.out.println("Could not send LBR sensormessage to ROS: " + e);
@@ -128,7 +120,11 @@ public class LBR_sensor_reader extends Node{
 	@Override
 	public void close() {
 		closed = true;
-		socket.close();
+		try{
+			this.socket.close();
+		}catch(Exception e){
+				System.out.println("Could not close LBR sensor connection: " +e);
+			}
 		System.out.println("LBR sensor closed!");
 
 	}

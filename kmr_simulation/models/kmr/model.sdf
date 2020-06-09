@@ -616,10 +616,10 @@
     <joint name="d435_base_front_depth_optical_joint" type="fixed">
       <pose>0 0 0 -1.570796 0 -1.570796 </pose>
       <parent>d435_base_front_depth_frame </parent>
-      <child> d435_base_front_depth_optical_frame</child>
+      <child> d435_base_front_depth_optical_frame_link</child>
     </joint>
 
-    <link name="d435_base_front_depth_optical_frame">
+    <link name="d435_base_front_depth_optical_frame_link">
       <pose>0.02 -0.0075 0.9 0 0 0 </pose>
       <sensor name="camera" type="depth">
         <always_on>true</always_on>

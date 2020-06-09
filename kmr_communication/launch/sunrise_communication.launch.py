@@ -36,7 +36,7 @@ def generate_launch_description(argv=sys.argv[1:]):
     # robot = args.robot
 
     connection_type_TCP='TCP'
-    connection_type_UDP = 'UDP'
+    connection_type_UDP ='UDP'
 
     #robot = argv[len(argv)-1].split("=")[1]
     robot="KMR2"

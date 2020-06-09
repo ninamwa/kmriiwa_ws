@@ -136,9 +136,9 @@ class UDPSocket:
 
         print("SHUTTING DOWN")
         self.udp.close()
-        self.isconnected = False
+        #self.isconnected = False
         print(cl_lightred('Connection is closed!'))
-        rclpy.shutdown()
+        #rclpy.shutdown()
 
     # Each send command runs as a thread. May need to control the maximum running time (valid time to send a command).
     def send(self, cmd):

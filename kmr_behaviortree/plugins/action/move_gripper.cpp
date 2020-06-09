@@ -24,11 +24,14 @@ public:
   BT::NodeStatus on_success() override
   {
     if(action == "open"){
+      RCLCPP_INFO(node_->get_logger(),"Gripper opened successfully");
       std::string current_frame;
       current_frame = config().blackboard->get<std::string>("current_frame");
       if (current_frame.compare("carryarea1") == 0 || current_frame.compare("carryarea2") == 0 || current_frame.compare("carryarea3") == 0 ){
         config().blackboard->set(current_frame, false);
       }
+    }else{
+      RCLCPP_INFO(node_->get_logger(),"Gripper closed successfully");
     }
     return BT::NodeStatus::SUCCESS;
   }

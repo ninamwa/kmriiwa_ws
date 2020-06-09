@@ -6,7 +6,7 @@
   <joint name="bf" type="fixed">
       <parent link="base_footprint"/>
       <child link="base_link"/>
-      <origin rpy="0 0 0.0775" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0775"/>
   </joint>
 
   <material name="Orange">
@@ -1023,20 +1023,20 @@
     <joint name="d435_base_front_depth_joint" type="fixed">
       <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
       <parent link="d435_base_front_link"/>
-      <child link="camera1_depth_optical_frame_link" />
+      <child link="d435_base_front_depth_optical_frame_link" />
     </joint>
 
-    <link name="camera1_depth_optical_frame_link"/>
+    <link name="d435_base_front_depth_optical_frame_link"/>
 
 
       <!-- camera color joints and links -->
     <joint name="d435_base_front_color_joint" type="fixed">
       <origin xyz="0.00016998473438434303 0.014875565655529499 0.00016222463455051184" rpy="-1.570796 0 -1.570796" />
       <parent link="d435_base_front_link"/>
-      <child link="camera1_color_optical_frame_link" />
+      <child link="d435_base_front_color_optical_frame_link" />
     </joint>
 
-    <link name="camera1_color_optical_frame_link"/>
+    <link name="d435_base_front_color_optical_frame_link"/>
     
 
     <joint name="metall_plate_left_joint" type="fixed">

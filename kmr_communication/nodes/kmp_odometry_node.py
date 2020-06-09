@@ -60,7 +60,6 @@ class KmpOdometryNode(Node):
             self.soc=None
 
         self.last_odom_timestamp = 0
-        self.last_sent_time = 0
 
         # Make Publisher for odometry
         self.pub_odometry = self.create_publisher(Odometry, 'odom', 10)
@@ -131,10 +130,8 @@ class KmpOdometryNode(Node):
             odom_tf.header.frame_id = odom.header.frame_id
             odom_tf.child_frame_id = odom.child_frame_id
             odom_tf.header.stamp = odom.header.stamp
-            if(self.get_clock().now().nanoseconds-self.last_sent_time>50000000):
-                self.tf_broadcaster.sendTransform(odom_tf)
-                publisher.publish(odom)
-                self.last_sent_time=self.get_clock().now().nanoseconds
+            self.tf_broadcaster.sendTransform(odom_tf)
+            publisher.publish(odom)
 
 
 
@@ -160,7 +157,6 @@ def main(argv=sys.argv[1:]):
     parser.add_argument('-c', '--connection')
     parser.add_argument('-ro', '--robot')
     args = parser.parse_args(remove_ros_args(args=argv))
-    #args.robot='KMR2'
     rclpy.init(args=argv)
     odometry_node = KmpOdometryNode(args.connection,args.robot)
 

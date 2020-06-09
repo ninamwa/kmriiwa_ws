@@ -47,7 +47,6 @@ class NavigationSupportNode(Node):
         self.warning_field_clear = True
         self.protection_field_clear = True
         self.bool=True
-        self.bool=True
 
         #Speed given as max_vel_x, max_vel_y, max_vel_theta, max_vel_xy
         self.highspeed = [0.4, 0.4, 0.5, 0.4]
@@ -103,7 +102,7 @@ class NavigationSupportNode(Node):
                 self.warning_field_clear = data.warning_field_clear
                 print(self.warning_field_clear)
                 self.last_update_time = self.get_clock().now().seconds_nanoseconds()[0]
-            
+
 
 
 def main(argv=None):

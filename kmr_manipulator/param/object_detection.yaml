@@ -3,7 +3,7 @@ Pipelines:
   inputs: [RealSenseCameraTopic]
   infers:
     - name: ObjectDetection
-      model: /home/kmriiwa/kmriiwa_ws/src/kmr_manipulator/model/circbox.xml
+      model: /model/circbox.xml
       engine: CPU #ELLER GPU ELLER MYRIAD, CPU Extension:/opt/intel/openvino/inference_engine/samples/build/intel64/Release/lib/libcpu_extension.so 
       label: to/be/set/xxx.labels
       batch: 1

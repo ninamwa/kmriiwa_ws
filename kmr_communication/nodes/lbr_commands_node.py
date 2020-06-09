@@ -18,7 +18,7 @@
 import sys
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import String, Float64
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, TransformStamped
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.utilities import remove_ros_args
@@ -72,6 +72,8 @@ class LbrCommandsNode(Node):
         sub_statusdata=self.create_subscription(LbrStatusdata, 'lbr_statusdata', self.status_callback, 10,callback_group=self.callback_group)
         self.path_server = ActionServer(self,MoveManipulator,'move_manipulator', self.move_manipulator_callback,callback_group=self.callback_group)
 
+        self.point_publisher = self.create_publisher(Float64, 'vinkel', 20)
+
         self.done_moving=False
         self.last_path_variable = False
 
@@ -97,7 +99,7 @@ class LbrCommandsNode(Node):
         self.soc.send(msg)
 
     def move_manipulator_callback(self, goal_handle):
-        print(goal_handle.request.path)
+        #print(goal_handle.request.path)
         self.path_callback(goal_handle.request.path)
         self.done_moving = False
         while (not self.done_moving):
@@ -113,6 +115,9 @@ class LbrCommandsNode(Node):
             positions = " ".join([str(s) for s in point.positions])
             velocities = " ".join([str(s) for s in point.velocities])
             accelerations = " ".join([str(s) for s in point.accelerations])
+            x = Float64()
+            x.data = point.positions[6]
+            self.point_publisher.publish(x)
             if i == 1:
                 type = "StartPoint"
             elif i ==len(data.points):

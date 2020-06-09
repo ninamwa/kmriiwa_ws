@@ -72,7 +72,7 @@ def generate_launch_description():
             emulate_tty=True,
             )
 
-        # object_analytics_rviz, add to launch description if desired
+    # object_analytics_rviz, add to launch description if desired
     oarviz = Node(
     package='object_analytics_rviz', node_executable='image_publisher',
     remappings=[('/object_analytics/rgb', 'ManipulatorCamera/camera/color/image_raw')],)
