@@ -1,5 +1,5 @@
 
-<root main_tree_to_execute="Test2">
+<root main_tree_to_execute="Test3">
 
     <BehaviorTree ID="Test2">
         <Sequence name="main_sequence">
@@ -20,8 +20,10 @@
 
     <BehaviorTree ID="Test3">
         <Sequence name="main_sequence">
-            <MoveGripper action="close"/>
-            <MoveGripper action="open"/>
+            <PlanManipulatorPath plan_to_frame="search3" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <PlanManipulatorPath plan_to_frame="object" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
         </Sequence>
     </BehaviorTree> 
 
@@ -35,7 +37,9 @@
 
     <BehaviorTree ID="TestTree">
         <Sequence name="main_sequence">
-            <PlanManipulatorPath plan_to_frame="search2" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <PlanManipulatorPath plan_to_frame="search1" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
+            <PlanManipulatorPath plan_to_frame="search3" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
             <MoveManipulator path="{manipulator_path}" move_to_frame="{move_to_frame}"/>
             <ObjectSearch object_pose="{object_pose}"/>
             <PlanManipulatorPath plan_to_frame="object" object_pose="{object_pose}" manipulator_path="{manipulator_path}" move_to_frame="{move_to_frame}"/>

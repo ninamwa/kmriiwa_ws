@@ -27,8 +27,7 @@ import launch_ros.actions
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
 
-    #urdf_file_name = 'kmr_withD435.urdf'
-    urdf_file_name = 'kmriiwa_withcameraframes.urdf'
+    urdf_file_name = 'kmriiwa.urdf'
     urdf = os.path.join(
         get_package_share_directory('kmr_bringup'),
         'urdf',
@@ -36,14 +35,6 @@ def generate_launch_description():
 
 
     return LaunchDescription([
-
-        launch_ros.actions.Node(
-            ## Configure the TF of the robot to the origin of the map coordinates
-            package='tf2_ros',
-            node_executable='static_transform_publisher',
-            output='screen',
-            arguments=['0', '0', '0.0775', '0', '0', '0', 'base_footprint', 'base_link']
-            ),
 
         launch_ros.actions.Node(
             package="robot_state_publisher",

@@ -30,7 +30,7 @@ def generate_launch_description():
         default=os.path.join(
             get_package_share_directory('kmr_navigation2'),
             'map',
-            'carto_map.yaml'))
+            'map_carto2scan3pc.yaml'))
 
     param_dir = LaunchConfiguration(
         'params_file',

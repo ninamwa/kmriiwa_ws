@@ -33,7 +33,8 @@ from pipeline_srv_msgs.srv import PipelineSrv
 from pipeline_srv_msgs.msg import PipelineRequest
 from object_analytics_msgs.msg import ObjectsInBoxes3D
 from object_analytics_msgs.msg import ObjectInBox3D
-from object_msgs.msg import Object
+from object_msgs.msg import ObjectInBox
+from object_msgs.msg import ObjectsInBoxes
 from geometry_msgs.msg import Point32
 from geometry_msgs.msg import PoseStamped
 
@@ -61,8 +62,9 @@ class ObjectDetectionNode(Node):
     def __init__(self):
         super().__init__('object_detection_node')
         self.name='object_detection_node'
-        self.detection_threshold = 0.70 # must be tuned
+        self.detection_threshold = 0.3 # must be tuned
         self.detected_object_pose = None
+        self.isSearching = False
 
         self.pipelinename = "object"
         self.callback_group = ReentrantCallbackGroup() 
@@ -74,19 +76,21 @@ class ObjectDetectionNode(Node):
 
 
         while not self.client.wait_for_service(timeout_sec=10.0):
-           self.get_logger(        ).info('Waiting for service')
+           self.get_logger().info('Waiting for service')
 
         sub_LocalizedObject = self.create_subscription(ObjectsInBoxes3D, '/object_analytics/localization', self.detectedObject_callback, qos_profile_sensor_data, callback_group=self.callback_group)
-        time.sleep(2)
-        self.endSearch()
+
+        self.last_instance = None
 
 
     def detectedObject_callback(self, ObjectsInBoxes):
+        probability=0
         for instance in ObjectsInBoxes.objects_in_boxes:
             probability = instance.object.probability
-            print(probability)
-            if(probability>=self.detection_threshold and self.isSearching):
-                self.detected_object_pose = self.getBoundingBoxMidPoint(instance.min, instance.max)
+            self.last_instance= instance
+        if(self.last_instance != None and self.isSearching):
+            if(self.last_instance.object.probability>=self.detection_threshold):
+                self.detected_object_pose = self.getBoundingBoxMidPoint(self.last_instance.min, self.last_instance.max)
                 print("OBJECT DETECTED")
                 self.endSearch()
 
@@ -95,7 +99,7 @@ class ObjectDetectionNode(Node):
         starttime = time.time()
         self.get_logger().info('Executing goal...')
         elapsed = 0
-        while (self.isSearching and elapsed<30):
+        while (self.isSearching and elapsed<20):
             elapsed = time.time() - starttime
             pass
         print("done searching")
@@ -105,26 +109,22 @@ class ObjectDetectionNode(Node):
         if self.detected_object_pose != None:
             result.success = True
             result.pose = self.detected_object_pose
-            print(result)
-            print(result.pose.pose.position.x)
-            print(result.pose.pose.position.y)
-            print(result.pose.pose.position.z)
             self.detected_object_pose = None
-        if result.success != True:
-           print("aborting goal")
-           goal_handle.abort()
+        if result.success == True:
+            goal_handle.succeed()
         else:
-           goal_handle.succeed()
-           return result
+            print("aborting goal")
+            goal_handle.abort()
+        return result
 
     def startSearch(self):
         self.isSearching = True
-        self.send_pipeline_request("RUN_PIPELINE")
+        #self.send_pipeline_request("RUN_PIPELINE")
 
 
     def endSearch(self):
         self.isSearching = False
-        self.send_pipeline_request("PAUSE_PIPELINE")
+        #self.send_pipeline_request("PAUSE_PIPELINE")
 
 
     def getBoundingBoxMidPoint(self,min,max):
@@ -132,6 +132,10 @@ class ObjectDetectionNode(Node):
         midpoint.pose.position.x = min.x - (min.x-max.x)/2
         midpoint.pose.position.y = min.y - (min.y-max.y)/2
         midpoint.pose.position.z = min.z - (min.z-max.z)/2
+        midpoint.pose.orientation.x = 0.0 
+        midpoint.pose.orientation.y = 0.0 
+        midpoint.pose.orientation.z = 0.7372773  
+        midpoint.pose.orientation.w = 0.6755902  
         midpoint.header.frame_id = "camera_color_optical_frame"
         return midpoint
 
