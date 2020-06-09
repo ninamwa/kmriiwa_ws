@@ -79,9 +79,6 @@ class LbrSensordataNode(Node):
             pass
         self.get_logger().info('Node is ready')
 
-        thread.start_new_thread(self.run, ())
-
-    def run(self):
         while rclpy.ok() and self.soc.isconnected:
             if len(self.soc.lbr_sensordata):
                 self.data_callback(self.pub_lbr_sensordata, self.soc.lbr_sensordata.pop(0))

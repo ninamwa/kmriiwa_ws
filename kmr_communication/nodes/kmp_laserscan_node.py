@@ -71,16 +71,13 @@ class KmpLaserScanNode(Node):
         # Make Publishers for relevant data
         self.pub_laserscan1 = self.create_publisher(LaserScan, 'scan', 10)
         self.pub_laserscan2 = self.create_publisher(LaserScan, 'scan_2', 10)
-        self.send_static_transform()
+        #self.send_static_transform()
 
 
         while not self.soc.isconnected:
             pass
         self.get_logger().info('Node is ready')
 
-        thread.start_new_thread(self.run, ())
-
-    def run(self):
         while rclpy.ok() and self.soc.isconnected:
             if len(self.soc.laserScanB1):
                 self.scan_callback(self.pub_laserscan1, self.soc.laserScanB1.pop(0))
@@ -94,7 +91,7 @@ class KmpLaserScanNode(Node):
             kmr_timestamp = values[1]
             self.last_scan_timestamp =kmr_timestamp
             scan = LaserScan()
-            scan.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
+            scan.header.stamp = self.get_clock().now().to_msg()
             if values[2] == '1801':
                 scan.header.frame_id = "scan"
             elif values[2] == '1802':

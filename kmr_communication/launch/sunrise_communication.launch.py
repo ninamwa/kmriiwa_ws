@@ -56,6 +56,20 @@ def generate_launch_description(argv=sys.argv[1:]):
             description='Full path to parameter file to load'),
 
         launch_ros.actions.Node(
+            package="tf2_ros",
+            node_executable="static_transform_publisher",
+            output="screen",
+            arguments=['0','0','0','0','0','0','laser_B4_link','scan_2'],
+           ),
+
+        launch_ros.actions.Node(
+            package="tf2_ros",
+            node_executable="static_transform_publisher",
+            output="screen",
+            arguments=['0','0','0','0','0','0','laser_B1_link','scan'],
+           ),
+
+        launch_ros.actions.Node(
             package="kmr_communication",
             node_executable="kmp_commands_node.py",
             node_name="kmp_commands_node",
