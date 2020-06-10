@@ -82,7 +82,6 @@ class NavigationSupportNode(Node):
         p4 = self.setParameter(speed[3], 'max_speed_xy')
         self.request.parameters = [p1,p2,p3,p4]
         wait = self.client.call_async(self.request)
-        #rclpy.spin_once(self)
         if wait.result() is not None:
             print(wait.result())
             #self.get_logger().info('Request was ' + self.request.parameters[0].name + '. Response is ' + str(wait.result().results.successful)) # + wait.result().results[1])

@@ -42,27 +42,11 @@ from geometry_msgs.msg import PoseStamped
 
 def cl_red(msge): return '\033[31m' + msge + '\033[0m'
 
-#MSGS:
-#PipelineRequest
-#std_msgs/Header header               # Header
-#string cmd                           # Name of a request action
-#string value                         # value of an action
-
-
-#Pipeline
-#string running_status              # Pipeline running state
-#string name                        # Name of pipeline
-#Connection[] connections             # connection map of a pipeline
-
-
-#PipelineRequest pipeline_request          # request content of pipeline service
-#---
-#Pipeline[] pipelines    # return all pipeline status
 class ObjectDetectionNode(Node):
     def __init__(self):
         super().__init__('object_detection_node')
         self.name='object_detection_node'
-        self.detection_threshold = 0.3 # must be tuned
+        self.detection_threshold = 0.5
         self.detected_object_pose = None
         self.isSearching = False
 

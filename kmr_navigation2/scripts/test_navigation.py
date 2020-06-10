@@ -47,8 +47,6 @@ class Test(Node):
         self.bool=True
 
         #Speed given as max_vel_x, max_vel_y, max_vel_theta, max_vel_xy
-        #self.highspeed = [0.5, 0.28, 0.5, 0.28]
-        #self.lowspeed = [0.13, 0.1, 0.2, 0.1]
         self.highspeed = [0.26, 0.0, 1.0, 0.26]
         self.lowspeed = [0.1, 0.0, 0.5, 0.1]
         self.highestspeed = [0.5, 0.0, 1.5, 0.5]
@@ -61,7 +59,6 @@ class Test(Node):
 
         st=0
         while(False):
-            #time.sleep(0.1)
             if (st == 25):
                 initial = PoseWithCovarianceStamped()
                 initial.header.frame_id = "map"

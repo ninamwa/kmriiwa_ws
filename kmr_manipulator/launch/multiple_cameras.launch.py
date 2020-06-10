@@ -95,5 +95,4 @@ def generate_launch_description():
                      'infra1.enabled': False,
 		             'infra2.enabled': False}]
         )
-    #camera1_node
     return launch.LaunchDescription([camera1_node,camera2_node,camera3_node])

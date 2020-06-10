@@ -69,7 +69,8 @@ class Kuka(Node):
 
         num_readings = 100
         laser_frequency = 40
-        ranges = []
+        ranges = []#from script.test import Test
+#from script.tcpSocket import *
         intensities = []
 
         broadcaster1 = StaticTransformBroadcaster(self)

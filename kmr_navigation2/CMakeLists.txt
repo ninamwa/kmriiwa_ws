@@ -50,7 +50,6 @@ install(
     scripts/pose_keyboard.py
     scripts/navigation_support_node.py
     scripts/manipulator_keyboard.py
-    scripts/keyboard_node.py
     scripts/test_navigation.py
     scripts/keyboard.py
     DESTINATION lib/${PROJECT_NAME}

@@ -1,3 +1,4 @@
+
 import os
 import yaml
 from launch import LaunchDescription
@@ -13,7 +14,7 @@ def load_file(package_name, file_path):
     try:
         with open(absolute_file_path, 'r') as file:
             return file.read()
-    except EnvironmentError: # parent of IOError, OSError *and* WindowsError where available
+    except EnvironmentError:
         return None
 
 def load_yaml(package_name, file_path):
@@ -23,15 +24,12 @@ def load_yaml(package_name, file_path):
     try:
         with open(absolute_file_path, 'r') as file:
             return yaml.load(file)
-    except EnvironmentError: # parent of IOError, OSError *and* WindowsError where available
+    except EnvironmentError:
         return None
 
 
 def generate_launch_description():
-    # moveit_cpp.yaml is passed by filename for now since it's node specific
     moveit_cpp_yaml_file_name = get_package_share_directory('kmr_moveit2') + "/config/moveit_cpp.yaml"
-
-    # Component yaml files are grouped in separate namespaces
     robot_description_config = load_file('kmr_bringup', 'urdf/kmriiwa.urdf')
     robot_description = {'robot_description' : robot_description_config}
 
@@ -55,7 +53,6 @@ def generate_launch_description():
 
     state_publisher_launch_file_dir = os.path.join(get_package_share_directory('kmr_bringup'), 'launch')
 
-    # MoveItCpp demo executable
     run_moveit_node = Node(node_name='run_moveit',
                                package='kmr_moveit2',
                                node_executable='run_moveit',

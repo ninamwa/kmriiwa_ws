@@ -70,7 +70,6 @@ class GripperNode(Node):
 
 
     def activate(self):
-        # Activation Request
         self.ser.write(GripperMsg.ClearMemory.value)
         data_raw = self.ser.readline()
         self.ser.write(GripperMsg.ActivationRequest.value)
@@ -86,12 +85,11 @@ class GripperNode(Node):
                 print("Gripper activation in progress...")
 
     def close(self):
-        # Close the gripper
         self.ser.write(GripperMsg.CloseRequest.value)
         self.ser.readline()
 
     def open(self):
-        # Open the gripper full speed and force
+        # Open the gripper, full speed and force
         self.ser.write(GripperMsg.OpenRequest.value)
         self.ser.readline()
 
@@ -117,7 +115,7 @@ class GripperNode(Node):
         if(gOBJ==GripperMsg.REQUESTEDPOSITION.value):
             result=False
             print(ErrorCodes.NO_OBJECT)
-            # Closed, object:
+        # Closed, object:
         if(gOBJ==GripperMsg.OBJECT_CLOSING.value):
             result=True
             print(ErrorCodes.OBJECT_FOUND)
@@ -131,7 +129,7 @@ class GripperNode(Node):
         if (gOBJ == GripperMsg.OBJECT_OPENING.value):
             result = False
             print(ErrorCodes.COLLISION)
-            # Open
+        # Open
         if (gOBJ == GripperMsg.REQUESTEDPOSITION.value):
             result = True
             print(ErrorCodes.OPEN)

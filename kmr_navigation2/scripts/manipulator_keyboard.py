@@ -98,8 +98,8 @@ if __name__=="__main__":
     pub = node.create_publisher(String, '/manipulator_vel', 10)
     stop_pub = node.create_publisher(String, '/shutdown', 10)
 
-    speed = 0.1 #node.get_parameter('speed', 0.5)
-    turn = 0.1 #node.get_parameter('turn', 1.0)
+    speed = 0.1 
+    turn = 0.1
 
     joint = ""
     a1_direction = 0

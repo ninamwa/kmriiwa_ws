@@ -35,7 +35,7 @@
 /* Author: Henning Kayser
    Desc: A simple demo node running MoveItCpp for planning and execution
 */
-/* Author: Nina Marie Wahk
+/* Author: Nina Marie Wahl
    Desc: Fuctionality added for communication with manipulator_node
 */
 
@@ -99,7 +99,6 @@ public:
       std::bind(&RunMoveIt::handle_cancel, this,  std::placeholders::_1),
       std::bind(&RunMoveIt::handle_accepted, this,  std::placeholders::_1));
 
-    // Create collision object, planning shouldn't be too easy
     moveit_msgs::msg::CollisionObject collision_object;
     collision_object.header.frame_id = "base_footprint";
     collision_object.id = "box";
@@ -136,22 +135,12 @@ public:
     snus.type = snus.CYLINDER;
     snus.dimensions = {0.01, 0.03};
 
-    geometry_msgs::msg::Pose snus_pose;
-    snus_pose.position.x = -0.2;
-    snus_pose.position.y = 0.0;
-    snus_pose.position.z = 0.6;
-
-  
-
     // collision_object.primitives.push_back(box);
     // collision_object.primitive_poses.push_back(box_pose);
     // collision_object.primitives.push_back(box2);
     // collision_object.primitive_poses.push_back(box2_pose);
     //collision_object.primitives.push_back(box3);
     //collision_object.primitive_poses.push_back(box3_pose);
-    collision_object.primitives.push_back(snus);
-    collision_object.primitive_poses.push_back(snus_pose);
-    collision_object.operation = collision_object.ADD;
 
     ::planning_interface::MotionPlanRequest req;
     moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
@@ -181,20 +170,7 @@ public:
     // RCLCPP_INFO(LOGGER, "Moving to search3");
     // RunMoveIt::move();
     // rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
-    
-    // pose_publisher_->publish(pose_msg);
-    // arm->setGoal(pose_msg, "gripper_middle_point"); 
-    // RCLCPP_INFO(LOGGER, "Moving to object");
-    // RunMoveIt::move();
-    // rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
 
-    // arm->setGoal("search2");
-    // RunMoveIt::move();
-
-    // rclcpp::sleep_for(std::chrono::nanoseconds(6000000000));
-
-    // arm->setGoal("search3");
-    // RunMoveIt::move();
     
   }
 
@@ -224,14 +200,6 @@ private:
 
   void goalpose_callback(geometry_msgs::msg::PoseStamped::SharedPtr msg)
   {
-    /*   ::planning_interface::MotionPlanRequest req;
-    moveit::core::RobotStatePtr start_state = moveit_cpp_->getCurrentState();
-    start_state->update();
-    moveit::core::robotStateToRobotStateMsg(*start_state, req.start_state);
-    {
-      planning_scene_monitor::LockedPlanningSceneRW scene(moveit_cpp_->getPlanningSceneMonitor());
-      scene->setCurrentState(*start_state);
-    } */
     RCLCPP_INFO(LOGGER, "GoalPose Received:");
     std::cout << msg->pose.position.x << std::endl;
     std::cout << msg->pose.position.y << std::endl;
