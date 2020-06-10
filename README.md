@@ -2,8 +2,6 @@
 
 Repository for master thesis and specialization project in Robotics & Automation, at NTNU Fall 2019, by Charlotte Heggem and Nina Marie Wahl. 
 
-**Title:** Configuration and Control of KMR iiwa with ROS2
-
 **Intention:**
 This project aims to create a communication API between a KUKA robot, KMR iiwa, and ROS2. 
 Multiple ROS packages are used for including functionality. 
