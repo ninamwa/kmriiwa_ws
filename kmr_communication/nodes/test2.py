@@ -20,8 +20,6 @@ from std_msgs.msg import String
 from rclpy.node import Node
 import sys
 
-#from script.test import Test
-#from script.tcpSocket import *
 from scripts import *
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from rclpy.qos import qos_profile_sensor_data

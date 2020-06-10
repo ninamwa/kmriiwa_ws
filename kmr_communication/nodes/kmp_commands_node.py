@@ -64,13 +64,6 @@ class KmpCommandsNode(Node):
             pass
         self.get_logger().info('Node is ready')
 
-        #Dette er brukt for odom og laserscan, tror ikke det er nodvendig ettersom subscriberne har callback, men lar de staa i tilfelle.
-
-        #thread.start_new_thread(self.run, ())
-
-    #def run(self):
-    #    while rclpy.ok() and self.soc.isconnected:
-    #        self.odom_callback(self.pub_odometry, self.soc.odometry)
 
     def shutdown_callback(self, data):
         print(data)
@@ -98,8 +91,6 @@ def main(argv=sys.argv[1:]):
 
     rclpy.spin(kmp_commands_node)
 
-    #while rclpy.ok():
-    #    rclpy.spin_once(odometry_node)
     try:
         kmp_commands_node.destroy_node()
         rclpy.shutdown()

@@ -134,15 +134,6 @@ class KmpOdometryNode(Node):
             publisher.publish(odom)
 
 
-
-    def getTimestamp(self,nano):
-        t = nano * 10 ** -9
-        timestamp = Time()
-        timestamp.sec = math.floor(t)
-        timestamp.nanosec = int((t - timestamp.sec) * 10 ** 9)
-        return timestamp
-
-
     def euler_to_quaternion(self, roll, pitch, yaw):
         qx = math.sin(roll/2) * math.cos(pitch/2) * math.cos(yaw/2) - math.cos(roll/2) * math.sin(pitch/2) * math.sin(yaw/2)
         qy = math.cos(roll/2) * math.sin(pitch/2) * math.cos(yaw/2) + math.sin(roll/2) * math.cos(pitch/2) * math.sin(yaw/2)
@@ -159,8 +150,6 @@ def main(argv=sys.argv[1:]):
     args = parser.parse_args(remove_ros_args(args=argv))
     rclpy.init(args=argv)
     odometry_node = KmpOdometryNode(args.connection,args.robot)
-
-    #rclpy.spin(odometry_node)
 
     while rclpy.ok():
         rclpy.spin_once(odometry_node)

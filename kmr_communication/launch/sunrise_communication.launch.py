@@ -28,19 +28,11 @@ import argparse
 
 
 def generate_launch_description(argv=sys.argv[1:]):
-    #parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    #parser.add_argument('-ro', '--robot')
-    #print(argv)
-    #args = parser.parse_args(remove_ros_args(args=argv))
-    #print(args)
-    # robot = args.robot
 
     connection_type_TCP='TCP'
     connection_type_UDP ='UDP'
 
-    #robot = argv[len(argv)-1].split("=")[1]
     robot="KMR2"
-    print(robot)
 
     param_dir = LaunchConfiguration(
         'param_dir',

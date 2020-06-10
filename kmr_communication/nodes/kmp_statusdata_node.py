@@ -70,10 +70,9 @@ class KmpStatusNode(Node):
             self.status_callback(self.pub_kmp_statusdata, self.soc.kmp_statusdata)
 
     def status_callback(self,publisher,data):
-        # TODO: Fyll inn med riktig statusdata - dette maa ogsaa gjores i selve meldingsfila - den er naa random.
         if data != None:
             msg = KmpStatusdata()
-            msg.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
+            msg.header.stamp = self.get_clock().now().to_msg()
             status_elements = data[1].split(",")
             if (status_elements[1] != self.last_status_timestamp):
                 self.last_status_timestamp = status_elements[1]
@@ -110,12 +109,6 @@ class KmpStatusNode(Node):
 
 
 
-    def getTimestamp(self,nano):
-        t = nano * 10 ** -9
-        timestamp = Time()
-        timestamp.sec = math.floor(t)
-        timestamp.nanosec = int((t - timestamp.sec) * 10 ** 9)
-        return timestamp
 
 
 def main(argv=sys.argv[1:]):
@@ -128,9 +121,6 @@ def main(argv=sys.argv[1:]):
     kmp_statusdata_node = KmpStatusNode(args.connection,args.robot)
 
     rclpy.spin(kmp_statusdata_node)
-
-    #while rclpy.ok():
-    #    rclpy.spin_once(odometry_node)
     try:
         kmp_statusdata_node.destroy_node()
         rclpy.shutdown()

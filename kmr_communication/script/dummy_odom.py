@@ -54,7 +54,7 @@ class dummy_odom(Node):
 
             odom = Odometry()
             odom.header.frame_id = "odom"
-            odom.header.stamp = getTimestamp(self.get_clock().now().nanoseconds)
+            odom.header.stamp = self.get_clock().now().to_msg()
 
             point = Point()
             point.x = float(x)
@@ -112,12 +112,6 @@ def euler_to_quaternion(roll, pitch, yaw):
 
     return [qx, qy, qz, qw]
 
-def getTimestamp(nano):
-        t = nano*10**-9
-        timestamp = Time()
-        timestamp.sec=math.floor(t)
-        timestamp.nanosec=int((t-timestamp.sec)*10**9)
-        return timestamp
 
 
 

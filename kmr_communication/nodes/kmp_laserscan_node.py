@@ -71,7 +71,6 @@ class KmpLaserScanNode(Node):
         # Make Publishers for relevant data
         self.pub_laserscan1 = self.create_publisher(LaserScan, 'scan', 10)
         self.pub_laserscan2 = self.create_publisher(LaserScan, 'scan_2', 10)
-        #self.send_static_transform()
 
 
         while not self.soc.isconnected:
@@ -99,7 +98,7 @@ class KmpLaserScanNode(Node):
             scan.angle_increment = (0.5*math.pi)/180
             scan.angle_min = (-135*math.pi)/180
             scan.angle_max = (135*math.pi)/180
-            scan.range_min = 0.12 # disse må finnes ut av
+            scan.range_min = 0.12
             scan.range_max = 15.0 
             try:
                 scan.ranges = [float(s) for s in values[3].split(',') if len(s)>0]
@@ -107,19 +106,6 @@ class KmpLaserScanNode(Node):
                 print(values[3].split(','))
                 print("Error", e)
 
-            if len(scan.ranges) == 541:
-                publisher.publish(scan)
-            else:
-                #print(len(scan.ranges)) ##FOR DEBUGGING
-                t=0
-
-
-    def getTimestamp(self,nano):
-        t = nano * 10 ** -9
-        timestamp = Time()
-        timestamp.sec = math.floor(t)
-        timestamp.nanosec = int((t - timestamp.sec) * 10 ** 9)
-        return timestamp
 
 
     def euler_to_quaternion(self, roll, pitch, yaw):
@@ -159,9 +145,6 @@ def main(argv=sys.argv[1:]):
     laserscan_node = KmpLaserScanNode(args.connection,args.robot)
 
     rclpy.spin(laserscan_node)
-
-    #while rclpy.ok():
-    #    rclpy.spin_once(odometry_node)
     try:
         laserscan_node.destroy_node()
         rclpy.shutdown()

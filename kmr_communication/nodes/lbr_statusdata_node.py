@@ -75,7 +75,7 @@ class LbrStatusNode(Node):
     def status_callback(self,status_publisher, data):
         if data != None:
             msg = LbrStatusdata()
-            msg.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
+            msg.header.stamp = self.get_clock().now().to_msg()
             status_elements = data[1].split(",")
             if (status_elements[1] != self.last_status_timestamp):
                 self.last_status_timestamp = status_elements[1]
@@ -105,13 +105,6 @@ class LbrStatusNode(Node):
                             msg.lbr_safetystop = False
                 status_publisher.publish(msg)
 
-    def getTimestamp(self,nano):
-        t = nano * 10 ** -9
-        timestamp = Time()
-        timestamp.sec = math.floor(t)
-        timestamp.nanosec = int((t - timestamp.sec) * 10 ** 9)
-        return timestamp
-
 
 def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -124,8 +117,7 @@ def main(argv=sys.argv[1:]):
 
     rclpy.spin(lbr_statusdata_node)
 
-    #while rclpy.ok():
-    #    rclpy.spin_once(odometry_node)
+
     try:
         lbr_statusdata_node.destroy_node()
         rclpy.shutdown()

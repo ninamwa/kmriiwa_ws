@@ -59,19 +59,13 @@ class UDPSocket:
         self.lbr_statusdata = None
 
 
-        #TODO: Do something with isready, which is relevant for us.
         threading.Thread(target=self.connect_to_socket).start()
-        #try:
-        #    threading.Thread(target=self.connect_to_socket).start()
-        #except:
-        #    print(cl_pink("Error: ") + "Unable to start connection thread")
 
     def close(self):
         self.isconnected = False
 
     def connect_to_socket(self):
 
-        #print(cl_cyan('Starting up on:'), 'IP:', ros_host, 'Port:', ros_port)
         print(cl_cyan('Starting up node:'), self.node_name, 'IP:', self.ip, 'Port:', self.port)
         try:
             self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -83,18 +77,14 @@ class UDPSocket:
             os._exit(-1)
 
 
-        #print(cl_cyan('Waiting for a connection...'))
         while (not self.isconnected):
             try:
                 data, self.client_address = self.udp.recvfrom(self.BUFFER_SIZE)
                 self.isconnected = True
             except:
                 t=0
-        #print(cl_cyan('Connection from: '), self.client_address)
-        #print(cl_cyan('Message: '), data.decode('utf-8'))
 
         self.udp.sendto("hello KUKA".encode('utf-8'), self.client_address)
-        #print("Responded KUKA")
 
 
         timee = time.time() #For debugging purposes
@@ -112,13 +102,10 @@ class UDPSocket:
                 if len(cmd_splt) and cmd_splt[0] == 'laserScan':
                     if cmd_splt[2] == '1801':
                         self.laserScanB1.append(cmd_splt)
-                        # print(cmd_splt)
                         count = count + 1
-                        #print(count)
                     elif cmd_splt[2] == '1802':
                         self.laserScanB4.append(cmd_splt)
                         count = count + 1
-                        #print(count)
                 if len(cmd_splt) and cmd_splt[0] == 'kmp_statusdata':
                     self.kmp_statusdata = cmd_splt
                 if len(cmd_splt) and cmd_splt[0] == 'lbr_statusdata':
@@ -128,17 +115,10 @@ class UDPSocket:
 
             except:
                 t=0
-                #elapsed_time = time.time() - last_read_time
-                #if elapsed_time > 5.0:  # Didn't receive a pack in 5s
-                #  print("exception!!")
-                #  self.isconnected = False
-                #  print(cl_lightred('No packet received from iiwa for 5s!'))
 
         print("SHUTTING DOWN")
         self.udp.close()
-        #self.isconnected = False
         print(cl_lightred('Connection is closed!'))
-        #rclpy.shutdown()
 
     # Each send command runs as a thread. May need to control the maximum running time (valid time to send a command).
     def send(self, cmd):

@@ -73,7 +73,6 @@ class TCPSocket:
            print(cl_red('Error: ') + "Connection for KUKA cannot assign requested address:", self.ip, self.port)
 
         self.tcp.listen(3)
-        #print(cl_cyan('Waiting for a connection...'))
         while (not self.isconnected):
             try:
                 self.connection, client_address = self.tcp.accept()
@@ -81,8 +80,7 @@ class TCPSocket:
                 self.isconnected = True
             except:
                 t=0
-        #print(cl_cyan('Connection from: '), client_address)
-        time.sleep(1) # wait for FDI
+        time.sleep(1) 
 
         count = 0
         while self.isconnected:
@@ -112,11 +110,7 @@ class TCPSocket:
 
             except:
                 t = 0
-                # elapsed_time = time.time() - last_read_time
-                # if elapsed_time > 5.0:  # Didn't receive a pack in 5s
-                #  print("exception!!")
-                #  self.isconnected = False
-                #  print(cl_lightred('No packet received from iiwa for 5s!'))
+
 
         print("SHUTTING DOWN")
         self.connection.shutdown(socket.SHUT_RDWR)
@@ -151,7 +145,6 @@ class TCPSocket:
             msg = self.connection.recv(msglength)
             diff_msg = msglength - len(msg)
             while(diff_msg>0):
-                #print("diff_msg: " + str(diff_msg))
                 newmsg = self.connection.recv(diff_msg)
                 msg.extend(newmsg)
                 diff_msg = msglength - len(msg)

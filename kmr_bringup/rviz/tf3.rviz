@@ -8,18 +8,13 @@ Panels:
         - /Status1
         - /TF1/Tree1
         - /RobotModel1
-        - /Odometry1
+        - /RobotModel1/Links1
         - /Odometry1/Topic1
         - /Odometry1/Shape1
-        - /LaserScan1
         - /LaserScan1/Topic1
         - /LaserScan2/Topic1
-        - /Map1
-        - /PointCloud21
-        - /PointCloud22
-        - /PointCloud23
       Splitter Ratio: 0.49464285373687744
-    Tree Height: 916
+    Tree Height: 796
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -54,178 +49,19 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: true
     - Class: rviz_default_plugins/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        adapter:
-          Value: true
-        back_left_wheel_link:
-          Value: true
-        back_right_wheel_link:
-          Value: true
-        base_footprint:
-          Value: true
-        base_iiwa:
-          Value: true
-        base_link:
-          Value: true
-        base_link_middle:
-          Value: true
-        base_link_top:
-          Value: true
-        camera1_color_optical_frame_link:
-          Value: true
-        camera1_depth_optical_frame_link:
-          Value: true
-        camera2_color_optical_frame_link:
-          Value: true
-        camera2_depth_optical_frame_link:
-          Value: true
-        camera3_color_optical_frame_link:
-          Value: true
-        camera3_depth_optical_frame_link:
-          Value: true
-        d435_base_front_link:
-          Value: true
-        d435_base_left_link:
-          Value: true
-        d435_base_right_link:
-          Value: true
-        d435_manipulator_link:
-          Value: true
-        front_left_wheel_link:
-          Value: true
-        front_right_wheel_link:
-          Value: true
-        gripper_base_link:
-          Value: true
-        gripper_middle_point:
-          Value: true
-        laser_B1_link:
-          Value: true
-        laser_B4_link:
-          Value: true
-        left_inner_finger:
-          Value: true
-        left_inner_finger_pad:
-          Value: true
-        left_inner_knuckle:
-          Value: true
-        left_outer_finger:
-          Value: true
-        left_outer_knuckle:
-          Value: true
-        link_1:
-          Value: true
-        link_2:
-          Value: true
-        link_3:
-          Value: true
-        link_4:
-          Value: true
-        link_5:
-          Value: true
-        link_6:
-          Value: true
-        link_7:
-          Value: true
-        metall_plate_left_link:
-          Value: true
-        metall_plate_right_link:
-          Value: true
-        odom:
-          Value: true
-        right_inner_finger:
-          Value: true
-        right_inner_finger_pad:
-          Value: true
-        right_inner_knuckle:
-          Value: true
-        right_outer_finger:
-          Value: true
-        right_outer_knuckle:
-          Value: true
-        scan:
-          Value: true
-        scan_2:
-          Value: true
-        tool0:
-          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: false
       Tree:
-        odom:
-          base_footprint:
-            base_link:
-              back_left_wheel_link:
-                {}
-              back_right_wheel_link:
-                {}
-              base_link_middle:
-                base_link_top:
-                  base_iiwa:
-                    link_1:
-                      link_2:
-                        link_3:
-                          link_4:
-                            link_5:
-                              link_6:
-                                link_7:
-                                  adapter:
-                                    d435_manipulator_link:
-                                      {}
-                                    gripper_base_link:
-                                      gripper_middle_point:
-                                        {}
-                                      left_inner_knuckle:
-                                        {}
-                                      left_outer_knuckle:
-                                        left_outer_finger:
-                                          left_inner_finger:
-                                            left_inner_finger_pad:
-                                              {}
-                                      right_inner_knuckle:
-                                        {}
-                                      right_outer_knuckle:
-                                        right_outer_finger:
-                                          right_inner_finger:
-                                            right_inner_finger_pad:
-                                              {}
-                                  tool0:
-                                    {}
-                  d435_base_front_link:
-                    camera1_color_optical_frame_link:
-                      {}
-                    camera1_depth_optical_frame_link:
-                      {}
-                  metall_plate_left_link:
-                    d435_base_left_link:
-                      camera3_color_optical_frame_link:
-                        {}
-                      camera3_depth_optical_frame_link:
-                        {}
-                  metall_plate_right_link:
-                    d435_base_right_link:
-                      camera2_color_optical_frame_link:
-                        {}
-                      camera2_depth_optical_frame_link:
-                        {}
-              front_left_wheel_link:
-                {}
-              front_right_wheel_link:
-                {}
-              laser_B1_link:
-                scan:
-                  {}
-              laser_B4_link:
-                scan_2:
-                  {}
+        {}
       Update Interval: 0
-      Value: true
+      Value: false
     - Alpha: 1
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
@@ -283,27 +119,11 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        camera1_color_optical_frame_link:
+        d435_base_front_depth_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera1_depth_optical_frame_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        camera2_color_optical_frame_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        camera2_depth_optical_frame_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        camera3_color_optical_frame_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        camera3_depth_optical_frame_link:
+        d435_base_front_depth_optical_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -451,18 +271,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        scan:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        scan_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        tool0:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
       Name: RobotModel
       TF Prefix: ""
       Update Interval: 0
@@ -726,33 +534,33 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 30.424118041992188
+      Distance: 2.7307486534118652
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: -1.0459702014923096
+        Y: -0.212755486369133
+        Z: 1.4326225519180298
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.48979586362838745
+      Pitch: 0.31979599595069885
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.2453949451446533
+      Yaw: 0.04539438337087631
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1145
+  Height: 1025
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000002320000041ffc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d0000041f000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f0000041ffc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d0000041f000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004420000003efc0100000002fb0000000800540069006d00650100000000000004420000000000000000fb0000000800540069006d00650100000000000004500000000000000000000003f00000041f00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd000000040000000000000256000003a7fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000003a7000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f000003a7fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d000003a7000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004420000003efc0100000002fb0000000800540069006d00650100000000000004420000000000000000fb0000000800540069006d00650100000000000004500000000000000000000003cc000003a700000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Tool Properties:

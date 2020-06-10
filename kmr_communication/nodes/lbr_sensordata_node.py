@@ -90,21 +90,12 @@ class LbrSensordataNode(Node):
             effort = [float(s) for s in data.split('MeasuredTorque:')[1].split(',') if len(s)>0]
             position = [float(s) for s in data.split('JointPosition:')[1].split('MeasuredTorque:')[0].split(',') if len(s)>0]
             msg = JointState()
-            msg.header.stamp = self.getTimestamp(self.get_clock().now().nanoseconds)
+            msg.header.stamp = self.get_clock().now().to_msg()
             msg.name = self.joint_names
             msg.position = position
             msg.effort = effort
             publisher.publish(msg)
-            #if (time.time()-self.prev_time>0.3):
-            #   publisher.publish(msg)
-            #   self.prev_time = time.time()
 
-    def getTimestamp(self,nano):
-        t = nano * 10 ** -9
-        timestamp = Time()
-        timestamp.sec = math.floor(t)
-        timestamp.nanosec = int((t - timestamp.sec) * 10 ** 9)
-        return timestamp
 
 
 
@@ -118,8 +109,6 @@ def main(argv=sys.argv[1:]):
 
     rclpy.spin(lbr_sensordata_node)
 
-    #while rclpy.ok():
-    #    rclpy.spin_once(odometry_node)
     try:
         lbr_sensordata_node.destroy_node()
         rclpy.shutdown()

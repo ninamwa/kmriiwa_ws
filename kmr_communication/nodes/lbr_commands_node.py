@@ -65,8 +65,6 @@ class LbrCommandsNode(Node):
         
 
         # Make a listener for relevant topics
-        # Denne første skal nok fjernes (ble brukt før vi la på actions)
-        # sub_pathplanning = self.create_subscription(JointTrajectory, '/fake_joint_trajectory_controller/joint_trajectory', self.path_callback, qos_profile_sensor_data)
         sub_manipulator_vel = self.create_subscription(String, 'manipulator_vel', self.manipulatorVel_callback, 10)
         sub_shutdown = self.create_subscription(String, 'shutdown', self.shutdown_callback, 10)
         sub_statusdata=self.create_subscription(LbrStatusdata, 'lbr_statusdata', self.status_callback, 10,callback_group=self.callback_group)
@@ -99,7 +97,6 @@ class LbrCommandsNode(Node):
         self.soc.send(msg)
 
     def move_manipulator_callback(self, goal_handle):
-        #print(goal_handle.request.path)
         self.path_callback(goal_handle.request.path)
         self.done_moving = False
         while (not self.done_moving):
@@ -140,9 +137,6 @@ def main(argv=sys.argv[1:]):
 
     executor = MultiThreadedExecutor()
     rclpy.spin(lbr_commands_node, executor)
-
-
-    #rclpy.spin(lbr_commands_node)
 
     try:
         lbr_commands_node.destroy_node()
